@@ -1,5 +1,5 @@
 
-Disaster Radio is a work-in-progres long-range, low-bandwidth wireless disaster recovery mesh network powered by the sun.
+Disaster Radio is a work-in-progress long-range, low-bandwidth wireless disaster recovery mesh network powered by the sun.
 
 * `firmware/` is the ESP8266 firmware
 * `web/` is the web app served up by the ESP8266
@@ -12,6 +12,8 @@ The `web/` dir includes a simulator server that presents the same API as the ESP
 ./fetch_deps.sh # download dependencies
 cp settings.mk.example settings.mk # create initial personal settings file
 ```
+
+Then edit `settings.mk` to suit your needs.
 
 # Building firmware
 
