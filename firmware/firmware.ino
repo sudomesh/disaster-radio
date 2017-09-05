@@ -1,12 +1,10 @@
 #include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
-#include <ArduinoOTA.h>
 #include <FS.h>
 #include <Hash.h>
+#include <SPI.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <SPIFFSEditor.h>
-#include <SPI.h>
 #include <LoRa.h>
 
 // This is just a slightly modified version of the
@@ -115,26 +113,6 @@ void setup(){
   }
   */
 
-  //Send OTA events to the browser
-  ArduinoOTA.onStart([]() { events.send("Update Start", "ota"); });
-  ArduinoOTA.onEnd([]() { events.send("Update End", "ota"); });
-  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    char p[32];
-    sprintf(p, "Progress: %u%%\n", (progress/(total/100)));
-    events.send(p, "ota");
-  });
-  ArduinoOTA.onError([](ota_error_t error) {
-    if(error == OTA_AUTH_ERROR) events.send("Auth Failed", "ota");
-    else if(error == OTA_BEGIN_ERROR) events.send("Begin Failed", "ota");
-    else if(error == OTA_CONNECT_ERROR) events.send("Connect Failed", "ota");
-    else if(error == OTA_RECEIVE_ERROR) events.send("Recieve Failed", "ota");
-    else if(error == OTA_END_ERROR) events.send("End Failed", "ota");
-  });
-  ArduinoOTA.setHostname(hostName);
-  ArduinoOTA.begin();
-
-  MDNS.addService("http","tcp",80);
-
   SPIFFS.begin();
 
   ws.onEvent(onWsEvent);
@@ -215,45 +193,9 @@ void setup(){
   });
   server.begin();
 
-
-  digitalWrite(SS, HIGH);
-  SPI.begin();
-  SPI.setFrequency(50000);
 }
 
-int mcount = 0;
-int ecount = 0;
-char last = 0;
+
 void loop(){
-  ArduinoOTA.handle();
-
-  char c;
-  char b;
-
-  // enable Slave Select
-  digitalWrite(SS, LOW);    // SS is pin 10
-
-  // send test string
-  for (const char * p = "Hello, world!\n" ; c = *p; p++) {
-    b = SPI.transfer (c);
-    mcount++;
-    delayMicroseconds (100);
-    if(b > 1 && (b != (last + 1))) {
-    
-      ecount++;
-    }
-    if(b == 0) {
-      ecount++;
-    }
-    
-    last = b;
-  }
-  if(mcount >= 2000) {
-    Serial.printf("tick: %d, %d\n", mcount, ecount);
-    mcount = 0;
-    ecount = 0;
-  }
-  // disable Slave Select
-  digitalWrite(SS, HIGH);
 
 }

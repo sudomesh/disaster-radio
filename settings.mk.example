@@ -1,0 +1,2 @@
+
+UPLOAD_PORT = /dev/ttyUSB0 # port where ESP8266 is connected
