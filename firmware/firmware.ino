@@ -1,16 +1,17 @@
 #include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
 #include <FS.h>
 #include <Hash.h>
-#include <SPI.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <SPIFFSEditor.h>
+#include <SPI.h>
 #include <LoRa.h>
 
 // This is just a slightly modified version of the
 // official ESPAsyncWebserver example
-// Where SPI has been added to talk to an arduino running the
-// arduino_spi_test code
+// Where the SetSpread example has been added 
+// from the LoRa library examples 
 
 // SKETCH BEGIN
 AsyncWebServer server(80);
@@ -96,6 +97,14 @@ const char * hostName = "esp-async";
 const char* http_username = "admin";
 const char* http_password = "admin";
 
+const int csPin = 15;          // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
+const int resetPin = 5;       // LoRa radio reset ,GPIO5 = D1
+const int irqPin = 4;        // interrupt pin for receive callback?, GPIO4 = D2
+
+byte msgCount = 0;            // count of outgoing messages
+int interval = 2000;          // interval between sends
+long lastSendTime = 0; // time of last packet send
+
 void setup(){
   Serial.begin(115200);
   Serial.setDebugOutput(true);
@@ -112,6 +121,8 @@ void setup(){
     WiFi.begin(ssid, password);
   }
   */
+
+  MDNS.addService("http","tcp",80);
 
   SPIFFS.begin();
 
@@ -193,9 +204,59 @@ void setup(){
   });
   server.begin();
 
+  Serial.println("LoRa Duplex - Set spreading factor");
+
+  // override the default CS, reset, and IRQ pins (optional)
+  LoRa.setPins(csPin, resetPin, irqPin); // set CS, reset, IRQ pin
+
+  if (!LoRa.begin(915E6)) {             // initialize ratio at 915 MHz
+    Serial.println("LoRa init failed. Check your connections.");
+    while (true);                       // if failed, do nothing
+  }
+
+  LoRa.setSpreadingFactor(12);           // ranges from 6-12,default 7 see API docs
+  Serial.println("LoRa init succeeded.");
 }
 
-
+int mcount = 0;
+int ecount = 0;
+char last = 0;
 void loop(){
 
+  if (millis() - lastSendTime > interval) {
+    String message = "HeLoRa World! ";   // send a message
+    message += msgCount;
+    sendMessage(message);
+    Serial.println("Sending " + message);
+    lastSendTime = millis();            // timestamp the message
+    interval = random(2000) + 1000;    // 2-3 seconds
+    msgCount++;
+  }
+
+  // parse for a packet, and call onReceive with the result:
+  onReceive(LoRa.parsePacket());
+
+}
+
+void sendMessage(String outgoing) {
+  LoRa.beginPacket();                   // start packet
+  LoRa.print(outgoing);                 // add payload
+  LoRa.endPacket();                     // finish packet and send it
+  msgCount++;                           // increment message ID
+}
+
+void onReceive(int packetSize) {
+  if (packetSize == 0) return;          // if there's no packet, return
+
+  // read packet header bytes:
+  String incoming = "";
+
+  while (LoRa.available()) {
+    incoming += (char)LoRa.read();
+  }
+
+  Serial.println("Message: " + incoming);
+  Serial.println("RSSI: " + String(LoRa.packetRssi()));
+  Serial.println("Snr: " + String(LoRa.packetSnr()));
+  Serial.println();
 }
