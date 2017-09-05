@@ -1,0 +1,42 @@
+{
+  "name": "disaster-radio",
+  "version": "0.0.1",
+  "scripts": {
+    "build-js": "bin/build.js",
+    "watch-js": "bin/build.js -d",
+    "hot-js": "bin/build.js -d --hot",
+    "build-css": "gulp build:css",
+    "watch-css": "gulp watch:css",
+    "build": "gulp build",
+    "watch": "gulp watch",
+    "hot": "gulp hot",
+    "dev": "bin/dev.js",
+    "start": "bin/cmd.js",
+    "clean": "rm static/build/*"
+  },
+  "dependencies": {
+    "babel-preset-react-hmre": "^1.1.1",
+    "ecstatic": "^2.2.1",
+    "minimist": "^1.2.0",
+    "routes": "^2.1.0",
+    "ws": "^3.1.0"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babelify": "^7.3.0",
+    "browserify": "^14.4.0",
+    "browserify-hmr": "^0.3.5",
+    "byline": "^5.0.0",
+    "colors": "^1.1.2",
+    "gulp": "^3.9.1",
+    "gulp-inline-source": "^3.1.0",
+    "gulp-sass": "^3.1.0",
+    "less": "^2.7.2",
+    "preact": "^8.2.1",
+    "watchify": "^3.9.0",
+    "purecss": "^1.0.0",
+    "gulp-gzip": "^1.4.0"
+  },
+  "license": "AGPL-3.0"
+}
