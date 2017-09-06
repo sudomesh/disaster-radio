@@ -1,5 +1,4 @@
 #include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
 #include <FS.h>
 #include <Hash.h>
 #include <ESPAsyncTCP.h>
@@ -122,8 +121,6 @@ void setup(){
   }
   */
 
-  MDNS.addService("http","tcp",80);
-
   SPIFFS.begin();
 
   ws.onEvent(onWsEvent);
@@ -218,6 +215,30 @@ void setup(){
   Serial.println("LoRa init succeeded.");
 }
 
+void onReceive(int packetSize) {
+  if (packetSize == 0) return;          // if there's no packet, return
+
+  // read packet header bytes:
+  String incoming = "";
+
+  while (LoRa.available()) {
+    incoming += (char)LoRa.read();
+  }
+
+  Serial.println("Message: " + incoming);
+  Serial.println("RSSI: " + String(LoRa.packetRssi()));
+  Serial.println("Snr: " + String(LoRa.packetSnr()));
+  Serial.println();
+}
+
+
+void sendMessage(String outgoing) {
+  LoRa.beginPacket();                   // start packet
+  LoRa.print(outgoing);                 // add payload
+  LoRa.endPacket();                     // finish packet and send it
+  msgCount++;                           // increment message ID
+}
+
 int mcount = 0;
 int ecount = 0;
 char last = 0;
@@ -236,27 +257,4 @@ void loop(){
   // parse for a packet, and call onReceive with the result:
   onReceive(LoRa.parsePacket());
 
-}
-
-void sendMessage(String outgoing) {
-  LoRa.beginPacket();                   // start packet
-  LoRa.print(outgoing);                 // add payload
-  LoRa.endPacket();                     // finish packet and send it
-  msgCount++;                           // increment message ID
-}
-
-void onReceive(int packetSize) {
-  if (packetSize == 0) return;          // if there's no packet, return
-
-  // read packet header bytes:
-  String incoming = "";
-
-  while (LoRa.available()) {
-    incoming += (char)LoRa.read();
-  }
-
-  Serial.println("Message: " + incoming);
-  Serial.println("RSSI: " + String(LoRa.packetRssi()));
-  Serial.println("Snr: " + String(LoRa.packetSnr()));
-  Serial.println();
 }
