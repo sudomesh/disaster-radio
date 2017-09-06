@@ -17,6 +17,7 @@
   "dependencies": {
     "babel-preset-react-hmre": "^1.1.1",
     "ecstatic": "^2.2.1",
+    "gulp-cssimport": "^6.0.0",
     "minimist": "^1.2.0",
     "routes": "^2.1.0",
     "ws": "^3.1.0"
