@@ -1,0 +1,4 @@
+esp8266-arduino/
+libs/
+settings.mk
+web/node_modules/
