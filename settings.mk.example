@@ -1,2 +1,16 @@
 
-UPLOAD_PORT = /dev/ttyUSB0 # port where ESP8266 is connected
+ # port where ESP8266 is connected
+UPLOAD_PORT = /dev/ttyUSB0
+
+# speed to use for uploading to ESP8266
+UPLOAD_SPEED = 115200
+
+# to list possible boards use: make list_boards
+BOARD = d1_mini
+
+# reset method used to reset the board
+# can be: none, ck, nodemcu or wifio
+#UPLOAD_RESET = nodemcu
+
+# Flash size and portion of flash taken by spiffs
+#FLASH_DEF = 4M3M
