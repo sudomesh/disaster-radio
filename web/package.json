@@ -35,8 +35,7 @@
     "less": "^2.7.2",
     "preact": "^8.2.1",
     "watchify": "^3.9.0",
-    "purecss": "^1.0.0",
-    "gulp-gzip": "^1.4.0"
+    "purecss": "^1.0.0"
   },
   "license": "AGPL-3.0"
 }

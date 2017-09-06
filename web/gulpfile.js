@@ -3,7 +3,6 @@
 var gulp = require('gulp');
 var sass = require('gulp-sass');
 var inlineSource = require('gulp-inline-source');
-var gzip = require('gulp-gzip');
 var js = require('./bin/build.js');
 
 gulp.task('build:js', js.build); 
@@ -16,7 +15,6 @@ gulp.task('hot:js', js.hot);
 gulp.task('build:css', function() {
   return gulp.src('./src/css/*.scss')
     .pipe(sass().on('error', sass.logError))
-    .pipe(gzip())
     .pipe(gulp.dest('./static/build'));
 });
  
