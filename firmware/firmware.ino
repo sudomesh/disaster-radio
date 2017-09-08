@@ -17,6 +17,73 @@ AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 AsyncEventSource events("/events");
 
+byte mac[6];
+char ssid[32] = "DisasterRadio ";
+//const char* password = "*******";
+const char * hostName = "esp-async";
+const char* http_username = "admin";
+const char* http_password = "admin";
+
+const int csPin = 15;          // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
+const int resetPin = 5;       // LoRa radio reset ,GPIO5 = D1
+const int irqPin = 4;        // interrupt pin for receive callback?, GPIO4 = D2
+
+String outgoing;              // outgoing message
+byte msgCount = 0;            // count of outgoing messages
+byte localAddress;     // assigned to last two of mac address in setup
+byte destination = 0xFF;      // destination to send to
+int interval = 2000;          // interval between sends
+long lastSendTime = 0; // time of last packet send
+
+void onReceive(int packetSize) {
+  if (packetSize == 0) return;          // if there's no packet, return
+
+  // read packet header bytes:
+  int recipient = LoRa.read();          // recipient address
+  byte sender = LoRa.read();            // sender address
+  byte incomingMsgId = LoRa.read();     // incoming msg ID
+  byte incomingLength = LoRa.read();    // incoming msg length
+
+  String incoming = "";                 // payload of packet
+
+  while (LoRa.available()) {            // can't use readString() in callback, so
+    incoming += (char)LoRa.read();      // add bytes one by one
+  }
+
+  if (incomingLength != incoming.length()) {   // check length for error
+    Serial.println("error: message length does not match length");
+    return;                             // skip rest of function
+  }
+
+  // if the recipient isn't this device or broadcast,
+  if (recipient != localAddress && recipient != 0xFF) {
+    Serial.println("This message is not for me.");
+    return;                             // skip rest of function
+  }
+
+  // if message is for this device, or broadcast, print details:
+  Serial.println("Received from: 0x" + String(sender, HEX));
+  Serial.println("Sent to: 0x" + String(recipient, HEX));
+  Serial.println("Message ID: " + String(incomingMsgId));
+  Serial.println("Message length: " + String(incomingLength));
+  Serial.println("Message: " + incoming);
+  Serial.println("RSSI: " + String(LoRa.packetRssi()));
+  Serial.println("Snr: " + String(LoRa.packetSnr()));
+  Serial.println();
+}
+
+
+void sendMessage(String outgoing) {
+  LoRa.beginPacket();                   // start packet
+  LoRa.write(destination);              // add destination address
+  LoRa.write(localAddress);             // add sender address
+  LoRa.write(msgCount);                 // add message ID
+  LoRa.write(outgoing.length());        // add payload length
+  LoRa.print(outgoing);                 // add payload
+  LoRa.endPacket();                     // finish packet and send it
+  msgCount++;                           // increment message ID
+}
+
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
   if(type == WS_EVT_CONNECT){
     Serial.printf("ws[%s][%u] connect\n", server->url(), client->id());
@@ -46,7 +113,10 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
           msg += buff ;
         }
       }
-      Serial.printf("%s\n",msg.c_str());
+      //Serial.printf("%s\n",msg.c_str());
+      sendMessage(msg);
+      Serial.println("Sending " + msg);
+      LoRa.receive();
 
       if(info->opcode == WS_TEXT)
         client->text("I got your text message");
@@ -90,61 +160,37 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 }
 
 
-const char* ssid = "DisasterRadio duino";
-//const char* password = "*******";
-const char * hostName = "esp-async";
-const char* http_username = "admin";
-const char* http_password = "admin";
-
-const int csPin = 15;          // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
-const int resetPin = 5;       // LoRa radio reset ,GPIO5 = D1
-const int irqPin = 4;        // interrupt pin for receive callback?, GPIO4 = D2
-
-byte msgCount = 0;            // count of outgoing messages
-int interval = 2000;          // interval between sends
-long lastSendTime = 0; // time of last packet send
-
 void setup(){
   Serial.begin(115200);
   Serial.setDebugOutput(true);
+  char macaddr[14];
+  WiFi.macAddress(mac);
+  //this could be done more loopy, but it works
+  sprintf(macaddr, "%02x:%02x:%02x:%02x:%02x:%02x", mac[5], mac[4], mac[3], mac[2], mac[1], mac [0]);
+  strcat(ssid, macaddr);
   WiFi.hostname(hostName);
   //WiFi.mode(WIFI_AP_STA);
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ssid);
-  /*
-  WiFi.begin(ssid, password);
-  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.printf("STA: Failed!\n");
-    WiFi.disconnect(false);
-    delay(1000);
-    WiFi.begin(ssid, password);
-  }
-  */
 
   if (SPIFFS.begin()) {
-
-    Serial.println("ok");
-
+    Serial.printf("ok\n");
     if (SPIFFS.exists("/index.html")) {
-
-      Serial.println("The file exists!");
+      Serial.printf("The file exists!\n");
       File f = SPIFFS.open("/index.html", "r");
-
       if (!f) {
-        Serial.println("Some thing went wrong trying to open the file...");
+        Serial.printf("Some thing went wrong trying to open the file...\n");
       }
       else {
-
         int s = f.size();
         Serial.printf("Size=%d\r\n", s);
         String data = f.readString();
         Serial.println(data);
-
         f.close();
       }
     }
     else {
-      Serial.println("No such file found.");
+      Serial.printf("No such file found.\n");
     }
   }
 
@@ -228,6 +274,8 @@ void setup(){
 
   Serial.println("LoRa Duplex - Set spreading factor");
 
+  localAddress = mac[0];
+
   // override the default CS, reset, and IRQ pins (optional)
   LoRa.setPins(csPin, resetPin, irqPin); // set CS, reset, IRQ pin
 
@@ -237,38 +285,19 @@ void setup(){
   }
 
   LoRa.setSpreadingFactor(12);           // ranges from 6-12,default 7 see API docs
-  Serial.println("LoRa init succeeded.");
+  LoRa.onReceive(onReceive);
+  LoRa.receive();
+  Serial.printf("LoRa init succeeded.\n");
+  Serial.printf("local address: ");
+  Serial.println(localAddress, HEX);
+  Serial.print(macaddr);
 }
 
-void onReceive(int packetSize) {
-  if (packetSize == 0) return;          // if there's no packet, return
-
-  // read packet header bytes:
-  String incoming = "";
-
-  while (LoRa.available()) {
-    incoming += (char)LoRa.read();
-  }
-
-  Serial.println("Message: " + incoming);
-  Serial.println("RSSI: " + String(LoRa.packetRssi()));
-  Serial.println("Snr: " + String(LoRa.packetSnr()));
-  Serial.println();
-}
-
-
-void sendMessage(String outgoing) {
-  LoRa.beginPacket();                   // start packet
-  LoRa.print(outgoing);                 // add payload
-  LoRa.endPacket();                     // finish packet and send it
-  msgCount++;                           // increment message ID
-}
-
-int mcount = 0;
+/*int mcount = 0;
 int ecount = 0;
 char last = 0;
-void loop(){
 
+void beaconMode(){
   if (millis() - lastSendTime > interval) {
     String message = "HeLoRa World! ";   // send a message
     message += msgCount;
@@ -278,8 +307,8 @@ void loop(){
     interval = random(2000) + 1000;    // 2-3 seconds
     msgCount++;
   }
+}*/
 
-  // parse for a packet, and call onReceive with the result:
-  onReceive(LoRa.parsePacket());
-
+void loop(){
+  //everything is done in callbacks
 }
