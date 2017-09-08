@@ -1,4 +1,10 @@
-esp8266-arduino/
-libs/
+~*
+esp8266-arduino/**
+libs/**
 settings.mk
-web/node_modules/
+web/settings.js
+web/static/build/*.js
+web/static/build/*.css
+web/static/build/*.gz
+
+
