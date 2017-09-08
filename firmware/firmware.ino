@@ -121,7 +121,32 @@ void setup(){
   }
   */
 
-  SPIFFS.begin();
+  if (SPIFFS.begin()) {
+
+    Serial.println("ok");
+
+    if (SPIFFS.exists("/index.html")) {
+
+      Serial.println("The file exists!");
+      File f = SPIFFS.open("/index.html", "r");
+
+      if (!f) {
+        Serial.println("Some thing went wrong trying to open the file...");
+      }
+      else {
+
+        int s = f.size();
+        Serial.printf("Size=%d\r\n", s);
+        String data = f.readString();
+        Serial.println(data);
+
+        f.close();
+      }
+    }
+    else {
+      Serial.println("No such file found.");
+    }
+  }
 
   ws.onEvent(onWsEvent);
   server.addHandler(&ws);
@@ -137,7 +162,7 @@ void setup(){
     request->send(200, "text/plain", String(ESP.getFreeHeap()));
   });
 
-  server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.htm");
+  server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
 
   server.onNotFound([](AsyncWebServerRequest *request){
     Serial.printf("NOT_FOUND: ");

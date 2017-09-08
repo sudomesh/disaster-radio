@@ -3,10 +3,12 @@
 UPLOAD_PORT = /dev/ttyUSB0
 
 # speed to use for uploading to ESP8266
-UPLOAD_SPEED = 115200
+UPLOAD_SPEED = 921600 
 
 # to list possible boards use: make list_boards
 BOARD = d1_mini
+
+FS_DIR = web/static/
 
 # reset method used to reset the board
 # can be: none, ck, nodemcu or wifio
