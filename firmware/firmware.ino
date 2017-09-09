@@ -60,6 +60,11 @@ void onReceive(int packetSize) {
     Serial.println("This message is not for me.");
     return;                             // skip rest of function
   }
+  char text[20] = "You got a message: ";
+  char msg[100];
+  incoming.toCharArray(msg, incomingLength);
+  strcat(text, msg);
+  ws.textAll((char*)text);
 
   // if message is for this device, or broadcast, print details:
   Serial.println("Received from: 0x" + String(sender, HEX));
@@ -113,15 +118,15 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
           msg += buff ;
         }
       }
-      //Serial.printf("%s\n",msg.c_str());
+
       sendMessage(msg);
       Serial.println("Sending " + msg);
       LoRa.receive();
 
       if(info->opcode == WS_TEXT)
-        client->text("I got your text message");
+        client->text("Your message was broadcast");
       else
-        client->binary("I got your binary message");
+        client->binary("Your binary message was broadcast");
     } else {
       //message is comprised of multiple frames or the frame is split into multiple packets
       if(info->index == 0){
