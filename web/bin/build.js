@@ -39,8 +39,7 @@ function build(opts) {
     b.bundle()
 
       .on('error', function(err) {
-        beep();
-        if(err instanceof SyntaxError) {
+        if(err instanceof SyntaxError && err.message.match(/while parsing file/)) {
           // Format syntax error messages nicely
           var re = new RegExp(err.filename+'\:? ?');
           var msg = err.message.replace(re, '');
@@ -57,6 +56,7 @@ function build(opts) {
         } else {
           console.error(err);
         }
+
       })
     
       .pipe(outStream);

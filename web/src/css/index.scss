@@ -2,5 +2,51 @@
 @import "../../node_modules/purecss/build/pure-min.css";
 
 body {
+    font-family: sans-serif;
+    margin: 20px;
+}
 
+.noselect {
+  -webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+
+#chat {
+    width: 630px;
+    height: 470px;
+    background-color: black;
+    color: #0fba00;
+    font-family: monospace;
+    font-size: 14px;
+    padding: 5px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#chat .remote {
+    color: #ffffff;
+}
+
+#chat .unsent {
+    color: #303030;
+}
+
+#chat .status {
+    color: #ba0f00;
+}
+
+#chatInput {
+    width: 618px;
+    padding: 5px;
+    display: block;
+    color: #0fba00;
+    font-family: monospace;
+    font-size: 14px;
+    background-color: black;
+    border: 0;
+    border-top: 1px solid gray;
 }

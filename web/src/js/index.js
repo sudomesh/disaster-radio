@@ -1,9 +1,10 @@
 
-import {h, render, Component, createElement} from 'preact'
-import Chat from './chat.js'
-import app from './app.js'
+import {h, render, Component as PreactComponent} from 'preact'
 import Socket from './socket.js'
+import ashnazg from 'ashnazg'
 
+const Component = ashnazg(PreactComponent)
+var Chat = require('./chat.js')(Component)
 
 function renderAll() {
   var container = document.getElementById('container');
@@ -18,9 +19,7 @@ function renderAll() {
 
 
 function init() {
-  app.socket = new Socket('/ws', function(msg) {
-    console.log("GOT:", msg);
-  });
+  app.socket = new Socket('/ws', {debug: true});
 
   app.socket.connect(function(err, isConnected) {
 

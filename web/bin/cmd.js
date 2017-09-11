@@ -28,6 +28,7 @@ var argv = minimist(process.argv.slice(2), {
 var settings = require(argv.settings);
 settings.home = argv.home || settings.home;
 settings.port = argv.port || settings.port;
+settings.msgIDLength = settings.msgIDLength || 8;
 
 var staticFiles = ecstatic({
   root: path.join(settings.home, 'static'),
@@ -53,8 +54,19 @@ var wsServer = new WebSocket.Server({
 
 wsServer.on('connection', function(ws, req) {
  
-  wsServer.on('message', function(message) {
-    console.log('received: %s', message);
+  ws.on('message', function(message) {
+
+    console.log('received: %s', message.toString('utf8'));
+
+    // send ACK
+
+    var msgID = message.slice(0, settings.msgIDLength);
+    var msg = Buffer.concat([msgID, Buffer.from('!', 'utf8')]);
+
+    ws.send(msg, {
+      compress: false,
+      binary: true
+    });
   });
  
 });

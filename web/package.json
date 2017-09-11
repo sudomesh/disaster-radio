@@ -15,7 +15,6 @@
     "clean": "rm static/build/*"
   },
   "dependencies": {
-    "babel-preset-react-hmre": "^1.1.1",
     "ecstatic": "^2.2.1",
     "gulp-cssimport": "^6.0.0",
     "minimist": "^1.2.0",
@@ -23,8 +22,11 @@
     "ws": "^3.1.0"
   },
   "devDependencies": {
+    "ashnazg": "0.0.5",
+    "arraybuffer-to-buffer": "0.0.4",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
+    "babel-preset-react-hmre": "^1.1.1",
     "babelify": "^7.3.0",
     "browserify": "^14.4.0",
     "browserify-hmr": "^0.3.5",
@@ -35,8 +37,8 @@
     "gulp-sass": "^3.1.0",
     "less": "^2.7.2",
     "preact": "^8.2.1",
-    "watchify": "^3.9.0",
-    "purecss": "^1.0.0"
+    "purecss": "^1.0.0",
+    "watchify": "^3.9.0"
   },
   "license": "AGPL-3.0"
 }
