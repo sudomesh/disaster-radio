@@ -3,7 +3,6 @@ var arrayBufferToBuffer = require('arraybuffer-to-buffer');
 
 module.exports = function(uriPath, opts) {
   opts = opts || {};
-  opts.msgIDLength = 8
   this.opts = opts;
   
 
@@ -19,13 +18,18 @@ module.exports = function(uriPath, opts) {
   this._listeners = [];
   this._sentCallbacks = {};
 
-  this._id = function(len) {
-    len = len || this.opts.msgIDLength;
-    var b = Buffer.alloc(len);
-    var i;
-    for(i=0; i < len; i++) {
-      b[i] = Math.floor(Math.random() * 256);
+  this.curId = 0;
+
+  this._id = function() {
+    var b = Buffer.alloc(2);
+    b.writeUInt16LE(this.curId);
+
+    if(this.curId >= (Math.pow(2, 16) - 1)) {
+      this.curId = 0;
+    } else {
+      this.curId++;
     }
+
     return b;
   }
 
@@ -61,13 +65,14 @@ module.exports = function(uriPath, opts) {
     }
     var data = arrayBufferToBuffer(event.data);
 
-    if(data.length <= this.opts.msgIDLength) {
+    // is the message shorter than the message ID?
+    if(data.length <= 2) {
       console.warn("Received invalid message (too short)");
       return;
     }
 
-    var id = data.slice(0, this.opts.msgIDLength);
-    data = data.slice(this.opts.msgIDLength);
+    var id = data.slice(0, 2);
+    data = data.slice(2);
 
     if(opts.debug) console.log("[websocket rx]", this._toHex(id), data.toString('utf8'))
 

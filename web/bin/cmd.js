@@ -28,7 +28,6 @@ var argv = minimist(process.argv.slice(2), {
 var settings = require(argv.settings);
 settings.home = argv.home || settings.home;
 settings.port = argv.port || settings.port;
-settings.msgIDLength = settings.msgIDLength || 8;
 
 var staticFiles = ecstatic({
   root: path.join(settings.home, 'static'),
@@ -60,7 +59,7 @@ wsServer.on('connection', function(ws, req) {
 
     // send ACK
 
-    var msgID = message.slice(0, settings.msgIDLength);
+    var msgID = message.slice(0, 2);
     var msg = Buffer.concat([msgID, Buffer.from('!', 'utf8')]);
 
     ws.send(msg, {

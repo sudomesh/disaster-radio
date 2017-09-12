@@ -13,7 +13,7 @@ module.exports = function(Component) {
     
 	  render() {
 		  return <div>
-        <span class="unsent">{this.props.txt}</span>
+        <span>{this.props.txt}</span>
       </div>
 
 	  }

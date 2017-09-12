@@ -19,7 +19,7 @@ module.exports = {
         return cb();
       }
     }
-
+    // <16 bytes random id><single byte msg type / namespace>|<actual message>
     app.socket.send('c', msg, function(err) {
       if(err) {
         console.error("Failed to send:", err) // TODO handle better
