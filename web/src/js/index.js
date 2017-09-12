@@ -4,7 +4,7 @@ import Socket from './socket.js'
 import ashnazg from 'ashnazg'
 
 const Component = ashnazg(PreactComponent)
-var Chat = require('./chat.js')(Component)
+var Chat = require('./components/chat.js')(Component)
 
 function renderAll() {
   var container = document.getElementById('container');
@@ -14,7 +14,7 @@ function renderAll() {
     replace = container.children[0];
   }
 
-  render(<Chat />, container, replace);
+  render(<Chat state />, container, replace);
 }
 
 
@@ -28,6 +28,8 @@ function init() {
 
   });
   
+  app.actions = require('./actions/index');
+
   renderAll();
 }
 

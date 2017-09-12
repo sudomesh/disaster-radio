@@ -78,7 +78,7 @@ module.exports = function(uriPath, opts) {
         console.warn("Got ACK for unknown message ID");
         return;
       }
-      
+
       clearTimeout(sentCb.timeout);
       sentCb.callback();
 
