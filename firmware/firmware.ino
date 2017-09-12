@@ -30,8 +30,8 @@ const int irqPin = 4;        // interrupt pin for receive callback?, GPIO4 = D2
 
 String outgoing;              // outgoing message
 byte msgCount = 0;            // count of outgoing messages
-byte localAddress;     // assigned to last two of mac address in setup
-byte destination = 0xFF;      // destination to send to
+byte localAddress;     // assigned to last byte of mac address in setup
+byte destination = 0xFF;      // destination to send to default broadcast
 int interval = 2000;          // interval between sends
 long lastSendTime = 0; // time of last packet send
 
@@ -51,30 +51,32 @@ void onReceive(int packetSize) {
   }
 
   if (incomingLength != incoming.length()) {   // check length for error
-    Serial.println("error: message length does not match length");
+    Serial.printf("error: message length does not match length\r\n");
     return;                             // skip rest of function
   }
 
   // if the recipient isn't this device or broadcast,
   if (recipient != localAddress && recipient != 0xFF) {
-    Serial.println("This message is not for me.");
+    Serial.printf("This message is not for me.\r\n");
     return;                             // skip rest of function
   }
+
+  // if message is for this device, or broadcast, print details:
+  Serial.printf("Received from: 0x%02x/r/n", sender);
+  Serial.printf("Sent to: 0x%02x/r/n", recipient);
+  Serial.printf("Message ID: %d/r/n", incomingMsgId);
+  Serial.printf("Message length: %d/r/n", incomingLength);
+  Serial.printf("Message: %s/r/n", incoming.c_str());
+  Serial.printf("RSSI: %f/r/n", LoRa.packetRssi());
+  Serial.printf("Snr: %f/r/n", LoRa.packetSnr());
+
   char text[20] = "You got a message: ";
   char msg[100];
   incoming.toCharArray(msg, incomingLength);
   strcat(text, msg);
-  ws.textAll((char*)text);
+  // TODO send message to websocket chat
+  //ws.textAll((char*)text);
 
-  // if message is for this device, or broadcast, print details:
-  Serial.println("Received from: 0x" + String(sender, HEX));
-  Serial.println("Sent to: 0x" + String(recipient, HEX));
-  Serial.println("Message ID: " + String(incomingMsgId));
-  Serial.println("Message length: " + String(incomingLength));
-  Serial.println("Message: " + incoming);
-  Serial.println("RSSI: " + String(LoRa.packetRssi()));
-  Serial.println("Snr: " + String(LoRa.packetSnr()));
-  Serial.println();
 }
 
 
@@ -91,15 +93,15 @@ void sendMessage(String outgoing) {
 
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
   if(type == WS_EVT_CONNECT){
-    Serial.printf("ws[%s][%u] connect\n", server->url(), client->id());
+    Serial.printf("ws[%s][%u] connect\r\n", server->url(), client->id());
     client->printf("Hello Client %u :)", client->id());
     client->ping();
   } else if(type == WS_EVT_DISCONNECT){
-    Serial.printf("ws[%s][%u] disconnect: %u\n", server->url(), client->id());
+    Serial.printf("ws[%s][%u] disconnect: %u\r\n", server->url(), client->id());
   } else if(type == WS_EVT_ERROR){
-    Serial.printf("ws[%s][%u] error(%u): %s\n", server->url(), client->id(), *((uint16_t*)arg), (char*)data);
+    Serial.printf("ws[%s][%u] error(%u): %s\r\n", server->url(), client->id(), *((uint16_t*)arg), (char*)data);
   } else if(type == WS_EVT_PONG){
-    Serial.printf("ws[%s][%u] pong[%u]: %s\n", server->url(), client->id(), len, (len)?(char*)data:"");
+    Serial.printf("ws[%s][%u] pong[%u]: %s\r\n", server->url(), client->id(), len, (len)?(char*)data:"");
   } else if(type == WS_EVT_DATA){
     AwsFrameInfo * info = (AwsFrameInfo*)arg;
     String msg = "";
@@ -120,19 +122,22 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       }
 
       sendMessage(msg);
-      Serial.println("Sending " + msg);
+      Serial.printf("Sending %s\r\n", msg.c_str());
       LoRa.receive();
 
+      /*
       if(info->opcode == WS_TEXT)
         client->text("Your message was broadcast");
       else
         client->binary("Your binary message was broadcast");
-    } else {
+      */
+    } 
+    else {
       //message is comprised of multiple frames or the frame is split into multiple packets
       if(info->index == 0){
         if(info->num == 0)
-          Serial.printf("ws[%s][%u] %s-message start\n", server->url(), client->id(), (info->message_opcode == WS_TEXT)?"text":"binary");
-        Serial.printf("ws[%s][%u] frame[%u] start[%llu]\n", server->url(), client->id(), info->num, info->len);
+          Serial.printf("ws[%s][%u] %s-message start\r\n", server->url(), client->id(), (info->message_opcode == WS_TEXT)?"text":"binary");
+        Serial.printf("ws[%s][%u] frame[%u] start[%llu]\r\n", server->url(), client->id(), info->num, info->len);
       }
 
       Serial.printf("ws[%s][%u] frame[%u] %s[%llu - %llu]: ", server->url(), client->id(), info->num, (info->message_opcode == WS_TEXT)?"text":"binary", info->index, info->index + len);
@@ -148,12 +153,12 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
           msg += buff ;
         }
       }
-      Serial.printf("%s\n",msg.c_str());
+      Serial.printf("%s\r\n",msg.c_str());
 
       if((info->index + len) == info->len){
-        Serial.printf("ws[%s][%u] frame[%u] end[%llu]\n", server->url(), client->id(), info->num, info->len);
+        Serial.printf("ws[%s][%u] frame[%u] end[%llu]\r\n", server->url(), client->id(), info->num, info->len);
         if(info->final){
-          Serial.printf("ws[%s][%u] %s-message end\n", server->url(), client->id(), (info->message_opcode == WS_TEXT)?"text":"binary");
+          Serial.printf("ws[%s][%u] %s-message end\r\n", server->url(), client->id(), (info->message_opcode == WS_TEXT)?"text":"binary");
           if(info->message_opcode == WS_TEXT)
             client->text("I got your text message");
           else
@@ -179,23 +184,23 @@ void setup(){
   WiFi.softAP(ssid);
 
   if (SPIFFS.begin()) {
-    Serial.printf("ok\n");
+    Serial.print("ok\r\n");
     if (SPIFFS.exists("/index.html")) {
-      Serial.printf("The file exists!\n");
+      Serial.printf("The file exists!\r\n");
       File f = SPIFFS.open("/index.html", "r");
       if (!f) {
-        Serial.printf("Some thing went wrong trying to open the file...\n");
+        Serial.printf("Some thing went wrong trying to open the file...\r\n");
       }
       else {
         int s = f.size();
         Serial.printf("Size=%d\r\n", s);
         String data = f.readString();
-        Serial.println(data);
+        Serial.printf("%s\r\n", data.c_str());
         f.close();
       }
     }
     else {
-      Serial.printf("No such file found.\n");
+      Serial.printf("No such file found.\r\n");
     }
   }
 
@@ -233,29 +238,29 @@ void setup(){
       Serial.printf("OPTIONS");
     else
       Serial.printf("UNKNOWN");
-    Serial.printf(" http://%s%s\n", request->host().c_str(), request->url().c_str());
+    Serial.printf(" http://%s%s\r\n", request->host().c_str(), request->url().c_str());
 
     if(request->contentLength()){
-      Serial.printf("_CONTENT_TYPE: %s\n", request->contentType().c_str());
-      Serial.printf("_CONTENT_LENGTH: %u\n", request->contentLength());
+      Serial.printf("_CONTENT_TYPE: %s\r\n", request->contentType().c_str());
+      Serial.printf("_CONTENT_LENGTH: %u\r\n", request->contentLength());
     }
 
     int headers = request->headers();
     int i;
     for(i=0;i<headers;i++){
       AsyncWebHeader* h = request->getHeader(i);
-      Serial.printf("_HEADER[%s]: %s\n", h->name().c_str(), h->value().c_str());
+      Serial.printf("_HEADER[%s]: %s\r\n", h->name().c_str(), h->value().c_str());
     }
 
     int params = request->params();
     for(i=0;i<params;i++){
       AsyncWebParameter* p = request->getParam(i);
       if(p->isFile()){
-        Serial.printf("_FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());
+        Serial.printf("_FILE[%s]: %s, size: %u\r\n", p->name().c_str(), p->value().c_str(), p->size());
       } else if(p->isPost()){
-        Serial.printf("_POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+        Serial.printf("_POST[%s]: %s\r\n", p->name().c_str(), p->value().c_str());
       } else {
-        Serial.printf("_GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
+        Serial.printf("_GET[%s]: %s\r\n", p->name().c_str(), p->value().c_str());
       }
     }
 
@@ -263,21 +268,21 @@ void setup(){
   });
   server.onFileUpload([](AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final){
     if(!index)
-      Serial.printf("UploadStart: %s\n", filename.c_str());
+      Serial.printf("UploadStart: %s\r\n", filename.c_str());
     Serial.printf("%s", (const char*)data);
     if(final)
-      Serial.printf("UploadEnd: %s (%u)\n", filename.c_str(), index+len);
+      Serial.printf("UploadEnd: %s (%u)\r\n", filename.c_str(), index+len);
   });
   server.onRequestBody([](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
     if(!index)
-      Serial.printf("BodyStart: %u\n", total);
+      Serial.printf("BodyStart: %u\r\n", total);
     Serial.printf("%s", (const char*)data);
     if(index + len == total)
-      Serial.printf("BodyEnd: %u\n", total);
+      Serial.printf("BodyEnd: %u\r\n", total);
   });
   server.begin();
 
-  Serial.println("LoRa Duplex - Set spreading factor");
+  Serial.printf("LoRa Duplex - Set spreading factor\r\n");
 
   localAddress = mac[0];
 
@@ -285,17 +290,16 @@ void setup(){
   LoRa.setPins(csPin, resetPin, irqPin); // set CS, reset, IRQ pin
 
   if (!LoRa.begin(915E6)) {             // initialize ratio at 915 MHz
-    Serial.println("LoRa init failed. Check your connections.");
+    Serial.printf("LoRa init failed. Check your connections.\r\n");
     while (true);                       // if failed, do nothing
   }
 
   LoRa.setSpreadingFactor(12);           // ranges from 6-12,default 7 see API docs
   LoRa.onReceive(onReceive);
   LoRa.receive();
-  Serial.printf("LoRa init succeeded.\n");
-  Serial.printf("local address: ");
-  Serial.println(localAddress, HEX);
-  Serial.print(macaddr);
+  Serial.printf("LoRa init succeeded.\r\n");
+  Serial.printf("local address: %02x\r\n", localAddress);
+  Serial.printf("%s\r\n", macaddr);
 }
 
 /*int mcount = 0;
