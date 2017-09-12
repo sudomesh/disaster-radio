@@ -28,6 +28,7 @@ module.exports = function(Component) {
         if(err) return;
 
         inp.value = '';
+        inp.placeholder = '';
       });
     }
 

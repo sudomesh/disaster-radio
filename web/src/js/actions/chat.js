@@ -19,9 +19,8 @@ module.exports = {
         return cb();
       }
     }
-    console.log("GOT HERE 1");
+
     app.socket.send('c', msg, function(err) {
-      console.log('called');
       if(err) {
         console.error("Failed to send:", err) // TODO handle better
         return cb(err)
