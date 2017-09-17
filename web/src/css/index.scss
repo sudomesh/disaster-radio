@@ -1,9 +1,13 @@
 
 @import "../../node_modules/purecss/build/pure-min.css";
 
+$white: rgba(220,220,220,1);
+
 body {
     font-family: sans-serif;
     margin: 20px;
+    background: rgba(0,0,0,1);
+    color: $white;
 }
 
 .noselect {
@@ -15,10 +19,19 @@ body {
             user-select: none;
 }
 
+h1 {
+    text-align: center;
+    margin: 5px 0 10px 0;
+    font-size: 1.2em;
+}
+
 #chat {
-    width: 630px;
+    width: 100%;
+    max-width: 630px;
     height: 470px;
+    margin: 0 auto;
     background-color: black;
+    border: 1px solid rgba(80,80,80,1);
     color: #0fba00;
     font-family: monospace;
     font-size: 14px;
@@ -40,7 +53,9 @@ body {
 }
 
 #chatInput {
-    width: 618px;
+    width: 100%;
+    max-width: 618px;
+    margin: 20px auto;
     padding: 5px;
     display: block;
     color: #0fba00;
