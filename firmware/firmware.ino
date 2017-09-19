@@ -29,6 +29,7 @@ const int resetPin = 5;       // LoRa radio reset ,GPIO5 = D1
 const int irqPin = 4;        // interrupt pin for receive callback?, GPIO4 = D2
 
 String outgoing;              // outgoing message
+int id_length = 15;
 byte msgCount = 0;            // count of outgoing messages
 byte localAddress;     // assigned to last byte of mac address in setup
 byte destination = 0xFF;      // destination to send to default broadcast
@@ -94,7 +95,6 @@ void sendMessage(String outgoing) {
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
   if(type == WS_EVT_CONNECT){
     Serial.printf("ws[%s][%u] connect\r\n", server->url(), client->id());
-    client->printf("Hello Client %u :)", client->id());
     client->ping();
   } else if(type == WS_EVT_DISCONNECT){
     Serial.printf("ws[%s][%u] disconnect: %u\r\n", server->url(), client->id());
@@ -104,27 +104,25 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
     Serial.printf("ws[%s][%u] pong[%u]: %s\r\n", server->url(), client->id(), len, (len)?(char*)data:"");
   } else if(type == WS_EVT_DATA){
     AwsFrameInfo * info = (AwsFrameInfo*)arg;
-    String msg = "";
+    char msg_id[4];
+    char msg[256];
     if(info->final && info->index == 0 && info->len == len){
       //the whole message is in a single frame and we got all of it's data
       Serial.printf("ws[%s][%u] %s-message[%llu]: ", server->url(), client->id(), (info->opcode == WS_TEXT)?"text":"binary", info->len);
 
-      if(info->opcode == WS_TEXT){
-        for(size_t i=0; i < info->len; i++) {
-          msg += (char) data[i];
-        }
-      } else {
-        char buff[3];
-        for(size_t i=0; i < info->len; i++) {
-          sprintf(buff, "%02x ", (uint8_t) data[i]);
-          msg += buff ;
-        }
+      //if(info->opcode == WS_TEXT){
+      for(size_t i=0; i < info->len; i++) {
+        //TODO check if info length is bigger than allocated memory
+        msg[i] = (char) data[i];
       }
 
+      memcpy( msg_id, msg, 2 );
+      msg_id[2] = '!' ;
+      msg_id[3] = '\0' ;
+      Serial.printf("Message ID: %02d%02d %c\r\n", msg_id[0], msg_id[1], msg_id[2]);
+      ws.binary(client->id(), msg_id, 3);
       sendMessage(msg);
-      Serial.printf("Sending %s\r\n", msg.c_str());
       LoRa.receive();
-
       /*
       if(info->opcode == WS_TEXT)
         client->text("Your message was broadcast");
@@ -144,16 +142,17 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
       if(info->opcode == WS_TEXT){
         for(size_t i=0; i < info->len; i++) {
-          msg += (char) data[i];
+          msg[i] = (char) data[i];
         }
       } else {
-        char buff[3];
+        //char buff[3];
         for(size_t i=0; i < info->len; i++) {
-          sprintf(buff, "%02x ", (uint8_t) data[i]);
-          msg += buff ;
+          msg[i] = (char) data[i];
+          //sprintf(buff, "%02x ", (uint8_t) data[i]);
+          //strcat(msg, buff);
         }
       }
-      Serial.printf("%s\r\n",msg.c_str());
+      Serial.printf("%s\r\n",msg);
 
       if((info->index + len) == info->len){
         Serial.printf("ws[%s][%u] frame[%u] end[%llu]\r\n", server->url(), client->id(), info->num, info->len);
