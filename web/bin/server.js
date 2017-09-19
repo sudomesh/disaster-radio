@@ -51,21 +51,85 @@ var wsServer = new WebSocket.Server({
   path: '/ws'
 });
 
+function genID(curID) {
+  var b = Buffer.alloc(2);
+  b.writeUInt16LE(curID);
+
+  if(curID >= (Math.pow(2, 16) - 1)) {
+    curID = 0;
+  } else {
+    curID++;
+  }
+
+  return {
+    id: b,
+    nextID: curID
+  }
+}
+
+
+function send(ws, msg, curID) {
+  var o;
+  if(!Buffer.isBuffer(curID)) {
+    o = genID(curID);
+  }
+
+  var msg = Buffer.concat([((o) ? o.id : curID), msg]);
+  
+  ws.send(msg, {
+    compress: false,
+    binary: true
+  });
+
+  if(o) {
+    return o.nextID;
+  }
+}
+
+function sendMsg(ws, msg, curID) {
+
+  if(!Buffer.isBuffer(msg)) {
+    msg = Buffer.from(msg, 'utf8');
+  }
+
+  msg = Buffer.concat([Buffer.from('c|', 'utf8'), msg]);
+
+  return send(ws, msg, curID);
+}
+
+function sendACK(ws, msg) {
+  var msgID = msg.slice(0, 2);
+
+  return send(ws, Buffer.from('!', 'utf8'), msgID);
+}
+
+
 wsServer.on('connection', function(ws, req) {
+
+  var curID = 0;
+
+  // send fake chat messages every so often
+  var sendTimer = setInterval(function() {
+    console.log("sending message with ID:", curID);
+    curID = sendMsg(ws, "<cookie_cat> hello apocalypse!", curID);
+
+  }, 5000);
+
+  ws.on('close', function(code, reason) {
+    console.log("client disconnected");
+    clearInterval(sendTimer);
+  });
  
   ws.on('message', function(message) {
 
     console.log('received: %s', message.toString('utf8'));
 
     // send ACK
+    setTimeout(function() {
 
-    var msgID = message.slice(0, 2);
-    var msg = Buffer.concat([msgID, Buffer.from('!', 'utf8')]);
+      sendACK(ws, message);
 
-    ws.send(msg, {
-      compress: false,
-      binary: true
-    });
+    }, 500)
   });
  
 });

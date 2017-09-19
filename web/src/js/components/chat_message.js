@@ -12,7 +12,7 @@ module.exports = function(Component) {
     }
     
 	  render() {
-		  return <div>
+		  return <div class={this.props.type}>
         <span>{this.props.txt}</span>
       </div>
 

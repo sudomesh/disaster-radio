@@ -63,6 +63,7 @@ module.exports = function(uriPath, opts) {
       console.warn("Received message with no data");
       return;
     }
+    console.log("msg length:", event.data.length)
     var data = arrayBufferToBuffer(event.data);
 
     // is the message shorter than the message ID?
@@ -80,7 +81,7 @@ module.exports = function(uriPath, opts) {
     if((data.slice(0, 1).toString('utf8') === '!') && (data.length === 1)) {
       var sentCb = this._sentCallbacks[id];
       if(!sentCb) {
-        console.warn("Got ACK for unknown message ID");
+        console.warn("Got ACK for unknown message ID: " + id);
         return;
       }
 

@@ -11,7 +11,7 @@
     "watch": "gulp watch",
     "hot": "gulp hot",
     "dev": "bin/dev.js",
-    "start": "bin/cmd.js",
+    "start": "bin/server.js",
     "clean": "rm static/build/*"
   },
   "dependencies": {

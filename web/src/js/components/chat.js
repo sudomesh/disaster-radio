@@ -16,8 +16,13 @@ module.exports = function(Component) {
       app.socket.addListener('c', this.receive)
     }
     
+    scrollBottom() {
+      var chat = document.getElementById('chat');
+      chat.scrollTop = chat.scrollHeight;
+    }
+
     receive(namespace, data) {
-      console.log("Received data:", data.toString())
+      app.actions.chat.showMessage(data.toString('utf8'));
     }
 
     send(e) {
@@ -32,10 +37,15 @@ module.exports = function(Component) {
       });
     }
 
+    componentDidUpdate() {
+      this.scrollBottom()
+    }
+
 	  render() {
 
-      var messages = this.state.messages.map(function(txt) {
-          return <ChatMessage txt={txt} />
+      var messages = this.state.messages.map(function(o) {
+        // TODO is there a simpler way of passing a bunch of properties?
+        return <ChatMessage txt={o.txt} type={o.type} />
       }, this)
 
 		  return <div>
