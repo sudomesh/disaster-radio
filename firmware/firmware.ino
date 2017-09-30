@@ -25,8 +25,8 @@ const char* http_username = "admin";
 const char* http_password = "admin";
 
 const int csPin = 15;          // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
-const int resetPin = 5;       // LoRa radio reset ,GPIO5 = D1
-const int irqPin = 4;        // interrupt pin for receive callback?, GPIO4 = D2
+const int resetPin = 0;       // LoRa radio reset ,GPIO5 = D1
+const int irqPin = 2;        // interrupt pin for receive callback?, GPIO4 = D2
 
 String outgoing;              // outgoing message
 int id_length = 15;
@@ -45,6 +45,7 @@ void onReceive(int packetSize) {
   byte incomingMsgId = LoRa.read();     // incoming msg ID
   byte incomingLength = LoRa.read();    // incoming msg length
 
+  //don't use string
   String incoming = "";                 // payload of packet
 
   while (LoRa.available()) {            // can't use readString() in callback, so
@@ -63,21 +64,17 @@ void onReceive(int packetSize) {
   }
 
   // if message is for this device, or broadcast, print details:
-  Serial.printf("Received from: 0x%02x/r/n", sender);
-  Serial.printf("Sent to: 0x%02x/r/n", recipient);
-  Serial.printf("Message ID: %d/r/n", incomingMsgId);
-  Serial.printf("Message length: %d/r/n", incomingLength);
-  Serial.printf("Message: %s/r/n", incoming.c_str());
-  Serial.printf("RSSI: %f/r/n", LoRa.packetRssi());
-  Serial.printf("Snr: %f/r/n", LoRa.packetSnr());
+  Serial.printf("Received from: 0x%02x\r\n", sender);
+  Serial.printf("Sent to: 0x%02x\r\n", recipient);
+  Serial.printf("Message ID: %d\r\n", incomingMsgId);
+  Serial.printf("Message length: %d\r\n", incomingLength);
+  Serial.printf("Message: %s\r\n", incoming.c_str());
+  Serial.printf("RSSI: %f\r\n", LoRa.packetRssi());
+  Serial.printf("Snr: %f\r\n", LoRa.packetSnr());
 
-  char text[20] = "You got a message: ";
-  char msg[100];
+  char msg[256];
   incoming.toCharArray(msg, incomingLength);
-  strcat(text, msg);
-  // TODO send message to websocket chat
-  //ws.textAll((char*)text);
-
+  ws.binaryAll(msg, incomingLength);
 }
 
 
@@ -123,12 +120,6 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       ws.binary(client->id(), msg_id, 3);
       sendMessage(msg);
       LoRa.receive();
-      /*
-      if(info->opcode == WS_TEXT)
-        client->text("Your message was broadcast");
-      else
-        client->binary("Your binary message was broadcast");
-      */
     } 
     else {
       //message is comprised of multiple frames or the frame is split into multiple packets
@@ -145,11 +136,8 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
           msg[i] = (char) data[i];
         }
       } else {
-        //char buff[3];
         for(size_t i=0; i < info->len; i++) {
           msg[i] = (char) data[i];
-          //sprintf(buff, "%02x ", (uint8_t) data[i]);
-          //strcat(msg, buff);
         }
       }
       Serial.printf("%s\r\n",msg);
