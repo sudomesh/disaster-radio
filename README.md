@@ -17,14 +17,16 @@ Then edit `settings.mk` to suit your needs.
 
 # Hardware Connections  
 
-**NodeMCU/ESP8266 <-> SX1276**  
-D3/GPIO0/OUT -> RESET 
-D4/GPIO2/INT <- DIO0 (this sends an interrupt from the LoRa chip upon Tx/Rx Ready on the radio)  
-D5/GPIO14/SCK -> SCK  
-D6/GPIO12/MISO <- MISO  
-D7/GPIO13/MOSI -> MOSI  
-D8/GPIO15/SS -> NSS  
-
+| NodeMCU/ESP8266 | SX1276 |  
+|-----------------|--------|
+|  D3/GPIO0/OUT   |  RESET |
+|  D4/GPIO2/INT   |  DIO0  | 
+|  D5/GPIO14/SCK  |  SCK   |  
+|  D6/GPIO12/MISO |  MISO  |  
+|  D7/GPIO13/MOSI |  MOSI  |  
+|  D8/GPIO15/SS   |  NSS   |    
+DIO0 sends an interrupt from the LoRa chip upon Tx/Rx Ready on the radio. It is run through GPIO2, which should be connected to the on-board LED of the ESP8266, thereby blinking a light upon transmit and recieve. 
+  
 # Building firmware
 
 ```
