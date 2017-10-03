@@ -16,6 +16,8 @@
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 AsyncEventSource events("/events");
+ #define HEADERSIZE 4 
+ #define BUFFERSIZE 252
 
 byte mac[6];
 char ssid[32] = "DisasterRadio ";
@@ -25,8 +27,9 @@ const char* http_username = "admin";
 const char* http_password = "admin";
 
 const int csPin = 15;          // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
-const int resetPin = 0;       // LoRa radio reset ,GPIO5 = D1
-const int irqPin = 2;        // interrupt pin for receive callback?, GPIO4 = D2
+const int resetPin = 0;       // LoRa radio reset, GPIO0 = D3
+const int irqPin = 2;        // interrupt pin for receive callback?, GPIO2 = D4
+//TODO: switch to volatile byte for interrupt
 
 String outgoing;              // outgoing message
 int id_length = 15;
@@ -45,14 +48,15 @@ void onReceive(int packetSize) {
   byte incomingMsgId = LoRa.read();     // incoming msg ID
   byte incomingLength = LoRa.read();    // incoming msg length
 
-  //don't use string
-  String incoming = "";                 // payload of packet
+  char incoming[BUFFERSIZE];                 // payload of packet
 
-  while (LoRa.available()) {            // can't use readString() in callback, so
-    incoming += (char)LoRa.read();      // add bytes one by one
+  int i = 0;
+  while (LoRa.available()) { 
+    incoming[i] += (char)LoRa.read(); 
+    i++;
   }
 
-  if (incomingLength != incoming.length()) {   // check length for error
+  if (incomingLength != i) {   // check length for error
     Serial.printf("error: message length does not match length\r\n");
     return;                             // skip rest of function
   }
@@ -68,13 +72,13 @@ void onReceive(int packetSize) {
   Serial.printf("Sent to: 0x%02x\r\n", recipient);
   Serial.printf("Message ID: %d\r\n", incomingMsgId);
   Serial.printf("Message length: %d\r\n", incomingLength);
-  Serial.printf("Message: %s\r\n", incoming.c_str());
+  //Serial.printf("Message: %s\r\n", incoming));
   Serial.printf("RSSI: %f\r\n", LoRa.packetRssi());
   Serial.printf("Snr: %f\r\n", LoRa.packetSnr());
 
-  char msg[256];
-  incoming.toCharArray(msg, incomingLength);
-  ws.binaryAll(msg, incomingLength);
+  //char msg[incomingLength];
+  //incoming.toCharArray(msg, incomingLength);
+  ws.binaryAll(incoming, incomingLength);
 }
 
 
@@ -199,7 +203,8 @@ void setup(){
   });
   server.addHandler(&events);
 
-  server.addHandler(new SPIFFSEditor(http_username,http_password));
+  //left over from example
+  //server.addHandler(new SPIFFSEditor(http_username,http_password));
 
   server.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(200, "text/plain", String(ESP.getFreeHeap()));
