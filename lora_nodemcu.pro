@@ -1,4 +1,4 @@
-update=Monday, September 25, 2017 'PMt' 08:05:17 PM
+update=Sunday, October 08, 2017 'PMt' 05:46:32 PM
 version=1
 last_client=kicad
 [pcbnew]
@@ -59,3 +59,4 @@ LibName27=atmel
 LibName28=contrib
 LibName29=valves
 LibName30=rfm95
+LibName31=disaster_radio
