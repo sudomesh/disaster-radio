@@ -27,8 +27,8 @@ const char* http_username = "admin";
 const char* http_password = "admin";
 
 const int csPin = 15;          // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
-const int resetPin = 0;       // LoRa radio reset, GPIO0 = D3
-const int irqPin = 2;        // interrupt pin for receive callback?, GPIO2 = D4
+const int resetPin = 5;       // LoRa radio reset, GPIO0 = D3
+const int irqPin = 4;        // interrupt pin for receive callback?, GPIO2 = D4
 //TODO: switch to volatile byte for interrupt
 
 String outgoing;              // outgoing message

@@ -19,8 +19,8 @@ Then edit `settings.mk` to suit your needs.
 
 NodeMCU/ESP8266 | SX1276   
 ----------------|--------
-D3/GPIO0/OUT | RESET
-D4/GPIO2/INT | DIO0   
+D1/GPIO5/OUT | RESET
+D2/GPIO4/INT | DIO0   
 D5/GPIO14/SCK | SCK  
 D6/GPIO12/MISO | MISO   
 D7/GPIO13/MOSI | MOSI   
