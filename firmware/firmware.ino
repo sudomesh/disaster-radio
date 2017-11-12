@@ -31,7 +31,7 @@ const int resetPin = 5;       // LoRa radio reset, GPIO0 = D3
 const int irqPin = 4;        // interrupt pin for receive callback?, GPIO2 = D4
 //TODO: switch to volatile byte for interrupt
 
-String outgoing;              // outgoing message
+//String outgoing;              // outgoing message
 int id_length = 15;
 byte msgCount = 0;            // count of outgoing messages
 byte localAddress;     // assigned to last byte of mac address in setup
@@ -56,10 +56,10 @@ void onReceive(int packetSize) {
     i++;
   }
 
-  if (incomingLength != i) {   // check length for error
+  /*if (incomingLength != i) {   // check length for error
     Serial.printf("error: message length does not match length\r\n");
     return;                             // skip rest of function
-  }
+  }*/
 
   // if the recipient isn't this device or broadcast,
   if (recipient != localAddress && recipient != 0xFF) {
@@ -78,17 +78,26 @@ void onReceive(int packetSize) {
 
   //char msg[incomingLength];
   //incoming.toCharArray(msg, incomingLength);
-  ws.binaryAll(incoming, incomingLength);
+  //Serial.printf("Message: %s", incoming);
+  for(int i = 0 ; i < incomingLength ; i++){
+    Serial.printf(" %c", incoming[i]);
+  }
+  Serial.printf("\r\n");
+    
+  //ws.binaryAll(incoming, incomingLength);
 }
 
 
-void sendMessage(String outgoing) {
+void sendMessage(char* outgoing, int outgoing_length) {
   LoRa.beginPacket();                   // start packet
   LoRa.write(destination);              // add destination address
   LoRa.write(localAddress);             // add sender address
   LoRa.write(msgCount);                 // add message ID
-  LoRa.write(outgoing.length());        // add payload length
-  LoRa.print(outgoing);                 // add payload
+  Serial.printf("sending length: %d\r\n", outgoing_length);
+  LoRa.write(outgoing_length);        // add payload length
+  for( int i = 0 ; i < outgoing_length ; i++){
+    LoRa.write(outgoing[i]);                 // add payload
+  }
   LoRa.endPacket();                     // finish packet and send it
   msgCount++;                           // increment message ID
 }
@@ -107,6 +116,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
     AwsFrameInfo * info = (AwsFrameInfo*)arg;
     char msg_id[4];
     char msg[256];
+    int msg_length;
     if(info->final && info->index == 0 && info->len == len){
       //the whole message is in a single frame and we got all of it's data
       Serial.printf("ws[%s][%u] %s-message[%llu]: ", server->url(), client->id(), (info->opcode == WS_TEXT)?"text":"binary", info->len);
@@ -115,14 +125,21 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       for(size_t i=0; i < info->len; i++) {
         //TODO check if info length is bigger than allocated memory
         msg[i] = (char) data[i];
+        msg_length = i; 
       }
 
       memcpy( msg_id, msg, 2 );
       msg_id[2] = '!' ;
       msg_id[3] = '\0' ;
+      Serial.printf("Message Length: %d\r\n", msg_length);
       Serial.printf("Message ID: %02d%02d %c\r\n", msg_id[0], msg_id[1], msg_id[2]);
+      Serial.printf("Message:");
+      for( int i = 0 ; i < msg_length ; i++){
+        Serial.printf(" %c", msg[i]);
+      }
+      Serial.printf("\r\n");
       ws.binary(client->id(), msg_id, 3);
-      sendMessage(msg);
+      sendMessage(msg, msg_length);
       LoRa.receive();
     } 
     else {
@@ -286,7 +303,7 @@ void setup(){
     while (true);                       // if failed, do nothing
   }
 
-  LoRa.setSpreadingFactor(12);           // ranges from 6-12,default 7 see API docs
+  LoRa.setSpreadingFactor(7);           // ranges from 6-12,default 7 see API docs
   LoRa.onReceive(onReceive);
   LoRa.receive();
   Serial.printf("LoRa init succeeded.\r\n");
