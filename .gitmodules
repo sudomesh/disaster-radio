@@ -1,0 +1,3 @@
+[submodule "hardware/lora-wemos-hat"]
+	path = hardware/lora-wemos-hat
+	url = https://github.com/nanomonkey/lora-to-nodemcu-circuit.git

@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="D">
+  <design>
+    <source>/Users/scott/git/lora-to-nodemcu-circuit/lora_nodemcu.sch</source>
+    <date>Monday, October 30, 2017 'PMt' 06:14:54 PM</date>
+    <tool>Eeschema 4.0.6</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>lora_nodemcu.sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="U1">
+      <value>RFM95</value>
+      <footprint>DisasterRadio:RFM95</footprint>
+      <libsource lib="rfm95" part="RFM95"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59C9C638</tstamp>
+    </comp>
+    <comp ref="AE1">
+      <value>Antenna_Shield</value>
+      <footprint>Connectors:SMA_SMD_Jack_Straight</footprint>
+      <libsource lib="device" part="Antenna_Shield"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59CB0BD9</tstamp>
+    </comp>
+    <comp ref="R3">
+      <value>0k</value>
+      <footprint>Resistors_SMD:R_0805</footprint>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59CC447A</tstamp>
+    </comp>
+    <comp ref="R5">
+      <value>0k</value>
+      <footprint>Resistors_SMD:R_0805</footprint>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59CC4726</tstamp>
+    </comp>
+    <comp ref="R6">
+      <value>0k</value>
+      <footprint>Resistors_SMD:R_0805</footprint>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59CC47A1</tstamp>
+    </comp>
+    <comp ref="R4">
+      <value>0k</value>
+      <footprint>Resistors_SMD:R_0805</footprint>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59CF0F92</tstamp>
+    </comp>
+    <comp ref="R2">
+      <value>0k</value>
+      <footprint>Resistors_SMD:R_0805</footprint>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59CF1001</tstamp>
+    </comp>
+    <comp ref="R1">
+      <value>0k</value>
+      <footprint>Resistors_SMD:R_0805</footprint>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59CF1A56</tstamp>
+    </comp>
+    <comp ref="U3">
+      <value>WeMos_mini</value>
+      <footprint>DisasterRadio:D1_mini_Hat</footprint>
+      <libsource lib="lora_nodemcu-cache" part="WeMos_mini"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59DACFEC</tstamp>
+    </comp>
+    <comp ref="U2">
+      <value>LM1117-3.3</value>
+      <footprint>TO_SOT_Packages_SMD:SOT-223</footprint>
+      <libsource lib="regul" part="LM1117-3.3"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59DDA3AE</tstamp>
+    </comp>
+    <comp ref="C2">
+      <value>10u</value>
+      <footprint>Capacitors_SMD:C_0805_HandSoldering</footprint>
+      <libsource lib="device" part="C"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59DDA417</tstamp>
+    </comp>
+    <comp ref="C1">
+      <value>10u</value>
+      <footprint>Capacitors_SMD:C_0805_HandSoldering</footprint>
+      <libsource lib="device" part="C"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59DDA458</tstamp>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="device" part="Antenna_Shield">
+      <description>Antenna symbol with extra pin for shielding</description>
+      <fields>
+        <field name="Reference">AE</field>
+        <field name="Value">Antenna_Shield</field>
+      </fields>
+      <pins>
+        <pin num="1" name="A" type="input"/>
+        <pin num="2" name="Shield" type="input"/>
+      </pins>
+    </libpart>
+    <libpart lib="device" part="C">
+      <description>Unpolarized capacitor</description>
+      <footprints>
+        <fp>C_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="regul" part="LM1117-ADJ">
+      <aliases>
+        <alias>LM1117-1.8</alias>
+        <alias>LM1117-2.5</alias>
+        <alias>LM1117-3.3</alias>
+        <alias>LM1117-5.0</alias>
+      </aliases>
+      <description>800mA Low-Dropout Linear Regulator, adjustable output</description>
+      <docs>http://www.ti.com/lit/ds/symlink/lm1117.pdf</docs>
+      <footprints>
+        <fp>SOT-223*</fp>
+        <fp>TO-263*</fp>
+        <fp>TO-252*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">LM1117-ADJ</field>
+      </fields>
+      <pins>
+        <pin num="1" name="GND/ADJ" type="power_in"/>
+        <pin num="2" name="VO" type="power_out"/>
+        <pin num="3" name="VI" type="power_in"/>
+        <pin num="4" name="VO" type="power_out"/>
+      </pins>
+    </libpart>
+    <libpart lib="device" part="R">
+      <description>Resistor</description>
+      <footprints>
+        <fp>R_*</fp>
+        <fp>R_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">R</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="rfm95" part="RFM95">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">RFM95</field>
+      </fields>
+      <pins>
+        <pin num="1" name="GND" type="input"/>
+        <pin num="2" name="MISO" type="input"/>
+        <pin num="3" name="MOSI" type="input"/>
+        <pin num="4" name="SCK" type="input"/>
+        <pin num="5" name="NSS" type="input"/>
+        <pin num="6" name="RESET" type="input"/>
+        <pin num="7" name="DIO5" type="input"/>
+        <pin num="8" name="GND" type="input"/>
+        <pin num="9" name="ANT" type="input"/>
+        <pin num="10" name="GND" type="input"/>
+        <pin num="11" name="DIO3" type="input"/>
+        <pin num="12" name="DIO4" type="input"/>
+        <pin num="13" name="3.3V" type="input"/>
+        <pin num="14" name="DIO0" type="input"/>
+        <pin num="15" name="DIO1" type="input"/>
+        <pin num="16" name="DIO2" type="input"/>
+      </pins>
+    </libpart>
+    <libpart lib="lora_nodemcu-cache" part="WeMos_mini">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">WeMos_mini</field>
+      </fields>
+      <pins>
+        <pin num="1" name="5V" type="power_in"/>
+        <pin num="2" name="GND" type="power_in"/>
+        <pin num="3" name="D4" type="BiDi"/>
+        <pin num="4" name="D3" type="BiDi"/>
+        <pin num="5" name="D2" type="BiDi"/>
+        <pin num="6" name="D1" type="BiDi"/>
+        <pin num="7" name="Rx" type="BiDi"/>
+        <pin num="8" name="Tx" type="BiDi"/>
+        <pin num="9" name="Rst" type="BiDi"/>
+        <pin num="10" name="A0" type="BiDi"/>
+        <pin num="11" name="D0" type="BiDi"/>
+        <pin num="12" name="D5" type="BiDi"/>
+        <pin num="13" name="D6" type="BiDi"/>
+        <pin num="14" name="D7" type="BiDi"/>
+        <pin num="15" name="D8" type="BiDi"/>
+        <pin num="16" name="3.3V" type="power_out"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="device">
+      <uri>/Library/Application Support/kicad/library/device.lib</uri>
+    </library>
+    <library logical="rfm95">
+      <uri>/Users/scott/git/lora-to-nodemcu-circuit/rfm95.lib</uri>
+    </library>
+    <library logical="regul">
+      <uri>/Library/Application Support/kicad/library/regul.lib</uri>
+    </library>
+    <library logical="lora_nodemcu-cache">
+      <uri>/Users/scott/git/lora-to-nodemcu-circuit/lora_nodemcu-cache.lib</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="+3V3">
+      <node ref="U1" pin="13"/>
+      <node ref="U3" pin="16"/>
+      <node ref="C2" pin="2"/>
+      <node ref="U2" pin="4"/>
+      <node ref="U2" pin="2"/>
+    </net>
+    <net code="2" name="Net-(R6-Pad2)">
+      <node ref="U1" pin="3"/>
+      <node ref="R6" pin="2"/>
+    </net>
+    <net code="3" name="Net-(R5-Pad2)">
+      <node ref="U1" pin="2"/>
+      <node ref="R5" pin="2"/>
+    </net>
+    <net code="4" name="Net-(R3-Pad2)">
+      <node ref="U1" pin="5"/>
+      <node ref="R3" pin="2"/>
+    </net>
+    <net code="5" name="Net-(R4-Pad2)">
+      <node ref="R4" pin="2"/>
+      <node ref="U1" pin="4"/>
+    </net>
+    <net code="6" name="Net-(R2-Pad2)">
+      <node ref="U1" pin="6"/>
+      <node ref="R2" pin="2"/>
+    </net>
+    <net code="7" name="Net-(R1-Pad2)">
+      <node ref="R1" pin="2"/>
+      <node ref="U1" pin="14"/>
+    </net>
+    <net code="8" name="+5V">
+      <node ref="U2" pin="3"/>
+      <node ref="U3" pin="1"/>
+      <node ref="C1" pin="2"/>
+    </net>
+    <net code="9" name="Net-(U1-Pad11)">
+      <node ref="U1" pin="11"/>
+    </net>
+    <net code="10" name="Net-(U1-Pad7)">
+      <node ref="U1" pin="7"/>
+    </net>
+    <net code="11" name="Net-(U1-Pad15)">
+      <node ref="U1" pin="15"/>
+    </net>
+    <net code="12" name="Net-(U1-Pad16)">
+      <node ref="U1" pin="16"/>
+    </net>
+    <net code="13" name="Net-(AE1-Pad1)">
+      <node ref="AE1" pin="1"/>
+      <node ref="U1" pin="9"/>
+    </net>
+    <net code="14" name="GND">
+      <node ref="U1" pin="1"/>
+      <node ref="AE1" pin="2"/>
+      <node ref="U1" pin="8"/>
+      <node ref="U1" pin="10"/>
+      <node ref="U3" pin="2"/>
+      <node ref="C1" pin="1"/>
+      <node ref="C2" pin="1"/>
+      <node ref="U2" pin="1"/>
+    </net>
+    <net code="15" name="Net-(R2-Pad1)">
+      <node ref="R2" pin="1"/>
+      <node ref="U3" pin="4"/>
+    </net>
+    <net code="16" name="Net-(R1-Pad1)">
+      <node ref="U3" pin="3"/>
+      <node ref="R1" pin="1"/>
+    </net>
+    <net code="17" name="Net-(U1-Pad12)">
+      <node ref="U1" pin="12"/>
+    </net>
+    <net code="18" name="/SS">
+      <node ref="R3" pin="1"/>
+      <node ref="U3" pin="15"/>
+    </net>
+    <net code="19" name="/MOSI">
+      <node ref="R6" pin="1"/>
+      <node ref="U3" pin="14"/>
+    </net>
+    <net code="20" name="/MISO">
+      <node ref="U3" pin="13"/>
+      <node ref="R5" pin="1"/>
+    </net>
+    <net code="21" name="/SCK">
+      <node ref="R4" pin="1"/>
+      <node ref="U3" pin="12"/>
+    </net>
+    <net code="22" name="Net-(U3-Pad5)">
+      <node ref="U3" pin="5"/>
+    </net>
+    <net code="23" name="Net-(U3-Pad6)">
+      <node ref="U3" pin="6"/>
+    </net>
+    <net code="24" name="Net-(U3-Pad7)">
+      <node ref="U3" pin="7"/>
+    </net>
+    <net code="25" name="Net-(U3-Pad8)">
+      <node ref="U3" pin="8"/>
+    </net>
+    <net code="26" name="Net-(U3-Pad11)">
+      <node ref="U3" pin="11"/>
+    </net>
+    <net code="27" name="Net-(U3-Pad10)">
+      <node ref="U3" pin="10"/>
+    </net>
+    <net code="28" name="Net-(U3-Pad9)">
+      <node ref="U3" pin="9"/>
+    </net>
+  </nets>
+</export>
