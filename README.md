@@ -3,6 +3,8 @@ Disaster Radio is a work-in-progress long-range, low-bandwidth wireless disaster
 
 * `firmware/` is the ESP8266 firmware
 * `web/` is the web app served up by the ESP8266
+* `hardware/` is the kicad board kayout and schematic
+* `enclosure/` are 3D models of the enclosure(s)
 
 The `web/` dir includes a simulator server that presents the same API as the ESP8266 to the client. This makes development of the web app possible without having the Disaster Radio hardware hooked up.
 
