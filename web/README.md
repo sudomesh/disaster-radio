@@ -31,7 +31,7 @@ or if you don't like HMR:
 
 # Uploading to ESP8266
 
-ToDo
+After building with npm, the web app can be uploaded with `make flash_fs'
 
 
 

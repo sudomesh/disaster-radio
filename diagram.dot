@@ -1,0 +1,54 @@
+digraph G {
+    antenna [shape=ellipse];
+    LoRa [label = "LoRa tranciever", shape=box];
+
+    subgraph cluster0 {
+        node [style=filled,color=white];
+        color=blue;
+        antenna -> LoRa [dir=both,label = "coaxial"]
+        LoRa -> LoRaSR [dir=both,label = "SPI"];
+
+        subgraph cluster1 {
+            node [style=filled,color=white];
+            style=filled;
+            color=lightgrey;
+            subgraph cluster2 {
+                node [style=filled,color=white];
+                color=red;
+                LoRaSR [label = "LoRa send/receive"];
+                WebSocketSR [label = "WebSocket send/receive"];
+                LoRaSR -> WebSocketSR [dir=both];
+                labeljust = l;
+                label = "firmware";
+            }
+            WebSocketSR -> JS [dir=both, label = "websocket"];
+            subgraph cluster3 {
+                node [style=filled,color=white];
+                color=green;
+                JS [label = "JavaScript/Preact"];
+                labeljust = l;
+                label = "file system"
+            }
+            labeljust = l;
+            label = "ESP8266";
+        }
+        label = "disaster.node1";
+    }
+    JS -> maps[dir=both];
+    JS -> apps[dir=both];
+    JS -> chat [dir=both, label = "WiFi"];
+    subgraph cluster4 {
+        node [style=filled,color=white];
+        color=yellow;
+        chat;
+        maps;
+        apps;
+        label = "client device"
+    }
+
+    disasternode2 [label = "disaster.node2", shape = "box"]
+
+    antenna -> disasternode2 
+    disasternode2 -> antenna [label = "900MHz RF"];
+
+}
