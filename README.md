@@ -8,6 +8,10 @@ Disaster Radio is a work-in-progress long-range, low-bandwidth wireless disaster
 
 The `web/` dir includes a simulator server that presents the same API as the ESP8266 to the client. This makes development of the web app possible without having the Disaster Radio hardware hooked up.
 
+# Layout and Flow
+The general layout and flow of hardware, firmware, and software can be seen below:
+![alt text](https://raw.githubusercontent.com/sudomesh/disaster-radio/master/diagram.png "disaster flow")
+
 # Initial setup
 
 ```

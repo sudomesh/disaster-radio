@@ -5,7 +5,7 @@ digraph G {
     subgraph cluster0 {
         node [style=filled,color=white];
         color=blue;
-        antenna -> LoRa [dir=both,label = "coaxial"]
+        antenna -> LoRa [dir=both]
         LoRa -> LoRaSR [dir=both,label = "SPI"];
 
         subgraph cluster1 {
@@ -16,16 +16,16 @@ digraph G {
                 node [style=filled,color=white];
                 color=red;
                 LoRaSR [label = "LoRa send/receive"];
-                WebSocketSR [label = "WebSocket send/receive"];
-                LoRaSR -> WebSocketSR [dir=both];
+                WebServer [label = "Web Server"];
+                LoRaSR -> WebServer [dir=both];
                 labeljust = l;
                 label = "firmware";
             }
-            WebSocketSR -> JS [dir=both, label = "websocket"];
+            FS -> WebServer;
             subgraph cluster3 {
                 node [style=filled,color=white];
                 color=green;
-                JS [label = "JavaScript/Preact"];
+                FS [label = "JavaScript/Preact"];
                 labeljust = l;
                 label = "file system"
             }
@@ -34,15 +34,14 @@ digraph G {
         }
         label = "disaster.node1";
     }
-    JS -> maps[dir=both];
-    JS -> apps[dir=both];
-    JS -> chat [dir=both, label = "WiFi"];
+    WebServer -> JS [dir=both, label="websocket over WiFi"];
     subgraph cluster4 {
         node [style=filled,color=white];
         color=yellow;
-        chat;
-        maps;
-        apps;
+        JS [shape=none,label = "Running JavaScript/Preact"]
+        JS -> maps [dir=both];
+        JS -> apps [dir=both];
+        JS -> chat [dir=both];
         label = "client device"
     }
 
