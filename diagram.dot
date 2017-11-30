@@ -45,7 +45,7 @@ digraph G {
         label = "client device"
     }
 
-    disasternode2 [label = "disaster.node2", shape = "box"]
+    disasternode2 [label = "disaster.node2", shape = "box", color = blue]
 
     antenna -> disasternode2 
     disasternode2 -> antenna [label = "900MHz RF"];
