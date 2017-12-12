@@ -1,4 +1,5 @@
 
+import cipher from '../cipher.js';
 
 var self = module.exports = {
 
@@ -30,6 +31,9 @@ var self = module.exports = {
       msg = '<'+app.state.user.name+'> ' + msg;
     }
 
+    // TODO also send the signature
+    var signature = cipher.sign(msg);
+    console.log("Signature:", signature);
 
     // <16 bytes random id><single byte msg type / namespace>|<actual message>
     app.socket.send('c', msg, function(err) {

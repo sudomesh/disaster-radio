@@ -2,6 +2,7 @@
 import {h, render, Component as PreactComponent} from 'preact'
 import Socket from './socket.js'
 import ashnazg from 'ashnazg'
+import cipher from './cipher.js'
 
 const Component = ashnazg(PreactComponent)
 var Chat = require('./components/chat.js')(Component)
@@ -18,6 +19,8 @@ function renderAll() {
 }
 
 
+
+
 function init() {
   app.socket = new Socket('/ws', {debug: true});
 
@@ -31,6 +34,12 @@ function init() {
   app.actions = require('./actions/index');
 
   renderAll();
+  try {
+    cipher.init();
+  } catch(e) {
+    console.error(e);
+    alert("Fatal error:", e);
+  }
 }
 
 
