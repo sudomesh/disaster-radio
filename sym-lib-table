@@ -1,0 +1,5 @@
+(sym_lib_table
+  (lib (name lora_nodemcu-rescue)(type Legacy)(uri ${KIPRJMOD}/lora_nodemcu-rescue.lib)(options "")(descr ""))
+  (lib (name display)(type Legacy)(uri ${KICAD_SYMBOL_DIR}/display.lib)(options "")(descr ""))
+  (lib (name rfm95)(type Legacy)(uri ${KIPRJMOD}/rfm95.lib)(options "")(descr ""))
+)
