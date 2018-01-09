@@ -316,13 +316,13 @@ Wire Wire Line
 Wire Wire Line
 	4450 3500 4450 3950
 Wire Wire Line
-	3940 3400 4500 3400
+	3940 3400 3990 3400
 Wire Wire Line
 	5700 3500 5800 3500
 Wire Wire Line
 	5800 3500 5800 3650
 Wire Wire Line
-	3910 3100 4500 3100
+	3910 3100 3990 3100
 Wire Wire Line
 	5900 3300 5700 3300
 Wire Wire Line
@@ -347,8 +347,6 @@ Wire Wire Line
 	4250 2450 4250 3000
 Wire Wire Line
 	5700 2800 5700 2700
-Wire Wire Line
-	7700 2150 7700 2500
 Wire Wire Line
 	7700 2500 7850 2500
 Wire Wire Line
@@ -390,11 +388,11 @@ Wire Wire Line
 Wire Wire Line
 	7000 3550 7000 3100
 Wire Wire Line
-	8100 4550 8600 4550
+	8100 4550 8350 4550
 Wire Wire Line
-	7050 4550 7500 4550
+	7050 4550 7300 4550
 Wire Wire Line
-	7800 4850 7800 5150
+	7800 4850 7800 5000
 Wire Wire Line
 	7300 4700 7300 4550
 Connection ~ 7300 4550
@@ -402,12 +400,12 @@ Wire Wire Line
 	8350 4550 8350 4600
 Connection ~ 8350 4550
 Wire Wire Line
-	7300 5000 8350 5000
+	7300 5000 7800 5000
 Wire Wire Line
 	8350 5000 8350 4900
 Connection ~ 7800 5000
 Wire Wire Line
-	8100 4475 8100 4650
+	8100 4475 8100 4550
 Connection ~ 8100 4550
 Wire Wire Line
 	7160 2450 6500 2450
@@ -422,12 +420,9 @@ Wire Wire Line
 Wire Wire Line
 	7160 2900 7850 2900
 Wire Wire Line
-	7380 2600 7380 2170
-Wire Wire Line
-	7700 1840 7700 1940
+	7380 2600 7380 2330
 Wire Wire Line
 	7700 2330 7630 2330
-Connection ~ 7700 2330
 Wire Wire Line
 	7430 2330 7380 2330
 Connection ~ 7380 2330
@@ -442,20 +437,20 @@ Connection ~ 3990 3100
 $Comp
 L device:C_Small C5
 U 1 1 5A1F028E
-P 9060 2310
-F 0 "C5" V 8831 2310 50  0000 C CNN
-F 1 "C_decoupling" V 8922 2310 50  0000 C CNN
-F 2 "Capacitors_SMD:C_0805_HandSoldering" H 9060 2310 50  0001 C CNN
-F 3 "" H 9060 2310 50  0001 C CNN
-	1    9060 2310
+P 9110 2310
+F 0 "C5" V 8881 2310 50  0000 C CNN
+F 1 "C_decoupling" V 8972 2310 50  0000 C CNN
+F 2 "Capacitors_SMD:C_0805_HandSoldering" H 9110 2310 50  0001 C CNN
+F 3 "" H 9110 2310 50  0001 C CNN
+	1    9110 2310
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	8850 2500 8910 2500
+	8850 2500 8890 2500
 Wire Wire Line
-	8910 2500 8910 2310
+	8890 2500 8890 2310
 Wire Wire Line
-	8910 2310 8960 2310
+	8890 2310 9010 2310
 $Comp
 L power:GND #PWR010
 U 1 1 5A1F2C89
@@ -468,8 +463,37 @@ F 3 "" H 9300 2310 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 Wire Wire Line
-	9300 2310 9160 2310
+	9300 2310 9210 2310
 Wire Wire Line
 	4350 3950 4350 3400
 Connection ~ 4350 3400
+Wire Wire Line
+	7300 4550 7500 4550
+Wire Wire Line
+	8350 4550 8600 4550
+Wire Wire Line
+	7800 5000 7800 5150
+Wire Wire Line
+	7800 5000 8350 5000
+Wire Wire Line
+	8100 4550 8100 4650
+Wire Wire Line
+	7700 2330 7700 2500
+Wire Wire Line
+	7380 2330 7380 2170
+Wire Wire Line
+	3990 3400 4350 3400
+Wire Wire Line
+	3990 3100 4500 3100
+Wire Wire Line
+	4350 3400 4500 3400
+Wire Wire Line
+	7700 1840 7700 1940
+Connection ~ 7700 2330
+Wire Wire Line
+	7700 2140 7700 2330
+Text Label 7700 2350 0    50   ~ 0
+wemos_5V
+Text Label 4100 3100 0    50   ~ 0
+RF95_3V3
 $EndSCHEMATC
