@@ -1,7 +1,7 @@
 This firmware interfaces with the LoRa transciever and Javascript web apps.
 
 # Setup and development
-See the main [README](github.com/sudomesh/disaster-radio) to build the firmware
+See the main [README](https://github.com/sudomesh/disaster-radio) to build the firmware
 
 # Testing
 Debugging can be done over serial using screen or minicom.
