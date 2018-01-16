@@ -37,9 +37,11 @@ DIO0 sends an interrupt from the LoRa chip upon Tx/Rx Ready on the radio. It is 
 
 The disaster.radio firmware opens up a websocket through which you can transmit and receive messages over the LoRa tranceiver. If you'd like to build an application for disaster.radio, you will need to write a websocket client that can send and receive messages in the proper format to the websocket server running on the ESP8266. Currently, the firmware expects websocket messages in the following format,   
 `<msgID><msgType>|<msg>`  
-where `<msgID>` is a two-byte binary unsigned integer representing an abitrary sequence number, this is sent back to the websocket client with an `!` appended to act as an acknowledgment and could be used for error-checking,  
-`<msgType>` is a single binary utf8 encoded character representing the application for which the message is intended, such 'c' for chat or 'm' for maps,  
-and `<msg>` is a binary utf8 encoded string of characters limited to 252 bytes, this can be treated as the body of the message and may be used to handle client-side concerns, such as intended recipient or requested map tile.    
+where,
+* `<msgID>` is a two-byte binary unsigned integer representing an abitrary sequence number, this is sent back to the websocket client with an `!` appended to act as an acknowledgment and could be used for error-checking,  
+* `<msgType>` is a single binary utf8 encoded character representing the application for which the message is intended, such 'c' for chat or 'm' for maps,  
+* `<msg>` is a binary utf8 encoded string of characters limited to 252 bytes, this can be treated as the body of the message and may be used to handle client-side concerns, such as intended recipient or requested map tile.    
+
 An example messge may appear as follows,
 `001Ac|<noffle>@juul did you feel that earthquake!`
 or
