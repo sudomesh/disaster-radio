@@ -1,5 +1,5 @@
 ~*
-esp8266-arduino/**
+esp8266-arduino
 libs/**
 settings.mk
 web/settings.js
