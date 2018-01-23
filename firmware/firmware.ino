@@ -3,73 +3,68 @@
 #include <Hash.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <DNSServer.h>
 #include <SPIFFSEditor.h>
 #include <SPI.h>
 #include <LoRa.h>
 
-// This is just a slightly modified version of the
-// official ESPAsyncWebserver example
-// Where the SetSpread example has been added 
-// from the LoRa library examples 
-
-// SKETCH BEGIN
-AsyncWebServer server(80);
-AsyncWebSocket ws("/ws");
-AsyncEventSource events("/events");
 #define HEADERSIZE 4 
 #define BUFFERSIZE 252
 
 byte mac[6];
+char macaddr[14];
 char ssid[32] = "DisasterRadio ";
-const char * hostName = "esp-async";
+const char * hostName = "disaster-node";
+
+const byte DNS_PORT = 53;
+DNSServer dnsServer;
+IPAddress gateway(192, 162, 4, 1);
+const char * url = "disaster.chat";
+
+AsyncWebServer server(80);
+AsyncWebSocket ws("/ws");
+AsyncEventSource events("/events");
 
 const int csPin = 15;          // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
 const int resetPin = 5;       // LoRa radio reset, GPIO0 = D3
 const int irqPin = 4;        // interrupt pin for receive callback?, GPIO2 = D4
 //TODO: switch to volatile byte for interrupt
 
-//String outgoing;              // outgoing message
-int id_length = 15;
-byte msgCount = 0;            // count of outgoing messages
 byte localAddress;     // assigned to last byte of mac address in setup
 byte destination = 0xFF;      // destination to send to default broadcast
-int interval = 2000;          // interval between sends
-long lastSendTime = 0; // time of last packet send
 
+/*
+  CALLBACK FUNCTIONS
+*/
 void onReceive(int packetSize) {
     if (packetSize == 0) return;          // if there's no packet, return
 
     // read packet header bytes:
-    int recipient = LoRa.read();          // recipient address
-    byte sender = LoRa.read();            // sender address
-    byte incomingMsgId = LoRa.read();     // incoming msg ID
-    byte incomingLength = LoRa.read();    // incoming msg length
+    //int recipient = LoRa.read();          // recipient address
+    //byte sender = LoRa.read();            // sender address
+    //byte incomingMsgId = LoRa.read();     // incoming msg ID
+    //byte incomingLength = LoRa.read();    // incoming msg length
 
     char incoming[BUFFERSIZE];                 // payload of packet
 
-    int i = 0;
+    int incomingLength = 0;
     while (LoRa.available()) { 
-        incoming[i] += (char)LoRa.read(); 
-        i++;
+        incoming[incomingLength] += (char)LoRa.read(); 
+        incomingLength++;
     }
-
-    /*if (incomingLength != i) {   // check length for error
+    
+    /* TODO: fix error check once garbling solved
+    if (incomingLength != i) {   // check length for error
       Serial.printf("error: message length does not match length\r\n");
       return;                             // skip rest of function
-      }*/
+    }*/
 
     // if the recipient isn't this device or broadcast,
-    if (recipient != localAddress && recipient != 0xFF) {
+    /*if (recipient != localAddress && recipient != 0xFF) {
         Serial.printf("This message is not for me.\r\n");
         return;                             // skip rest of function
-    }
+    }*/
 
-    // if message is for this device, or broadcast, print details:
-    Serial.printf("Received from: 0x%02x\r\n", sender);
-    Serial.printf("Sent to: 0x%02x\r\n", recipient);
-    Serial.printf("Message ID: %d\r\n", incomingMsgId);
-    Serial.printf("Message length: %d\r\n", incomingLength);
-    //Serial.printf("Message: %s\r\n", incoming));
     Serial.printf("RSSI: %f\r\n", LoRa.packetRssi());
     Serial.printf("Snr: %f\r\n", LoRa.packetSnr());
 
@@ -78,20 +73,18 @@ void onReceive(int packetSize) {
     }
     Serial.printf("\r\n");
 
-    //ws.binaryAll(incoming, incomingLength);
+    ws.binaryAll(incoming, incomingLength);
 }
 
 void sendMessage(char* outgoing, int outgoing_length) {
     LoRa.beginPacket();                   // start packet
-    LoRa.write(destination);              // add destination address
-    LoRa.write(localAddress);             // add sender address
-    LoRa.write(msgCount);                 // add message ID
-    LoRa.write(outgoing_length);        // add payload length
+    //LoRa.write(destination);              // add destination address
+    //LoRa.write(localAddress);             // add sender address
+    //LoRa.write(outgoing_length);        // add payload length
     for( int i = 0 ; i < outgoing_length ; i++){
         LoRa.write(outgoing[i]);                 // add payload
     }
     LoRa.endPacket();                     // finish packet and send it
-    msgCount++;                           // increment message ID
 }
 
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
@@ -119,7 +112,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
             Serial.printf("ws[%s][%u] %s-message[%llu]: \r\n", server->url(), client->id(), (info->opcode == WS_TEXT)?"text":"binary", info->len);
 
-            //cast data into a char
+            //cast data to char array
             for(size_t i=0; i < info->len; i++) {
                 //TODO check if info length is bigger than allocated memory
                 msg[i] = (char) data[i];
@@ -153,13 +146,13 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             }
             Serial.printf("\r\n");
 
-            //respond to websocket
+            //send ack to websocket
             ws.binary(client->id(), msg_id, 3);
 
             //transmit message over LoRa
             sendMessage(msg, msg_length);
 
-            //echoing message
+            //echoing message to ws
             char echo[256]; 
             char prepend[7] = "<echo>";
             int prepend_length= 6;
@@ -185,17 +178,20 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 }
 
 
-void setup(){
-    Serial.begin(115200);
-    Serial.setDebugOutput(true);
-    char macaddr[14];
+/*
+  SETUP FUNCTIONS
+*/
+void wifiSetup(){
     WiFi.macAddress(mac);
     sprintf(macaddr, "%02x:%02x:%02x:%02x:%02x:%02x", mac[5], mac[4], mac[3], mac[2], mac[1], mac [0]);
     strcat(ssid, macaddr);
     WiFi.hostname(hostName);
     WiFi.mode(WIFI_AP);
+    WiFi.softAPConfig(gateway, gateway, IPAddress(255, 255, 255, 0));
     WiFi.softAP(ssid);
+}
 
+void spiffsSetup(){
     if (SPIFFS.begin()) {
         Serial.print("ok\r\n");
         if (SPIFFS.exists("/index.html")) {
@@ -216,7 +212,21 @@ void setup(){
             Serial.printf("No such file found.\r\n");
         }
     }
+}
 
+void dnsSetup(){
+    // modify TTL associated  with the domain name (in seconds)
+    // default is 60 seconds
+    dnsServer.setTTL(300);
+    // set which return code will be used for all other domains (e.g. sending
+    // ServerFailure instead of NonExistentDomain will reduce number of queries
+    // sent by clients)
+    // default is DNSReplyCode::NonExistentDomain
+    dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
+    dnsServer.start(DNS_PORT, url, gateway);
+}
+
+void webServerSetup(){
     ws.onEvent(onWsEvent);
     server.addHandler(&ws);
 
@@ -277,6 +287,7 @@ void setup(){
 
         request->send(404);
     });
+
     server.onFileUpload([](AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final){
         if(!index)
         Serial.printf("UploadStart: %s\r\n", filename.c_str());
@@ -284,6 +295,7 @@ void setup(){
         if(final)
         Serial.printf("UploadEnd: %s (%u)\r\n", filename.c_str(), index+len);
     });
+
     server.onRequestBody([](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
         if(!index)
         Serial.printf("BodyStart: %u\r\n", total);
@@ -291,10 +303,12 @@ void setup(){
         if(index + len == total)
         Serial.printf("BodyEnd: %u\r\n", total);
     });
+
     server.begin();
+}
 
-    Serial.printf("LoRa Duplex - Set spreading factor\r\n");
 
+void loraSetup(){
     localAddress = mac[0];
 
     // override the default CS, reset, and IRQ pins (optional)
@@ -313,6 +327,24 @@ void setup(){
     Serial.printf("%s\r\n", macaddr);
 }
 
+/*
+  START MAIN
+*/
+void setup(){
+    Serial.begin(115200);
+    Serial.setDebugOutput(true);
+
+    wifiSetup();
+
+    spiffsSetup();
+
+    dnsSetup();
+
+    webServerSetup();
+
+    loraSetup();
+}
+
 void loop(){
-    //everything is done in callbacks
+    dnsServer.processNextRequest();
 }

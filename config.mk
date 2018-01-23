@@ -9,5 +9,6 @@ LIBS = ./libs/ESPAsyncTCP \
 	./libs/arduino-LoRa \
 	$(ESP_LIBS)/ESP8266WiFi \
 	$(ESP_LIBS)/Hash \
-	$(ESP_LIBS)/SPI
+	$(ESP_LIBS)/SPI \
+	$(ESP_LIBS)/DNSServer
 
