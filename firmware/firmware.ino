@@ -49,10 +49,10 @@ void onReceive(int packetSize) {
 
     int incomingLength = 0;
     while (LoRa.available()) { 
-        incoming[incomingLength] += (char)LoRa.read(); 
+        incoming[incomingLength] = (char)LoRa.read(); 
         incomingLength++;
     }
-    
+
     /* TODO: fix error check once garbling solved
     if (incomingLength != i) {   // check length for error
       Serial.printf("error: message length does not match length\r\n");
@@ -74,6 +74,7 @@ void onReceive(int packetSize) {
     Serial.printf("\r\n");
 
     ws.binaryAll(incoming, incomingLength);
+   
 }
 
 void sendMessage(char* outgoing, int outgoing_length) {
@@ -82,8 +83,9 @@ void sendMessage(char* outgoing, int outgoing_length) {
     //LoRa.write(localAddress);             // add sender address
     //LoRa.write(outgoing_length);        // add payload length
     for( int i = 0 ; i < outgoing_length ; i++){
-        LoRa.write(outgoing[i]);                 // add payload
+        LoRa.write(outgoing[i]);
     }
+    Serial.printf("\r\n");
     LoRa.endPacket();                     // finish packet and send it
 }
 
@@ -148,7 +150,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
             //send ack to websocket
             ws.binary(client->id(), msg_id, 3);
-
+            
             //transmit message over LoRa
             sendMessage(msg, msg_length);
 
@@ -187,7 +189,7 @@ void wifiSetup(){
     strcat(ssid, macaddr);
     WiFi.hostname(hostName);
     WiFi.mode(WIFI_AP);
-    WiFi.softAPConfig(gateway, gateway, IPAddress(255, 255, 255, 0));
+    //WiFi.softAPConfig(gateway, gateway, IPAddress(255, 255, 255, 0));
     WiFi.softAP(ssid);
 }
 
@@ -319,7 +321,8 @@ void loraSetup(){
         while (true);                       // if failed, do nothing
     }
 
-    LoRa.setSpreadingFactor(7);           // ranges from 6-12,default 7 see API docs
+    LoRa.setSPIFrequency(100E3);
+    LoRa.setSpreadingFactor(8);           // ranges from 6-12,default 7 see API docs
     LoRa.onReceive(onReceive);
     LoRa.receive();
     Serial.printf("LoRa init succeeded.\r\n");
