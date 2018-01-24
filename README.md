@@ -64,7 +64,7 @@ make flash
 
 # Building web app
 
-See `web/README.md`
+See [web/README.md](https://github.com/sudomesh/disaster-radio/tree/master/web)
 
 # Building and uploading SPIFFS image
 
@@ -85,6 +85,9 @@ If building doesn't work then try this first:
 ```
 touch web/static/*
 ```
+
+# Testing the firmware and web app  
+See [firmware/README.md](https://github.com/sudomesh/disaster-radio/tree/master/firmware)
 
 # Adding libraries
 

@@ -18,7 +18,9 @@ const char * hostName = "disaster-node";
 
 const byte DNS_PORT = 53;
 DNSServer dnsServer;
-IPAddress gateway(192, 162, 4, 1);
+IPAddress local_IP(192, 162, 4, 1);
+IPAddress gateway(0, 0, 0, 0);
+IPAddress netmask(255, 255, 255, 0);
 const char * url = "disaster.chat";
 
 AsyncWebServer server(80);
@@ -32,6 +34,8 @@ const int irqPin = 4;        // interrupt pin for receive callback?, GPIO2 = D4
 
 byte localAddress;     // assigned to last byte of mac address in setup
 byte destination = 0xFF;      // destination to send to default broadcast
+
+bool echo_on = true;
 
 /*
   CALLBACK FUNCTIONS
@@ -113,12 +117,15 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             //the whole message is in a single frame and we got all of it's data
 
             Serial.printf("ws[%s][%u] %s-message[%llu]: \r\n", server->url(), client->id(), (info->opcode == WS_TEXT)?"text":"binary", info->len);
-
             //cast data to char array
             for(size_t i=0; i < info->len; i++) {
                 //TODO check if info length is bigger than allocated memory
                 msg[i] = (char) data[i];
                 msg_length = i; 
+                    
+                if(msg[i] == '$'){
+                    echo_on = !echo_on;
+                }
 
                 // check for stop char of usr_id
                 if(msg[i] == '>'){
@@ -155,18 +162,20 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             sendMessage(msg, msg_length);
 
             //echoing message to ws
-            char echo[256]; 
-            char prepend[7] = "<echo>";
-            int prepend_length= 6;
-            memcpy(echo, msg, 4);
-            for( int i = 0 ; i < prepend_length ; i++){
-                echo[4+i] = prepend[i];
+            if(echo_on){
+                char echo[256]; 
+                char prepend[7] = "<echo>";
+                int prepend_length= 6;
+                memcpy(echo, msg, 4);
+                for( int i = 0 ; i < prepend_length ; i++){
+                    echo[4+i] = prepend[i];
+                }
+                for( int i = 0 ; i < msg_length-usr_id_stop ; i++){
+                    echo[4+prepend_length+i] = msg[i+usr_id_stop+1];
+                }
+                int echo_length = prepend_length - usr_id_length + msg_length - 1;
+                ws.binaryAll(echo, echo_length);
             }
-            for( int i = 0 ; i < msg_length-usr_id_stop ; i++){
-                echo[4+prepend_length+i] = msg[i+usr_id_stop+1];
-            }
-            int echo_length = prepend_length - usr_id_length + msg_length - 1;
-            ws.binaryAll(echo, echo_length);
 
             //set LoRa back into receive mode
             LoRa.receive();
@@ -189,7 +198,7 @@ void wifiSetup(){
     strcat(ssid, macaddr);
     WiFi.hostname(hostName);
     WiFi.mode(WIFI_AP);
-    //WiFi.softAPConfig(gateway, gateway, IPAddress(255, 255, 255, 0));
+    WiFi.softAPConfig(local_IP, gateway, netmask);
     WiFi.softAP(ssid);
 }
 
@@ -225,7 +234,7 @@ void dnsSetup(){
     // sent by clients)
     // default is DNSReplyCode::NonExistentDomain
     dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
-    dnsServer.start(DNS_PORT, url, gateway);
+    dnsServer.start(DNS_PORT, url, local_IP);
 }
 
 void webServerSetup(){
