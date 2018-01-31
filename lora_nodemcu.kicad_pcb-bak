@@ -1,4 +1,4 @@
-(kicad_pcb (version 20171130) (host pcbnew no-vcs-found-bf44d39~61~ubuntu16.04.1)
+(kicad_pcb (version 20170922) (host pcbnew "(2017-11-19 revision 8b2b138)-master")
 
   (general
     (thickness 1.2)
@@ -85,7 +85,7 @@
       (mirror false)
       (drillshape 0)
       (scaleselection 1)
-      (outputdirectory ""))
+      (outputdirectory gerber/))
   )
 
   (net 0 "")

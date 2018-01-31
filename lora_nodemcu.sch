@@ -26,7 +26,7 @@ F 3 "" H 5150 3150 60  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L device:Antenna_Shield AE1
+L lora_nodemcu-rescue:Antenna_Shield-device AE1
 U 1 1 59CB0BD9
 P 4450 4150
 F 0 "AE1" H 4375 4325 50  0000 R CNN
@@ -70,7 +70,7 @@ F 3 "" H 3640 3100 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L device:R R3
+L lora_nodemcu-rescue:R-device R3
 U 1 1 59CC447A
 P 6350 3100
 F 0 "R3" V 6430 3100 50  0000 C CNN
@@ -81,7 +81,7 @@ F 3 "" H 6350 3100 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L device:R R5
+L lora_nodemcu-rescue:R-device R5
 U 1 1 59CC4726
 P 6350 3650
 F 0 "R5" V 6430 3650 50  0000 C CNN
@@ -92,7 +92,7 @@ F 3 "" H 6350 3650 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L device:R R6
+L lora_nodemcu-rescue:R-device R6
 U 1 1 59CC47A1
 P 6350 3800
 F 0 "R6" V 6430 3800 50  0000 C CNN
@@ -103,7 +103,7 @@ F 3 "" H 6350 3800 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L device:R R4
+L lora_nodemcu-rescue:R-device R4
 U 1 1 59CF0F92
 P 6350 3450
 F 0 "R4" V 6430 3450 50  0000 C CNN
@@ -114,7 +114,7 @@ F 3 "" H 6350 3450 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L device:R R2
+L lora_nodemcu-rescue:R-device R2
 U 1 1 59CF1001
 P 6350 2800
 F 0 "R2" V 6430 2800 50  0000 C CNN
@@ -125,7 +125,7 @@ F 3 "" H 6350 2800 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L device:R R1
+L lora_nodemcu-rescue:R-device R1
 U 1 1 59CF1A56
 P 6350 2450
 F 0 "R1" V 6430 2450 50  0000 C CNN
@@ -231,7 +231,7 @@ F 3 "" H 7800 4550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L device:C C2
+L lora_nodemcu-rescue:C-device C2
 U 1 1 59DDA417
 P 8350 4750
 F 0 "C2" H 8375 4850 50  0000 L CNN
@@ -242,7 +242,7 @@ F 3 "" H 8350 4750 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L device:C C1
+L lora_nodemcu-rescue:C-device C1
 U 1 1 59DDA458
 P 7300 4850
 F 0 "C1" H 7325 4950 50  0000 L CNN
@@ -268,7 +268,7 @@ NoConn ~ 7850 2700
 Text Label 4450 3720 0    60   ~ 0
 50Ohm
 $Comp
-L device:C_Small C4
+L lora_nodemcu-rescue:C_Small-device C4
 U 1 1 5A1CF19C
 P 7530 2330
 F 0 "C4" H 7622 2376 50  0000 L CNN
@@ -279,7 +279,7 @@ F 3 "" H 7530 2330 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L device:L_Core_Ferrite_Small L2
+L lora_nodemcu-rescue:L_Core_Ferrite_Small-device L2
 U 1 1 5A1CF7A6
 P 7700 2040
 F 0 "L2" V 7522 2040 50  0000 C CNN
@@ -290,7 +290,7 @@ F 3 "" H 7700 2040 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L device:C_Small C3
+L lora_nodemcu-rescue:C_Small-device C3
 U 1 1 5A1DF95C
 P 3990 3250
 F 0 "C3" H 4082 3296 50  0000 L CNN
@@ -301,7 +301,7 @@ F 3 "" H 3990 3250 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L device:L_Core_Ferrite_Small L1
+L lora_nodemcu-rescue:L_Core_Ferrite_Small-device L1
 U 1 1 5A1DFA59
 P 3810 3100
 F 0 "L1" V 3632 3100 50  0000 C CNN
@@ -435,7 +435,7 @@ Wire Wire Line
 	3990 3150 3990 3100
 Connection ~ 3990 3100
 $Comp
-L device:C_Small C5
+L lora_nodemcu-rescue:C_Small-device C5
 U 1 1 5A1F028E
 P 9110 2310
 F 0 "C5" V 8881 2310 50  0000 C CNN

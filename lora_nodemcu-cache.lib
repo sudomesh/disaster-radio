@@ -1,11 +1,11 @@
 EESchema-LIBRARY Version 2.4
 #encoding utf-8
 #
-# device:Antenna_Shield
+# lora_nodemcu-rescue:Antenna_Shield-device
 #
-DEF device:Antenna_Shield AE 0 40 N N 1 F N
+DEF lora_nodemcu-rescue:Antenna_Shield-device AE 0 40 N N 1 F N
 F0 "AE" -75 175 50 H V R CNN
-F1 "device:Antenna_Shield" -75 100 50 H V R CNN
+F1 "lora_nodemcu-rescue:Antenna_Shield-device" -75 100 50 H V R CNN
 F2 "" 0 100 50 H I C CNN
 F3 "" 0 100 50 H I C CNN
 DRAW
@@ -22,11 +22,11 @@ X Shield 2 100 -200 100 U 50 50 1 1 I
 ENDDRAW
 ENDDEF
 #
-# device:C
+# lora_nodemcu-rescue:C-device
 #
-DEF device:C C 0 10 N Y 1 F N
+DEF lora_nodemcu-rescue:C-device C 0 10 N Y 1 F N
 F0 "C" 25 100 50 H V L CNN
-F1 "device:C" 25 -100 50 H V L CNN
+F1 "lora_nodemcu-rescue:C-device" 25 -100 50 H V L CNN
 F2 "" 38 -150 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST
@@ -40,11 +40,11 @@ X ~ 2 0 -150 110 U 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
-# device:C_Small
+# lora_nodemcu-rescue:C_Small-device
 #
-DEF device:C_Small C 0 10 N N 1 F N
+DEF lora_nodemcu-rescue:C_Small-device C 0 10 N N 1 F N
 F0 "C" 10 70 50 H V L CNN
-F1 "device:C_Small" 10 -80 50 H V L CNN
+F1 "lora_nodemcu-rescue:C_Small-device" 10 -80 50 H V L CNN
 F2 "" 0 0 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST
@@ -58,11 +58,32 @@ X ~ 2 0 -100 80 U 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
-# device:L_Core_Ferrite_Small
+# lora_nodemcu-rescue:LM1117-3.3-RESCUE-lora_nodemcu
 #
-DEF device:L_Core_Ferrite_Small L 0 10 N N 1 F N
+DEF lora_nodemcu-rescue:LM1117-3.3-RESCUE-lora_nodemcu U 0 30 Y Y 1 F N
+F0 "U" 100 -250 50 H V C CNN
+F1 "lora_nodemcu-rescue:LM1117-3.3-RESCUE-lora_nodemcu" 0 250 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+$FPLIST
+ SOT-223*
+ TO-263*
+ TO-252*
+$ENDFPLIST
+DRAW
+S -200 -200 200 200 0 1 10 f
+X GND/ADJ 1 0 -300 100 U 50 50 1 1 W
+X VO 2 300 75 100 L 50 50 1 1 w
+X VI 3 -300 0 100 R 50 50 1 1 W
+X VO 4 300 -100 100 L 50 50 1 1 w
+ENDDRAW
+ENDDEF
+#
+# lora_nodemcu-rescue:L_Core_Ferrite_Small-device
+#
+DEF lora_nodemcu-rescue:L_Core_Ferrite_Small-device L 0 10 N N 1 F N
 F0 "L" 50 40 50 H V L CNN
-F1 "device:L_Core_Ferrite_Small" 50 -50 50 H V L CNN
+F1 "lora_nodemcu-rescue:L_Core_Ferrite_Small-device" 50 -50 50 H V L CNN
 F2 "" 0 0 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST
@@ -97,11 +118,11 @@ X ~ 2 0 -100 20 U 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
-# device:R
+# lora_nodemcu-rescue:R-device
 #
-DEF device:R R 0 0 N Y 1 F N
+DEF lora_nodemcu-rescue:R-device R 0 0 N Y 1 F N
 F0 "R" 80 0 50 V V C CNN
-F1 "device:R" 0 0 50 V V C CNN
+F1 "lora_nodemcu-rescue:R-device" 0 0 50 V V C CNN
 F2 "" -70 0 50 V I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST
@@ -112,27 +133,6 @@ DRAW
 S -40 -100 40 100 0 1 10 N
 X ~ 1 0 150 50 D 50 50 1 1 P
 X ~ 2 0 -150 50 U 50 50 1 1 P
-ENDDRAW
-ENDDEF
-#
-# lora_nodemcu-rescue:LM1117-3.3-RESCUE-lora_nodemcu
-#
-DEF lora_nodemcu-rescue:LM1117-3.3-RESCUE-lora_nodemcu U 0 30 Y Y 1 F N
-F0 "U" 100 -250 50 H V C CNN
-F1 "lora_nodemcu-rescue:LM1117-3.3-RESCUE-lora_nodemcu" 0 250 50 H V C CNN
-F2 "" 0 0 50 H I C CNN
-F3 "" 0 0 50 H I C CNN
-$FPLIST
- SOT-223*
- TO-263*
- TO-252*
-$ENDFPLIST
-DRAW
-S -200 -200 200 200 0 1 10 f
-X GND/ADJ 1 0 -300 100 U 50 50 1 1 W
-X VO 2 300 75 100 L 50 50 1 1 w
-X VI 3 -300 0 100 R 50 50 1 1 W
-X VO 4 300 -100 100 L 50 50 1 1 w
 ENDDRAW
 ENDDEF
 #
