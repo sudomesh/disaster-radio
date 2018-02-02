@@ -13,7 +13,7 @@
 
 byte mac[6];
 char macaddr[14];
-char ssid[32] = "DisasterRadio ";
+char ssid[32] = "disasterradio ";
 const char * hostName = "disaster-node";
 
 const byte DNS_PORT = 53;
@@ -89,7 +89,6 @@ void sendMessage(char* outgoing, int outgoing_length) {
     for( int i = 0 ; i < outgoing_length ; i++){
         LoRa.write(outgoing[i]);
     }
-    Serial.printf("\r\n");
     LoRa.endPacket();                     // finish packet and send it
 }
 
@@ -198,7 +197,7 @@ void wifiSetup(){
     strcat(ssid, macaddr);
     WiFi.hostname(hostName);
     WiFi.mode(WIFI_AP);
-    WiFi.softAPConfig(local_IP, gateway, netmask);
+    //WiFi.softAPConfig(local_IP, gateway, netmask);
     WiFi.softAP(ssid);
 }
 
@@ -331,7 +330,7 @@ void loraSetup(){
     }
 
     LoRa.setSPIFrequency(100E3);
-    LoRa.setSpreadingFactor(8);           // ranges from 6-12,default 7 see API docs
+    LoRa.setSpreadingFactor(9);           // ranges from 6-12,default 7 see API docs
     LoRa.onReceive(onReceive);
     LoRa.receive();
     Serial.printf("LoRa init succeeded.\r\n");
@@ -357,6 +356,24 @@ void setup(){
     loraSetup();
 }
 
+int interval = 30000;          // interval between sends
+long lastSendTime = 0; // time of last packet send
+
 void loop(){
+
+    /* uncomment to enable BEACON mode
+    if (millis() - lastSendTime > interval) {
+        int test_length = 26;
+        char test_message[252] = "FFc|<morgan> HeLoRa World! ";   // send a message
+        Serial.printf("Sending:");
+        for( int i = 0 ; i <= test_length ; i++){
+            Serial.printf("%c", test_message[i]);
+        }
+        Serial.printf("\r\n");
+        sendMessage(test_message, test_length);
+        lastSendTime = millis();            // timestamp the message
+        interval = random(2000) + 1000;    // 2-3 seconds
+    }*/ 
+
     dnsServer.processNextRequest();
 }
