@@ -3,7 +3,7 @@
 #include <Hash.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <DNSServer.h>
+#include <ESP8266mDNS.h>
 #include <SPIFFSEditor.h>
 #include <SPI.h>
 #include <LoRa.h>
@@ -16,8 +16,6 @@ char macaddr[14];
 char ssid[32] = "disaster.radio ";
 const char * hostName = "disaster-node";
 
-const byte DNS_PORT = 53;
-DNSServer dnsServer;
 IPAddress local_IP(192, 162, 4, 1);
 IPAddress gateway(0, 0, 0, 0);
 IPAddress netmask(255, 255, 255, 0);
@@ -280,16 +278,16 @@ void spiffsSetup(){
     }
 }
 
-void dnsSetup(){
-    // modify TTL associated  with the domain name (in seconds)
-    // default is 60 seconds
-    dnsServer.setTTL(300);
-    // set which return code will be used for all other domains (e.g. sending
-    // ServerFailure instead of NonExistentDomain will reduce number of queries
-    // sent by clients)
-    // default is DNSReplyCode::NonExistentDomain
-    dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
-    dnsServer.start(DNS_PORT, url, local_IP);
+void mdnsSetup(){
+  if(!MDNS.begin("disaster")){
+    Serial.printf("Error setting up mDNS\r\n");
+    while(1) {
+      delay(1000);
+    }
+  }
+  Serial.printf("mDNS responder started\r\n");
+      
+  MDNS.addService("http", "tcp", 80);
 }
 
 void webServerSetup(){
@@ -407,7 +405,7 @@ void setup(){
 
     spiffsSetup();
 
-    dnsSetup();
+    mdnsSetup();
 
     webServerSetup();
 
@@ -433,5 +431,4 @@ void loop(){
         interval = random(2000) + 1000;    // 2-3 seconds
     }*/ 
 
-    dnsServer.processNextRequest();
 }
