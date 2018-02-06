@@ -3,7 +3,7 @@
 #include <Hash.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <DNSServer.h>
+#include <ESP8266mDNS.h>
 #include <SPIFFSEditor.h>
 #include <SPI.h>
 #include <LoRa.h>
@@ -13,15 +13,13 @@
 
 byte mac[6];
 char macaddr[14];
-char ssid[32] = "disasterradio ";
+char ssid[32] = "disaster.radio ";
 const char * hostName = "disaster-node";
 
-const byte DNS_PORT = 53;
-DNSServer dnsServer;
 IPAddress local_IP(192, 162, 4, 1);
 IPAddress gateway(0, 0, 0, 0);
 IPAddress netmask(255, 255, 255, 0);
-const char * url = "disaster.chat";
+const char * url = "chat.disaster.radio";
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
@@ -36,6 +34,53 @@ byte localAddress;     // assigned to last byte of mac address in setup
 byte destination = 0xFF;      // destination to send to default broadcast
 
 bool echo_on = true;
+
+/*
+  FORWARD-DEFINED FUNCTIONS
+*/
+void sendMessage(char* outgoing, int outgoing_length) {
+    LoRa.beginPacket();
+    for( int i = 0 ; i < outgoing_length ; i++){
+        LoRa.write(outgoing[i]);
+    }
+    LoRa.endPacket();
+}
+
+void storeMessage(char* message, int message_length) {
+  //store full message in log file
+  File log = SPIFFS.open("/log.txt", "a");
+  if(!log){
+    Serial.printf("file open failed");
+  }
+  for(int i = 0 ; i <= message_length ; i++){
+    log.printf("%c", message[i]);
+  }
+  log.printf("\n");
+  log.close();
+}
+
+//TODO conver string to char array
+String dumpLog() {
+  String dump = "";
+  File log = SPIFFS.open("/log.txt", "r");
+  if(!log){
+    Serial.printf("file open failed");
+  }  
+  Serial.print("reading log file: \r\n");
+  while (log.available()){
+    //TODO replace string with char array
+    String s = log.readStringUntil('\n');
+    dump += s;
+    dump += "\r\n";
+  }
+  return dump;
+}
+
+void clearLog() {
+  File log = SPIFFS.open("/log.txt", "w");
+  log.close();
+}
+
 
 /*
   CALLBACK FUNCTIONS
@@ -77,19 +122,10 @@ void onReceive(int packetSize) {
     }
     Serial.printf("\r\n");
 
+    storeMessage(incoming, incomingLength);
+    
     ws.binaryAll(incoming, incomingLength);
    
-}
-
-void sendMessage(char* outgoing, int outgoing_length) {
-    LoRa.beginPacket();                   // start packet
-    //LoRa.write(destination);              // add destination address
-    //LoRa.write(localAddress);             // add sender address
-    //LoRa.write(outgoing_length);        // add payload length
-    for( int i = 0 ; i < outgoing_length ; i++){
-        LoRa.write(outgoing[i]);
-    }
-    LoRa.endPacket();                     // finish packet and send it
 }
 
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
@@ -134,6 +170,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             msg_length++;
             msg[msg_length] = '\0';
 
+	    
             //parse message id 
             memcpy( msg_id, msg, 2 );
             msg_id[2] = '!';
@@ -146,17 +183,34 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             usr_id_length = usr_id_stop - 5;
 
             //print message info to serial
-            Serial.printf("Message Length: %d\r\n", msg_length);
+            /*Serial.printf("Message Length: %d\r\n", msg_length);
             Serial.printf("Message ID: %02d%02d %c\r\n", msg_id[0], msg_id[1], msg_id[2]);
             Serial.printf("Message:");
             for( int i = 0 ; i <= msg_length ; i++){
                 Serial.printf("%c", msg[i]);
             }
             Serial.printf("\r\n");
+	    */
+	    
+	    //store full message in log file
+	    File log = SPIFFS.open("/log.txt", "a");
+	    if(!log){
+	      Serial.printf("file open failed");
+	    }
+	    //TODO msg_id is hex bytes not chars? adapt storeMessage function
+	    log.printf("%02d%02d", msg_id[0], msg_id[1]);
+	    for(int i = 2 ; i <= msg_length ; i++){
+	      log.printf("%c", msg[i]);
+	    }
+	    log.printf("\n");
+	    log.close();
 
+	    //TODO delay ack based on estimated transmit time
             //send ack to websocket
             ws.binary(client->id(), msg_id, 3);
-            
+
+	    Serial.print(dumpLog());
+	    
             //transmit message over LoRa
             sendMessage(msg, msg_length);
 
@@ -193,7 +247,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 */
 void wifiSetup(){
     WiFi.macAddress(mac);
-    sprintf(macaddr, "%02x:%02x:%02x:%02x:%02x:%02x", mac[5], mac[4], mac[3], mac[2], mac[1], mac [0]);
+    sprintf(macaddr, "%02x%02x%02x%02x%02x%02x", mac[5], mac[4], mac[3], mac[2], mac[1], mac [0]);
     strcat(ssid, macaddr);
     WiFi.hostname(hostName);
     WiFi.mode(WIFI_AP);
@@ -224,16 +278,16 @@ void spiffsSetup(){
     }
 }
 
-void dnsSetup(){
-    // modify TTL associated  with the domain name (in seconds)
-    // default is 60 seconds
-    dnsServer.setTTL(300);
-    // set which return code will be used for all other domains (e.g. sending
-    // ServerFailure instead of NonExistentDomain will reduce number of queries
-    // sent by clients)
-    // default is DNSReplyCode::NonExistentDomain
-    dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
-    dnsServer.start(DNS_PORT, url, local_IP);
+void mdnsSetup(){
+  if(!MDNS.begin("disaster")){
+    Serial.printf("Error setting up mDNS\r\n");
+    while(1) {
+      delay(1000);
+    }
+  }
+  Serial.printf("mDNS responder started\r\n");
+      
+  MDNS.addService("http", "tcp", 80);
 }
 
 void webServerSetup(){
@@ -248,6 +302,8 @@ void webServerSetup(){
     server.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request){
         request->send(200, "text/plain", String(ESP.getFreeHeap()));
     });
+
+    //server.serveStatic("/dump", SPIFFS, "/log.txt");
 
     server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
 
@@ -349,7 +405,7 @@ void setup(){
 
     spiffsSetup();
 
-    dnsSetup();
+    mdnsSetup();
 
     webServerSetup();
 
@@ -375,5 +431,4 @@ void loop(){
         interval = random(2000) + 1000;    // 2-3 seconds
     }*/ 
 
-    dnsServer.processNextRequest();
 }
