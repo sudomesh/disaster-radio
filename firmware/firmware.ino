@@ -71,12 +71,26 @@ void onReceive(int packetSize) {
 
     Serial.printf("RSSI: %f\r\n", LoRa.packetRssi());
     Serial.printf("Snr: %f\r\n", LoRa.packetSnr());
+    File log = SPIFFS.open("/log.txt", "w");
+      if(!log){
+	Serial.printf("file open failed");
+      }  
 
     for(int i = 0 ; i < incomingLength ; i++){
         Serial.printf("%c", incoming[i]);
+        log.print(incoming[i]);
     }
     Serial.printf("\r\n");
+    log.print("\r\n");
+    log.close();
 
+    log = SPIFFS.open("/log.txt", "r");
+      if(!log){
+	Serial.printf("file open failed");
+      }  
+    String s = log.readStringUntil('\n');
+    Serial.print("reading log file: ");
+    Serial.println(s);
     ws.binaryAll(incoming, incomingLength);
    
 }
