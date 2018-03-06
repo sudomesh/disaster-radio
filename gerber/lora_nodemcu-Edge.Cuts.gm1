@@ -1,11 +1,11 @@
-%TF.GenerationSoftware,KiCad,Pcbnew,no-vcs-found-c6d0075~61~ubuntu17.10.1*%
-%TF.CreationDate,2018-01-30T21:37:05-08:00*%
+%TF.GenerationSoftware,KiCad,Pcbnew,5.0.0-rc2-dev-unknown-31e78d6~62~ubuntu17.10.1*%
+%TF.CreationDate,2018-03-05T20:59:55-08:00*%
 %TF.ProjectId,lora_nodemcu,6C6F72615F6E6F64656D63752E6B6963,rev?*%
 %TF.SameCoordinates,Original*%
 %TF.FileFunction,Profile,NP*%
 %FSLAX46Y46*%
 G04 Gerber Fmt 4.6, Leading zero omitted, Abs format (unit mm)*
-G04 Created by KiCad (PCBNEW no-vcs-found-c6d0075~61~ubuntu17.10.1) date Tue Jan 30 21:37:05 2018*
+G04 Created by KiCad (PCBNEW 5.0.0-rc2-dev-unknown-31e78d6~62~ubuntu17.10.1) date Mon Mar  5 20:59:55 2018*
 %MOMM*%
 %LPD*%
 G01*
