@@ -1,0 +1,10 @@
+Id,Designator,Package,Quantity,Designation,Supplier and ref
+1,U3,D1_mini_board,1,WeMos_mini,DO NOT PLACE
+2,"C3,C5,C4",C_0805_HandSoldering,3,0.1uF,
+3,"L2,L1",L_0805_HandSoldering,2,0k,
+4,AE1,Molex_SMA_Jack_Edge_Mount,1,Antenna_Shield,DO NOT PLACE
+5,"C1,C2",C_0805_HandSoldering,2,10uF,
+6,R1,R_0805_HandSoldering,1,0,
+7,"R2,R3,R4,R5,R6",R_0805_HandSoldering,5,0k,
+8,U1,RFM95,1,RFM95,DO NOT PLACE
+9,U2,SOT-223,1,LM1117-3.3,
