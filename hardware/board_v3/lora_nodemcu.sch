@@ -1,0 +1,537 @@
+EESchema Schematic File Version 4
+LIBS:lora_nodemcu-cache
+EELAYER 26 0
+EELAYER END
+$Descr A3 16535 11693
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L rfm95:RFM95 U1
+U 1 1 59C9C638
+P 10550 2800
+F 0 "U1" H 10600 2850 60  0000 C CNN
+F 1 "RFM95" H 10600 2750 60  0000 C CNN
+F 2 "DisasterRadio:RFM95" H 10550 2800 60  0001 C CNN
+F 3 "" H 10550 2800 60  0001 C CNN
+	1    10550 2800
+	-1   0    0    1   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:Antenna_Shield-device AE1
+U 1 1 59CB0BD9
+P 9850 3800
+F 0 "AE1" H 9775 3975 50  0000 R CNN
+F 1 "Antenna_Shield" H 9775 3900 50  0000 R CNN
+F 2 "Connectors_Molex:Molex_SMA_Jack_Edge_Mount" H 9850 3900 50  0001 C CNN
+F 3 "" H 9850 3900 50  0001 C CNN
+	1    9850 3800
+	-1   0    0    1   
+$EndComp
+$Comp
+L power:GND #PWR01
+U 1 1 59CB0D77
+P 11200 3300
+F 0 "#PWR01" H 11200 3050 50  0001 C CNN
+F 1 "GND" H 11200 3150 50  0000 C CNN
+F 2 "" H 11200 3300 50  0001 C CNN
+F 3 "" H 11200 3300 50  0001 C CNN
+	1    11200 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR02
+U 1 1 59CB0DA4
+P 11100 2350
+F 0 "#PWR02" H 11100 2100 50  0001 C CNN
+F 1 "GND" H 11100 2200 50  0000 C CNN
+F 2 "" H 11100 2350 50  0001 C CNN
+F 3 "" H 11100 2350 50  0001 C CNN
+	1    11100 2350
+	-1   0    0    1   
+$EndComp
+$Comp
+L power:+3.3V #PWR03
+U 1 1 59CB1055
+P 9040 2750
+F 0 "#PWR03" H 9040 2600 50  0001 C CNN
+F 1 "+3.3V" H 9040 2890 50  0000 C CNN
+F 2 "" H 9040 2750 50  0001 C CNN
+F 3 "" H 9040 2750 50  0001 C CNN
+	1    9040 2750
+	0    -1   -1   0   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:WeMos_mini-RESCUE-lora_nodemcu U3
+U 1 1 59DACFEC
+P 13750 2500
+F 0 "U3" H 13750 3000 60  0000 C CNN
+F 1 "WeMos_mini" H 13750 2000 60  0000 C CNN
+F 2 "DisasterRadio:D1_mini_board" H 14300 1800 60  0001 C CNN
+F 3 "" H 14300 1800 60  0000 C CNN
+	1    13750 2500
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR07
+U 1 1 59DAD071
+P 13100 1490
+F 0 "#PWR07" H 13100 1340 50  0001 C CNN
+F 1 "+5V" H 13100 1630 50  0000 C CNN
+F 2 "" H 13100 1490 50  0001 C CNN
+F 3 "" H 13100 1490 50  0001 C CNN
+	1    13100 1490
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR08
+U 1 1 59DAD0A3
+P 12780 1820
+F 0 "#PWR08" H 12780 1570 50  0001 C CNN
+F 1 "GND" H 12780 1670 50  0000 C CNN
+F 2 "" H 12780 1820 50  0001 C CNN
+F 3 "" H 12780 1820 50  0001 C CNN
+	1    12780 1820
+	-1   0    0    1   
+$EndComp
+Text Label 14350 2250 0    60   ~ 0
+SS
+Text Label 14350 2350 0    60   ~ 0
+MOSI
+Text Label 14350 2450 0    60   ~ 0
+MISO
+Text Label 14350 2550 0    60   ~ 0
+SCK
+NoConn ~ 13250 2750
+NoConn ~ 13250 2850
+NoConn ~ 14250 2650
+NoConn ~ 14250 2750
+NoConn ~ 14250 2850
+NoConn ~ 9900 2850
+NoConn ~ 9900 2950
+NoConn ~ 11100 2550
+NoConn ~ 9900 2550
+NoConn ~ 9900 2450
+$Comp
+L power:GND #PWR09
+U 1 1 59E595E3
+P 9340 3050
+F 0 "#PWR09" H 9340 2800 50  0001 C CNN
+F 1 "GND" H 9340 2900 50  0000 C CNN
+F 2 "" H 9340 3050 50  0001 C CNN
+F 3 "" H 9340 3050 50  0001 C CNN
+	1    9340 3050
+	0    1    1    0   
+$EndComp
+NoConn ~ 13250 2450
+NoConn ~ 13250 2350
+Text Label 9850 3370 0    60   ~ 0
+50Ohm
+$Comp
+L lora_nodemcu-rescue:C_Small-device C4
+U 1 1 5A1CF19C
+P 12930 1980
+F 0 "C4" H 13022 2026 50  0000 L CNN
+F 1 "C_decoupling" H 13022 1935 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0805_HandSoldering" H 12930 1980 50  0001 C CNN
+F 3 "" H 12930 1980 50  0001 C CNN
+	1    12930 1980
+	0    -1   -1   0   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:L_Core_Ferrite_Small-device L2
+U 1 1 5A1CF7A6
+P 13100 1690
+F 0 "L2" V 12922 1690 50  0000 C CNN
+F 1 "L_Core_Ferrite" V 13013 1690 50  0000 C CNN
+F 2 "Inductors_SMD:L_0805_HandSoldering" H 13100 1690 50  0001 C CNN
+F 3 "" H 13100 1690 50  0001 C CNN
+	1    13100 1690
+	-1   0    0    1   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:C_Small-device C3
+U 1 1 5A1DF95C
+P 9390 2900
+F 0 "C3" H 9482 2946 50  0000 L CNN
+F 1 "C_Small" H 9482 2855 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0805_HandSoldering" H 9390 2900 50  0001 C CNN
+F 3 "" H 9390 2900 50  0001 C CNN
+	1    9390 2900
+	1    0    0    -1  
+$EndComp
+$Comp
+L lora_nodemcu-rescue:L_Core_Ferrite_Small-device L1
+U 1 1 5A1DFA59
+P 9210 2750
+F 0 "L1" V 9032 2750 50  0000 C CNN
+F 1 "L_Core_Ferrite_Small" V 9123 2750 50  0000 C CNN
+F 2 "Inductors_SMD:L_0805_HandSoldering" H 9210 2750 50  0001 C CNN
+F 3 "" H 9210 2750 50  0001 C CNN
+	1    9210 2750
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	9900 3150 9850 3150
+Wire Wire Line
+	9850 3150 9850 3600
+Wire Wire Line
+	9340 3050 9390 3050
+Wire Wire Line
+	11100 3150 11200 3150
+Wire Wire Line
+	11200 3150 11200 3300
+Wire Wire Line
+	9310 2750 9390 2750
+Wire Wire Line
+	11300 2950 11100 2950
+Wire Wire Line
+	11100 3050 11450 3050
+Wire Wire Line
+	11100 2750 11600 2750
+Wire Wire Line
+	11250 2650 11100 2650
+Wire Wire Line
+	9900 2650 9650 2650
+Wire Wire Line
+	11450 3050 11450 3300
+Wire Wire Line
+	11100 2850 11600 2850
+Wire Wire Line
+	11600 2850 11600 3100
+Wire Wire Line
+	11600 2450 11250 2450
+Wire Wire Line
+	11600 2100 9650 2100
+Wire Wire Line
+	9650 2100 9650 2650
+Wire Wire Line
+	11100 2450 11100 2350
+Wire Wire Line
+	13100 2150 13250 2150
+Wire Wire Line
+	12780 2250 13250 2250
+Wire Wire Line
+	14250 2250 14850 2250
+Wire Wire Line
+	14250 2350 14700 2350
+Wire Wire Line
+	14250 2550 14500 2550
+Wire Wire Line
+	11300 2950 11300 3450
+Wire Wire Line
+	11300 3450 11600 3450
+Wire Wire Line
+	11250 2450 11250 2650
+Wire Wire Line
+	14700 2350 14700 3450
+Wire Wire Line
+	14250 2450 14600 2450
+Wire Wire Line
+	14600 2450 14600 3300
+Wire Wire Line
+	14500 2550 14500 3100
+Wire Wire Line
+	11450 3300 11600 3300
+Wire Wire Line
+	14850 3200 14850 2250
+Wire Wire Line
+	13250 2650 12400 2650
+Wire Wire Line
+	12400 2650 12400 2450
+Wire Wire Line
+	12560 2100 12560 2550
+Wire Wire Line
+	12780 2250 12780 1980
+Wire Wire Line
+	13100 1980 13030 1980
+Wire Wire Line
+	12830 1980 12780 1980
+Connection ~ 12780 1980
+Wire Wire Line
+	9110 2750 9040 2750
+Wire Wire Line
+	9390 3000 9390 3050
+Connection ~ 9390 3050
+Wire Wire Line
+	9390 2800 9390 2750
+Connection ~ 9390 2750
+$Comp
+L lora_nodemcu-rescue:C_Small-device C5
+U 1 1 5A1F028E
+P 14510 1960
+F 0 "C5" V 14281 1960 50  0000 C CNN
+F 1 "C_decoupling" V 14372 1960 50  0000 C CNN
+F 2 "Capacitors_SMD:C_0805_HandSoldering" H 14510 1960 50  0001 C CNN
+F 3 "" H 14510 1960 50  0001 C CNN
+	1    14510 1960
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	14250 2150 14290 2150
+$Comp
+L power:GND #PWR010
+U 1 1 5A1F2C89
+P 14700 1960
+F 0 "#PWR010" H 14700 1710 50  0001 C CNN
+F 1 "GND" V 14705 1832 50  0000 R CNN
+F 2 "" H 14700 1960 50  0001 C CNN
+F 3 "" H 14700 1960 50  0001 C CNN
+	1    14700 1960
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	9750 3600 9750 3050
+Connection ~ 9750 3050
+Wire Wire Line
+	13100 1980 13100 2150
+Wire Wire Line
+	12780 1980 12780 1820
+Wire Wire Line
+	9390 3050 9750 3050
+Wire Wire Line
+	9390 2750 9900 2750
+Wire Wire Line
+	9750 3050 9900 3050
+Wire Wire Line
+	13100 1490 13100 1590
+Connection ~ 13100 1980
+Wire Wire Line
+	13100 1790 13100 1980
+Text Label 13100 2000 0    50   ~ 0
+wemos_5V
+Text Label 9500 2750 0    50   ~ 0
+RF95_3V3
+Wire Wire Line
+	14700 1960 14610 1960
+Wire Wire Line
+	14290 1960 14410 1960
+Wire Wire Line
+	14290 2150 14290 1960
+Wire Wire Line
+	12560 2550 13250 2550
+$Comp
+L lora_nodemcu-rescue:R-device R1
+U 1 1 59CF1A56
+P 11750 2100
+F 0 "R1" V 11830 2100 50  0000 C CNN
+F 1 "0k" V 11750 2100 50  0000 C CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" V 11680 2100 50  0001 C CNN
+F 3 "" H 11750 2100 50  0001 C CNN
+	1    11750 2100
+	0    1    1    0   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:R-device R2
+U 1 1 59CF1001
+P 11750 2450
+F 0 "R2" V 11830 2450 50  0000 C CNN
+F 1 "0k" V 11750 2450 50  0000 C CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" V 11680 2450 50  0001 C CNN
+F 3 "" H 11750 2450 50  0001 C CNN
+	1    11750 2450
+	0    1    1    0   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:R-device R4
+U 1 1 59CF0F92
+P 11750 3100
+F 0 "R4" V 11830 3100 50  0000 C CNN
+F 1 "0k" V 11750 3100 50  0000 C CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" V 11680 3100 50  0001 C CNN
+F 3 "" H 11750 3100 50  0001 C CNN
+	1    11750 3100
+	0    1    1    0   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:R-device R6
+U 1 1 59CC47A1
+P 11750 3450
+F 0 "R6" V 11830 3450 50  0000 C CNN
+F 1 "0k" V 11750 3450 50  0000 C CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" V 11680 3450 50  0001 C CNN
+F 3 "" H 11750 3450 50  0001 C CNN
+	1    11750 3450
+	0    1    1    0   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:R-device R5
+U 1 1 59CC4726
+P 11750 3300
+F 0 "R5" V 11830 3300 50  0000 C CNN
+F 1 "0k" V 11750 3300 50  0000 C CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" V 11680 3300 50  0001 C CNN
+F 3 "" H 11750 3300 50  0001 C CNN
+	1    11750 3300
+	0    1    1    0   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:R-device R3
+U 1 1 59CC447A
+P 11750 2750
+F 0 "R3" V 11830 2750 50  0000 C CNN
+F 1 "0k" V 11750 2750 50  0000 C CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" V 11680 2750 50  0001 C CNN
+F 3 "" H 11750 2750 50  0001 C CNN
+	1    11750 2750
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	12400 2750 11900 2750
+Wire Wire Line
+	12400 2450 11900 2450
+Wire Wire Line
+	12560 2100 11900 2100
+Wire Wire Line
+	12400 3200 12400 2750
+Wire Wire Line
+	14700 3450 11900 3450
+Wire Wire Line
+	14600 3300 11900 3300
+Wire Wire Line
+	12400 3200 14850 3200
+Wire Wire Line
+	14500 3100 11900 3100
+$Comp
+L rfm95:RFM95 U?
+U 1 1 5AA1A811
+P 7600 8000
+F 0 "U?" H 7650 8637 60  0000 C CNN
+F 1 "RFM95" H 7650 8531 60  0000 C CNN
+F 2 "" H 7600 8000 60  0001 C CNN
+F 3 "" H 7600 8000 60  0001 C CNN
+	1    7600 8000
+	1    0    0    -1  
+$EndComp
+$Comp
+L ESP8266:ESP-07S U?
+U 1 1 5AA0FEDC
+P 4000 7900
+F 0 "U?" H 4000 8978 50  0000 C CNN
+F 1 "ESP-07S" H 4000 8887 50  0000 C CNN
+F 2 "" H 4000 7900 50  0001 C CNN
+F 3 "https://www.tinyosshop.com/datasheet/ESP-07S_User_Manual.pdf" H 4000 7900 50  0001 C CNN
+	1    4000 7900
+	1    0    0    -1  
+$EndComp
+$Comp
+L Regulator_Linear:LM1117-3.3 U?
+U 1 1 5AA102A2
+P 3350 5750
+F 0 "U?" H 3350 5992 50  0000 C CNN
+F 1 "LM1117-3.3" H 3350 5901 50  0000 C CNN
+F 2 "" H 3350 5750 50  0001 C CNN
+F 3 "http://www.ti.com/lit/ds/symlink/lm1117.pdf" H 3350 5750 50  0001 C CNN
+	1    3350 5750
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR?
+U 1 1 5AA103DB
+P 2700 5450
+F 0 "#PWR?" H 2700 5300 50  0001 C CNN
+F 1 "+5V" H 2715 5623 50  0000 C CNN
+F 2 "" H 2700 5450 50  0001 C CNN
+F 3 "" H 2700 5450 50  0001 C CNN
+	1    2700 5450
+	1    0    0    -1  
+$EndComp
+$Comp
+L lora_nodemcu-cache:+3.3V #PWR?
+U 1 1 5AA10486
+P 3950 5500
+F 0 "#PWR?" H 3950 5350 50  0001 C CNN
+F 1 "+3.3V" H 3965 5673 50  0000 C CNN
+F 2 "" H 3950 5500 50  0001 C CNN
+F 3 "" H 3950 5500 50  0001 C CNN
+	1    3950 5500
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C?
+U 1 1 5AA10538
+P 2700 6000
+F 0 "C?" H 2792 6046 50  0000 L CNN
+F 1 "C_Small" H 2792 5955 50  0000 L CNN
+F 2 "" H 2700 6000 50  0001 C CNN
+F 3 "~" H 2700 6000 50  0001 C CNN
+	1    2700 6000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C?
+U 1 1 5AA105D0
+P 3950 6000
+F 0 "C?" H 4042 6046 50  0000 L CNN
+F 1 "C_Small" H 4042 5955 50  0000 L CNN
+F 2 "" H 3950 6000 50  0001 C CNN
+F 3 "~" H 3950 6000 50  0001 C CNN
+	1    3950 6000
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5AA107DA
+P 3350 6400
+F 0 "#PWR?" H 3350 6150 50  0001 C CNN
+F 1 "GND" H 3355 6227 50  0000 C CNN
+F 2 "" H 3350 6400 50  0001 C CNN
+F 3 "" H 3350 6400 50  0001 C CNN
+	1    3350 6400
+	1    0    0    -1  
+$EndComp
+Text Notes 11250 3750 0    50   ~ 0
+OLD SCHEMATIC TO BE REMOVED
+$Comp
+L lora_nodemcu-rescue:Antenna_Shield-device AE?
+U 1 1 5AA17190
+P 9500 7350
+F 0 "AE?" H 9425 7525 50  0000 R CNN
+F 1 "Antenna_Shield" H 9425 7450 50  0000 R CNN
+F 2 "Connectors_Molex:Molex_SMA_Jack_Edge_Mount" H 9500 7450 50  0001 C CNN
+F 3 "" H 9500 7450 50  0001 C CNN
+	1    9500 7350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Jumper:Jumper_2_Bridged JP?
+U 1 1 5AA197A7
+P 5800 7600
+F 0 "JP?" H 5800 7795 50  0000 C CNN
+F 1 "JUMPER" H 5800 7704 50  0000 C CNN
+F 2 "" H 5800 7600 50  0001 C CNN
+F 3 "~" H 5800 7600 50  0001 C CNN
+	1    5800 7600
+	1    0    0    -1  
+$EndComp
+$Comp
+L Jumper:Jumper_2_Bridged JP?
+U 1 1 5AA199C8
+P 5800 7900
+F 0 "JP?" H 5800 8095 50  0000 C CNN
+F 1 "JUMPER" H 5800 8004 50  0000 C CNN
+F 2 "" H 5800 7900 50  0001 C CNN
+F 3 "~" H 5800 7900 50  0001 C CNN
+	1    5800 7900
+	1    0    0    -1  
+$EndComp
+$Comp
+L Jumper:Jumper_2_Bridged JP?
+U 1 1 5AA19A44
+P 5800 8200
+F 0 "JP?" H 5800 8395 50  0000 C CNN
+F 1 "JUMPER" H 5800 8304 50  0000 C CNN
+F 2 "" H 5800 8200 50  0001 C CNN
+F 3 "~" H 5800 8200 50  0001 C CNN
+	1    5800 8200
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC

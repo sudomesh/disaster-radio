@@ -1,0 +1,521 @@
+EESchema Schematic File Version 4
+LIBS:lora_nodemcu-cache
+EELAYER 26 0
+EELAYER END
+$Descr A3 16535 11693
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L rfm95:RFM95 U1
+U 1 1 59C9C638
+P 9700 3150
+F 0 "U1" H 9750 3200 60  0000 C CNN
+F 1 "RFM95" H 9750 3100 60  0000 C CNN
+F 2 "DisasterRadio:RFM95" H 9700 3150 60  0001 C CNN
+F 3 "" H 9700 3150 60  0001 C CNN
+	1    9700 3150
+	-1   0    0    1   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:Antenna_Shield-device AE1
+U 1 1 59CB0BD9
+P 9000 4150
+F 0 "AE1" H 8925 4325 50  0000 R CNN
+F 1 "Antenna_Shield" H 8925 4250 50  0000 R CNN
+F 2 "Connectors_Molex:Molex_SMA_Jack_Edge_Mount" H 9000 4250 50  0001 C CNN
+F 3 "" H 9000 4250 50  0001 C CNN
+	1    9000 4150
+	-1   0    0    1   
+$EndComp
+$Comp
+L power:GND #PWR01
+U 1 1 59CB0D77
+P 10350 3650
+F 0 "#PWR01" H 10350 3400 50  0001 C CNN
+F 1 "GND" H 10350 3500 50  0000 C CNN
+F 2 "" H 10350 3650 50  0001 C CNN
+F 3 "" H 10350 3650 50  0001 C CNN
+	1    10350 3650
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR02
+U 1 1 59CB0DA4
+P 10250 2700
+F 0 "#PWR02" H 10250 2450 50  0001 C CNN
+F 1 "GND" H 10250 2550 50  0000 C CNN
+F 2 "" H 10250 2700 50  0001 C CNN
+F 3 "" H 10250 2700 50  0001 C CNN
+	1    10250 2700
+	-1   0    0    1   
+$EndComp
+$Comp
+L power:+3.3V #PWR03
+U 1 1 59CB1055
+P 8190 3100
+F 0 "#PWR03" H 8190 2950 50  0001 C CNN
+F 1 "+3.3V" H 8190 3240 50  0000 C CNN
+F 2 "" H 8190 3100 50  0001 C CNN
+F 3 "" H 8190 3100 50  0001 C CNN
+	1    8190 3100
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:GND #PWR04
+U 1 1 59D2FC8A
+P 12350 5150
+F 0 "#PWR04" H 12350 4900 50  0001 C CNN
+F 1 "GND" H 12350 5000 50  0000 C CNN
+F 2 "" H 12350 5150 50  0001 C CNN
+F 3 "" H 12350 5150 50  0001 C CNN
+	1    12350 5150
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+3.3V #PWR05
+U 1 1 59D2FCFE
+P 13150 4550
+F 0 "#PWR05" H 13150 4400 50  0001 C CNN
+F 1 "+3.3V" H 13150 4690 50  0000 C CNN
+F 2 "" H 13150 4550 50  0001 C CNN
+F 3 "" H 13150 4550 50  0001 C CNN
+	1    13150 4550
+	0    1    1    0   
+$EndComp
+$Comp
+L power:+5V #PWR06
+U 1 1 59D2FD9A
+P 11600 4550
+F 0 "#PWR06" H 11600 4400 50  0001 C CNN
+F 1 "+5V" H 11600 4690 50  0000 C CNN
+F 2 "" H 11600 4550 50  0001 C CNN
+F 3 "" H 11600 4550 50  0001 C CNN
+	1    11600 4550
+	0    -1   -1   0   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:WeMos_mini-RESCUE-lora_nodemcu U3
+U 1 1 59DACFEC
+P 12900 2850
+F 0 "U3" H 12900 3350 60  0000 C CNN
+F 1 "WeMos_mini" H 12900 2350 60  0000 C CNN
+F 2 "DisasterRadio:D1_mini_board" H 13450 2150 60  0001 C CNN
+F 3 "" H 13450 2150 60  0000 C CNN
+	1    12900 2850
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR07
+U 1 1 59DAD071
+P 12250 1840
+F 0 "#PWR07" H 12250 1690 50  0001 C CNN
+F 1 "+5V" H 12250 1980 50  0000 C CNN
+F 2 "" H 12250 1840 50  0001 C CNN
+F 3 "" H 12250 1840 50  0001 C CNN
+	1    12250 1840
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR08
+U 1 1 59DAD0A3
+P 11930 2170
+F 0 "#PWR08" H 11930 1920 50  0001 C CNN
+F 1 "GND" H 11930 2020 50  0000 C CNN
+F 2 "" H 11930 2170 50  0001 C CNN
+F 3 "" H 11930 2170 50  0001 C CNN
+	1    11930 2170
+	-1   0    0    1   
+$EndComp
+Text Label 13500 2600 0    60   ~ 0
+SS
+Text Label 13500 2700 0    60   ~ 0
+MOSI
+Text Label 13500 2800 0    60   ~ 0
+MISO
+Text Label 13500 2900 0    60   ~ 0
+SCK
+NoConn ~ 12400 3100
+NoConn ~ 12400 3200
+NoConn ~ 13400 3000
+NoConn ~ 13400 3100
+NoConn ~ 13400 3200
+NoConn ~ 9050 3200
+NoConn ~ 9050 3300
+NoConn ~ 10250 2900
+NoConn ~ 9050 2900
+NoConn ~ 9050 2800
+$Comp
+L lora_nodemcu-rescue:LM1117-3.3-RESCUE-lora_nodemcu U2
+U 1 1 59DDA3AE
+P 12350 4550
+F 0 "U2" H 12450 4300 50  0000 C CNN
+F 1 "LM1117-3.3" H 12350 4800 50  0000 C CNN
+F 2 "TO_SOT_Packages_SMD:SOT-223" H 12350 4550 50  0001 C CNN
+F 3 "" H 12350 4550 50  0001 C CNN
+	1    12350 4550
+	1    0    0    -1  
+$EndComp
+$Comp
+L lora_nodemcu-rescue:C-device C2
+U 1 1 59DDA417
+P 12900 4750
+F 0 "C2" H 12925 4850 50  0000 L CNN
+F 1 "10u" H 12925 4650 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0805_HandSoldering" H 12938 4600 50  0001 C CNN
+F 3 "" H 12900 4750 50  0001 C CNN
+	1    12900 4750
+	-1   0    0    1   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:C-device C1
+U 1 1 59DDA458
+P 11850 4850
+F 0 "C1" H 11875 4950 50  0000 L CNN
+F 1 "10u" H 11875 4750 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0805_HandSoldering" H 11888 4700 50  0001 C CNN
+F 3 "" H 11850 4850 50  0001 C CNN
+	1    11850 4850
+	-1   0    0    1   
+$EndComp
+$Comp
+L power:GND #PWR09
+U 1 1 59E595E3
+P 8490 3400
+F 0 "#PWR09" H 8490 3150 50  0001 C CNN
+F 1 "GND" H 8490 3250 50  0000 C CNN
+F 2 "" H 8490 3400 50  0001 C CNN
+F 3 "" H 8490 3400 50  0001 C CNN
+	1    8490 3400
+	0    1    1    0   
+$EndComp
+NoConn ~ 12400 2800
+NoConn ~ 12400 2700
+Text Label 9000 3720 0    60   ~ 0
+50Ohm
+$Comp
+L lora_nodemcu-rescue:C_Small-device C4
+U 1 1 5A1CF19C
+P 12080 2330
+F 0 "C4" H 12172 2376 50  0000 L CNN
+F 1 "C_decoupling" H 12172 2285 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0805_HandSoldering" H 12080 2330 50  0001 C CNN
+F 3 "" H 12080 2330 50  0001 C CNN
+	1    12080 2330
+	0    -1   -1   0   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:L_Core_Ferrite_Small-device L2
+U 1 1 5A1CF7A6
+P 12250 2040
+F 0 "L2" V 12072 2040 50  0000 C CNN
+F 1 "L_Core_Ferrite" V 12163 2040 50  0000 C CNN
+F 2 "Inductors_SMD:L_0805_HandSoldering" H 12250 2040 50  0001 C CNN
+F 3 "" H 12250 2040 50  0001 C CNN
+	1    12250 2040
+	-1   0    0    1   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:C_Small-device C3
+U 1 1 5A1DF95C
+P 8540 3250
+F 0 "C3" H 8632 3296 50  0000 L CNN
+F 1 "C_Small" H 8632 3205 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0805_HandSoldering" H 8540 3250 50  0001 C CNN
+F 3 "" H 8540 3250 50  0001 C CNN
+	1    8540 3250
+	1    0    0    -1  
+$EndComp
+$Comp
+L lora_nodemcu-rescue:L_Core_Ferrite_Small-device L1
+U 1 1 5A1DFA59
+P 8360 3100
+F 0 "L1" V 8182 3100 50  0000 C CNN
+F 1 "L_Core_Ferrite_Small" V 8273 3100 50  0000 C CNN
+F 2 "Inductors_SMD:L_0805_HandSoldering" H 8360 3100 50  0001 C CNN
+F 3 "" H 8360 3100 50  0001 C CNN
+	1    8360 3100
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	9050 3500 9000 3500
+Wire Wire Line
+	9000 3500 9000 3950
+Wire Wire Line
+	8490 3400 8540 3400
+Wire Wire Line
+	10250 3500 10350 3500
+Wire Wire Line
+	10350 3500 10350 3650
+Wire Wire Line
+	8460 3100 8540 3100
+Wire Wire Line
+	10450 3300 10250 3300
+Wire Wire Line
+	10250 3400 10600 3400
+Wire Wire Line
+	10250 3100 10750 3100
+Wire Wire Line
+	10400 3000 10250 3000
+Wire Wire Line
+	9050 3000 8800 3000
+Wire Wire Line
+	10600 3400 10600 3650
+Wire Wire Line
+	10250 3200 10750 3200
+Wire Wire Line
+	10750 3200 10750 3450
+Wire Wire Line
+	10750 2800 10400 2800
+Wire Wire Line
+	10750 2450 8800 2450
+Wire Wire Line
+	8800 2450 8800 3000
+Wire Wire Line
+	10250 2800 10250 2700
+Wire Wire Line
+	12250 2500 12400 2500
+Wire Wire Line
+	11930 2600 12400 2600
+Wire Wire Line
+	13400 2600 14000 2600
+Wire Wire Line
+	13400 2700 13850 2700
+Wire Wire Line
+	13400 2900 13650 2900
+Wire Wire Line
+	10450 3300 10450 3800
+Wire Wire Line
+	10450 3800 10750 3800
+Wire Wire Line
+	10400 2800 10400 3000
+Wire Wire Line
+	13850 2700 13850 3800
+Wire Wire Line
+	13400 2800 13750 2800
+Wire Wire Line
+	13750 2800 13750 3650
+Wire Wire Line
+	13650 2900 13650 3450
+Wire Wire Line
+	10600 3650 10750 3650
+Wire Wire Line
+	14000 3550 14000 2600
+Wire Wire Line
+	12650 4550 12900 4550
+Wire Wire Line
+	11600 4550 11850 4550
+Wire Wire Line
+	12350 4850 12350 5000
+Wire Wire Line
+	11850 4700 11850 4550
+Connection ~ 11850 4550
+Wire Wire Line
+	12900 4550 12900 4600
+Connection ~ 12900 4550
+Wire Wire Line
+	11850 5000 12350 5000
+Wire Wire Line
+	12900 5000 12900 4900
+Connection ~ 12350 5000
+Wire Wire Line
+	12650 4475 12650 4550
+Connection ~ 12650 4550
+Wire Wire Line
+	12400 3000 11550 3000
+Wire Wire Line
+	11550 3000 11550 2800
+Wire Wire Line
+	11710 2450 11710 2900
+Wire Wire Line
+	11930 2600 11930 2330
+Wire Wire Line
+	12250 2330 12180 2330
+Wire Wire Line
+	11980 2330 11930 2330
+Connection ~ 11930 2330
+Wire Wire Line
+	8260 3100 8190 3100
+Wire Wire Line
+	8540 3350 8540 3400
+Connection ~ 8540 3400
+Wire Wire Line
+	8540 3150 8540 3100
+Connection ~ 8540 3100
+$Comp
+L lora_nodemcu-rescue:C_Small-device C5
+U 1 1 5A1F028E
+P 13660 2310
+F 0 "C5" V 13431 2310 50  0000 C CNN
+F 1 "C_decoupling" V 13522 2310 50  0000 C CNN
+F 2 "Capacitors_SMD:C_0805_HandSoldering" H 13660 2310 50  0001 C CNN
+F 3 "" H 13660 2310 50  0001 C CNN
+	1    13660 2310
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	13400 2500 13440 2500
+$Comp
+L power:GND #PWR010
+U 1 1 5A1F2C89
+P 13850 2310
+F 0 "#PWR010" H 13850 2060 50  0001 C CNN
+F 1 "GND" V 13855 2182 50  0000 R CNN
+F 2 "" H 13850 2310 50  0001 C CNN
+F 3 "" H 13850 2310 50  0001 C CNN
+	1    13850 2310
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	8900 3950 8900 3400
+Connection ~ 8900 3400
+Wire Wire Line
+	11850 4550 12050 4550
+Wire Wire Line
+	12900 4550 13150 4550
+Wire Wire Line
+	12350 5000 12350 5150
+Wire Wire Line
+	12350 5000 12900 5000
+Wire Wire Line
+	12650 4550 12650 4650
+Wire Wire Line
+	12250 2330 12250 2500
+Wire Wire Line
+	11930 2330 11930 2170
+Wire Wire Line
+	8540 3400 8900 3400
+Wire Wire Line
+	8540 3100 9050 3100
+Wire Wire Line
+	8900 3400 9050 3400
+Wire Wire Line
+	12250 1840 12250 1940
+Connection ~ 12250 2330
+Wire Wire Line
+	12250 2140 12250 2330
+Text Label 12250 2350 0    50   ~ 0
+wemos_5V
+Text Label 8650 3100 0    50   ~ 0
+RF95_3V3
+Wire Wire Line
+	13850 2310 13760 2310
+Wire Wire Line
+	13440 2310 13560 2310
+Wire Wire Line
+	13440 2500 13440 2310
+Wire Wire Line
+	11710 2900 12400 2900
+$Comp
+L lora_nodemcu-rescue:R-device R1
+U 1 1 59CF1A56
+P 10900 2450
+F 0 "R1" V 10980 2450 50  0000 C CNN
+F 1 "0k" V 10900 2450 50  0000 C CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" V 10830 2450 50  0001 C CNN
+F 3 "" H 10900 2450 50  0001 C CNN
+	1    10900 2450
+	0    1    1    0   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:R-device R2
+U 1 1 59CF1001
+P 10900 2800
+F 0 "R2" V 10980 2800 50  0000 C CNN
+F 1 "0k" V 10900 2800 50  0000 C CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" V 10830 2800 50  0001 C CNN
+F 3 "" H 10900 2800 50  0001 C CNN
+	1    10900 2800
+	0    1    1    0   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:R-device R4
+U 1 1 59CF0F92
+P 10900 3450
+F 0 "R4" V 10980 3450 50  0000 C CNN
+F 1 "0k" V 10900 3450 50  0000 C CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" V 10830 3450 50  0001 C CNN
+F 3 "" H 10900 3450 50  0001 C CNN
+	1    10900 3450
+	0    1    1    0   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:R-device R6
+U 1 1 59CC47A1
+P 10900 3800
+F 0 "R6" V 10980 3800 50  0000 C CNN
+F 1 "0k" V 10900 3800 50  0000 C CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" V 10830 3800 50  0001 C CNN
+F 3 "" H 10900 3800 50  0001 C CNN
+	1    10900 3800
+	0    1    1    0   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:R-device R5
+U 1 1 59CC4726
+P 10900 3650
+F 0 "R5" V 10980 3650 50  0000 C CNN
+F 1 "0k" V 10900 3650 50  0000 C CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" V 10830 3650 50  0001 C CNN
+F 3 "" H 10900 3650 50  0001 C CNN
+	1    10900 3650
+	0    1    1    0   
+$EndComp
+$Comp
+L lora_nodemcu-rescue:R-device R3
+U 1 1 59CC447A
+P 10900 3100
+F 0 "R3" V 10980 3100 50  0000 C CNN
+F 1 "0k" V 10900 3100 50  0000 C CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" V 10830 3100 50  0001 C CNN
+F 3 "" H 10900 3100 50  0001 C CNN
+	1    10900 3100
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	11550 3100 11050 3100
+Wire Wire Line
+	11550 2800 11050 2800
+Wire Wire Line
+	11710 2450 11050 2450
+Wire Wire Line
+	11550 3550 11550 3100
+Wire Wire Line
+	13850 3800 11050 3800
+Wire Wire Line
+	13750 3650 11050 3650
+Wire Wire Line
+	11550 3550 14000 3550
+Wire Wire Line
+	13650 3450 11050 3450
+$Comp
+L rfm95:RFM95 U?
+U 1 1 5AA1A811
+P 9100 6750
+F 0 "U?" H 9150 7387 60  0000 C CNN
+F 1 "RFM95" H 9150 7281 60  0000 C CNN
+F 2 "" H 9100 6750 60  0001 C CNN
+F 3 "" H 9100 6750 60  0001 C CNN
+	1    9100 6750
+	1    0    0    -1  
+$EndComp
+$Comp
+L ESP8266:ESP-07S U?
+U 1 1 5AA0FEDC
+P 5950 6600
+F 0 "U?" H 5950 7678 50  0000 C CNN
+F 1 "ESP-07S" H 5950 7587 50  0000 C CNN
+F 2 "" H 5950 6600 50  0001 C CNN
+F 3 "https://www.tinyosshop.com/datasheet/ESP-07S_User_Manual.pdf" H 5950 6600 50  0001 C CNN
+	1    5950 6600
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC
