@@ -1,2 +1,3 @@
 (sym_lib_table
+  (lib (name disaster_radio)(type Legacy)(uri /media/fitz/Data/Dropbox/Projects/EE/disaster-radio/disaster-radio/hardware/board_v3/schematic_symbols/disaster_radio.lib)(options "")(descr ""))
 )
