@@ -1,8 +1,0 @@
-EESchema-DOCLIB  Version 2.0
-#
-$CMP D
-D Diode
-K diode
-$ENDCMP
-#
-#End Doc Library

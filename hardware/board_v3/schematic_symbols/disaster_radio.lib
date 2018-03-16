@@ -12,8 +12,8 @@ DRAW
 S -400 200 400 -200 0 1 0 N
 X Solar+ 1 -500 50 100 R 50 50 1 1 I
 X Solar- 2 -500 -50 100 R 50 50 1 1 I
-X Battery+ ~ 500 50 100 L 50 50 1 1 I
-X Battery- ~ 500 -50 100 L 50 50 1 1 I
+X Battery+ 3 500 50 100 L 50 50 1 1 I
+X Battery- 4 500 -50 100 L 50 50 1 1 I
 ENDDRAW
 ENDDEF
 #
