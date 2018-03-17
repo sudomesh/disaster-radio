@@ -1,0 +1,31 @@
+EESchema-LIBRARY Version 2.4
+#encoding utf-8
+#
+# CN3791_module
+#
+DEF CN3791_module U 0 40 Y Y 1 F N
+F0 "U" 0 300 50 H V C CNN
+F1 "CN3791_module" 0 -300 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+DRAW
+S -400 200 400 -200 0 1 0 N
+X Solar+ 1 -500 50 100 R 50 50 1 1 I
+X Solar- 2 -500 -50 100 R 50 50 1 1 I
+X Battery+ 3 500 50 100 L 50 50 1 1 I
+X Battery- 4 500 -50 100 L 50 50 1 1 I
+ENDDRAW
+ENDDEF
+#
+# res_small
+#
+DEF res_small U 0 40 Y Y 1 F N
+F0 "U" 0 0 50 H V C CNN
+F1 "res_small" 0 0 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+DRAW
+ENDDRAW
+ENDDEF
+#
+#End Library

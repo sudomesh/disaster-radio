@@ -1,0 +1,62 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP ESP-01v090
+D ESP8266 ESP-01 module, v090
+K MODULE ESP8266 ESP-8266
+F http://l0l.org.uk/2014/12/esp8266-modules-hardware-guide-gotta-catch-em-all/
+$ENDCMP
+#
+$CMP ESP-03
+D ESP8266 ESP-03 module, 14 pins, 2mm, ceramic antenna
+K MODULE ESP8266 ESP-8266
+F http://l0l.org.uk/2014/12/esp8266-modules-hardware-guide-gotta-catch-em-all/
+$ENDCMP
+#
+$CMP ESP-06
+D ESP8266, ESP-06 module, 20 pin
+K MODULE  ESP8266  ESP-8266
+F http://www.esp8266.com/viewtopic.php?f=6&t=9586
+$ENDCMP
+#
+$CMP ESP-07S
+D ESP8266 ESP-07S module, 16 pins, 2mm, IPX antenna connector
+K MODULE ESP8266 ESP-8266
+F https://www.tinyosshop.com/datasheet/ESP-07S_User_Manual.pdf
+$ENDCMP
+#
+$CMP ESP-07v2
+D ESP8266, ESP-07v2 module, 16 pin, 2mm, ceramic antenna
+K MODULE  ESP8266  ESP-8266
+F http://l0l.org.uk/2014/12/esp8266-modules-hardware-guide-gotta-catch-em-all/
+$ENDCMP
+#
+$CMP ESP-12
+D ESP8266 ESP-12 module, 16 pins, 2mm, PCB antenna
+K MODULE ESP8266 ESP-8266
+F http://l0l.org.uk/2014/12/esp8266-modules-hardware-guide-gotta-catch-em-all/
+$ENDCMP
+#
+$CMP ESP-12E
+D ESP8266 ESP-12E module, 22 pins, 2mm, PCB antenna
+K MODULE ESP8266 ESP-8266
+F http://l0l.org.uk/2014/12/esp8266-modules-hardware-guide-gotta-catch-em-all/
+$ENDCMP
+#
+$CMP ESP-13-WROOM-02
+D ESP8266 ESP-13-WROOM-02 module, 18 pins, 2mm, PCB antenna
+K MODULE ESP8266 ESP-8266
+F http://l0l.org.uk/2014/12/esp8266-modules-hardware-guide-gotta-catch-em-all/
+$ENDCMP
+#
+$CMP ESP-201
+D ESP8266 ESP-201 module, 26 pins, 0.1 inch
+K MODULE ESP8266 ESP-8266
+F http://l0l.org.uk/2014/12/esp8266-modules-hardware-guide-gotta-catch-em-all/
+$ENDCMP
+#
+$CMP ESP8266EX
+D ESP8266EX Espressif Wi-Fi SoC, 32pin, 0.5mm pitch, 5x5mm qfn32
+K Espressif Wi-Fi SoC IoT
+$ENDCMP
+#
+#End Doc Library
