@@ -217,8 +217,6 @@ Wire Wire Line
 Wire Wire Line
 	5950 2300 5950 3450
 Wire Wire Line
-	5950 3450 4950 3450
-Wire Wire Line
 	4350 3850 4350 3550
 Wire Wire Line
 	4350 3550 3550 3550
@@ -681,7 +679,6 @@ F 3 "" H 4500 3450 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	4700 3450 4850 3450
-Connection ~ 4950 3450
 $Comp
 L Jumper:Jumper_2_Bridged JP1
 U 1 1 5AAA022A
@@ -898,8 +895,6 @@ $EndComp
 Wire Wire Line
 	11700 4550 11700 4900
 Wire Wire Line
-	11700 5500 7450 5500
-Wire Wire Line
 	7450 5500 7450 6300
 Wire Wire Line
 	7450 6300 7100 6300
@@ -907,8 +902,6 @@ Wire Wire Line
 	11150 4550 11050 4550
 Wire Wire Line
 	11050 4550 11050 4950
-Wire Wire Line
-	11050 5350 7350 5350
 Wire Wire Line
 	7350 5350 7350 6200
 Wire Wire Line
@@ -1159,4 +1152,50 @@ F 3 "" H 6200 8800 50  0001 C CNN
 	1    6200 8800
 	1    0    0    -1  
 $EndComp
+$Comp
+L Jumper:Jumper_2_Bridged JP10
+U 1 1 5AADE3CF
+P 5450 3450
+F 0 "JP10" H 5450 3645 50  0000 C CNN
+F 1 "MPPT_TP" H 5450 3554 50  0000 C CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Bridged_Pad1.0x1.5mm" H 5450 3450 50  0001 C CNN
+F 3 "~" H 5450 3450 50  0001 C CNN
+	1    5450 3450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5250 3450 4950 3450
+Connection ~ 4950 3450
+Wire Wire Line
+	5650 3450 5950 3450
+$Comp
+L Device:R_Small R?
+U 1 1 5AAECE0B
+P 8300 5350
+F 0 "R?" V 8400 5300 50  0000 L CNN
+F 1 "10K" V 8200 5300 50  0000 L CNN
+F 2 "Resistor_SMD:R_0805_2012Metric_Pad1.15x1.50mm_HandSolder" H 8300 5350 50  0001 C CNN
+F 3 "~" H 8300 5350 50  0001 C CNN
+	1    8300 5350
+	0    1    -1   0   
+$EndComp
+$Comp
+L Device:R_Small R?
+U 1 1 5AAED216
+P 8650 5500
+F 0 "R?" V 8750 5450 50  0000 L CNN
+F 1 "10K" V 8550 5450 50  0000 L CNN
+F 2 "Resistor_SMD:R_0805_2012Metric_Pad1.15x1.50mm_HandSolder" H 8650 5500 50  0001 C CNN
+F 3 "~" H 8650 5500 50  0001 C CNN
+	1    8650 5500
+	0    1    -1   0   
+$EndComp
+Wire Wire Line
+	8550 5500 7450 5500
+Wire Wire Line
+	8200 5350 7350 5350
+Wire Wire Line
+	11050 5350 8400 5350
+Wire Wire Line
+	11700 5500 8750 5500
 $EndSCHEMATC

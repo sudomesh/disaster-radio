@@ -31,7 +31,7 @@ U 1 1 5AA102A2
 P 7550 2550
 F 0 "U3" H 7550 2792 50  0000 C CNN
 F 1 "LM1117-3.3" H 7550 2701 50  0000 C CNN
-F 2 "Package_TO_SOT_SMD:TSOT-23_HandSoldering" H 7550 2550 50  0001 C CNN
+F 2 "Package_TO_SOT_SMD:SOT-223-3_TabPin2" H 7550 2550 50  0001 C CNN
 F 3 "http://www.ti.com/lit/ds/symlink/lm1117.pdf" H 7550 2550 50  0001 C CNN
 	1    7550 2550
 	1    0    0    -1  
@@ -821,7 +821,7 @@ U 1 1 5AB4E7C5
 P 10700 4550
 F 0 "Q1" H 10500 4800 50  0000 L CNN
 F 1 "2N3904" H 10400 4700 50  0000 L CNN
-F 2 "Package_TO_SOT_THT:TO-92_Inline" H 10900 4475 50  0001 L CIN
+F 2 "Package_TO_SOT_SMD:SOT-23_Handsoldering" H 10900 4475 50  0001 L CIN
 F 3 "https://www.fairchildsemi.com/datasheets/2N/2N3904.pdf" H 10700 4550 50  0001 L CNN
 	1    10700 4550
 	1    0    0    -1  
@@ -832,7 +832,7 @@ U 1 1 5AB4EDC2
 P 11350 4550
 F 0 "Q2" H 11150 4800 50  0000 L CNN
 F 1 "2N3904" H 11050 4700 50  0000 L CNN
-F 2 "Package_TO_SOT_THT:TO-92_Inline" H 11550 4475 50  0001 L CIN
+F 2 "Package_TO_SOT_SMD:SOT-23_Handsoldering" H 11550 4475 50  0001 L CIN
 F 3 "https://www.fairchildsemi.com/datasheets/2N/2N3904.pdf" H 11350 4550 50  0001 L CNN
 	1    11350 4550
 	1    0    0    -1  
@@ -890,7 +890,7 @@ U 1 1 5AA80589
 P 12000 4550
 F 0 "Q3" H 12191 4596 50  0000 L CNN
 F 1 "2N3904" H 12191 4505 50  0000 L CNN
-F 2 "Package_TO_SOT_THT:TO-92_Inline" H 12200 4475 50  0001 L CIN
+F 2 "Package_TO_SOT_SMD:SOT-23_Handsoldering" H 12200 4475 50  0001 L CIN
 F 3 "https://www.fairchildsemi.com/datasheets/2N/2N3904.pdf" H 12000 4550 50  0001 L CNN
 	1    12000 4550
 	1    0    0    -1  
