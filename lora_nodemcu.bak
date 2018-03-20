@@ -370,11 +370,7 @@ Wire Wire Line
 Wire Wire Line
 	5850 2800 5850 3000
 Wire Wire Line
-	9300 2800 9300 3950
-Wire Wire Line
 	8850 2800 9200 2800
-Wire Wire Line
-	9200 2850 9200 3700
 Wire Wire Line
 	9100 2900 9100 3450
 Wire Wire Line
@@ -496,4 +492,8 @@ Text Label 7700 2350 0    50   ~ 0
 wemos_5V
 Text Label 4100 3100 0    50   ~ 0
 RF95_3V3
+Wire Wire Line
+	9300 2700 9300 3950
+Wire Wire Line
+	9200 2800 9200 3700
 $EndSCHEMATC

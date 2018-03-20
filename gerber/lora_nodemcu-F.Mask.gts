@@ -1,12 +1,12 @@
-%TF.GenerationSoftware,KiCad,Pcbnew,5.0.0-rc2-dev-unknown-f2bb398~62~ubuntu17.10.1*%
-%TF.CreationDate,2018-03-07T22:53:53-08:00*%
+%TF.GenerationSoftware,KiCad,Pcbnew,5.0.0-rc2-dev-unknown-c6ef0d5~62~ubuntu17.10.1*%
+%TF.CreationDate,2018-03-19T22:23:23-07:00*%
 %TF.ProjectId,lora_nodemcu,6C6F72615F6E6F64656D63752E6B6963,rev?*%
 %TF.SameCoordinates,Original*%
 %TF.FileFunction,Soldermask,Top*%
 %TF.FilePolarity,Negative*%
 %FSLAX46Y46*%
 G04 Gerber Fmt 4.6, Leading zero omitted, Abs format (unit mm)*
-G04 Created by KiCad (PCBNEW 5.0.0-rc2-dev-unknown-f2bb398~62~ubuntu17.10.1) date Wed Mar  7 22:53:53 2018*
+G04 Created by KiCad (PCBNEW 5.0.0-rc2-dev-unknown-c6ef0d5~62~ubuntu17.10.1) date Mon Mar 19 22:23:23 2018*
 %MOMM*%
 %LPD*%
 G01*
