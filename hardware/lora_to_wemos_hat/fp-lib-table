@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name DisasterRadio)(type KiCad)(uri "$(KIPRJMOD)/DisasterRadio.pretty")(options "")(descr ""))
+)

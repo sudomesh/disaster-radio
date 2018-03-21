@@ -1,0 +1,239 @@
+EESchema-LIBRARY Version 2.4
+#encoding utf-8
+#
+# lora_nodemcu-rescue_Antenna_Shield-device
+#
+DEF lora_nodemcu-rescue_Antenna_Shield-device AE 0 40 N N 1 F N
+F0 "AE" -75 175 50 H V R CNN
+F1 "lora_nodemcu-rescue_Antenna_Shield-device" -75 100 50 H V R CNN
+F2 "" 0 100 50 H I C CNN
+F3 "" 0 100 50 H I C CNN
+DRAW
+A -1 -73 32 -882 1242 0 1 0 N 0 -105 -20 -45
+A 1 -73 32 -918 558 0 1 0 N 0 -105 20 -45
+C 30 -75 7 0 1 0 F
+P 2 0 1 0 0 -100 0 0 N
+P 2 0 1 10 0 200 0 -150 N
+P 2 0 1 0 30 -75 100 -75 N
+P 2 0 1 0 100 -100 100 -75 N
+P 3 0 1 10 50 200 0 0 -50 200 N
+X A 1 0 -200 100 U 50 50 1 1 I
+X Shield 2 100 -200 100 U 50 50 1 1 I
+ENDDRAW
+ENDDEF
+#
+# lora_nodemcu-rescue_C-device
+#
+DEF lora_nodemcu-rescue_C-device C 0 10 N Y 1 F N
+F0 "C" 25 100 50 H V L CNN
+F1 "lora_nodemcu-rescue_C-device" 25 -100 50 H V L CNN
+F2 "" 38 -150 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+$FPLIST
+ C_*
+$ENDFPLIST
+DRAW
+P 2 0 1 20 -80 -30 80 -30 N
+P 2 0 1 20 -80 30 80 30 N
+X ~ 1 0 150 110 D 50 50 1 1 P
+X ~ 2 0 -150 110 U 50 50 1 1 P
+ENDDRAW
+ENDDEF
+#
+# lora_nodemcu-rescue_C_Small-device
+#
+DEF lora_nodemcu-rescue_C_Small-device C 0 10 N N 1 F N
+F0 "C" 10 70 50 H V L CNN
+F1 "lora_nodemcu-rescue_C_Small-device" 10 -80 50 H V L CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+$FPLIST
+ C_*
+$ENDFPLIST
+DRAW
+P 2 0 1 13 -60 -20 60 -20 N
+P 2 0 1 12 -60 20 60 20 N
+X ~ 1 0 100 80 D 50 50 1 1 P
+X ~ 2 0 -100 80 U 50 50 1 1 P
+ENDDRAW
+ENDDEF
+#
+# lora_nodemcu-rescue_LM1117-3.3-RESCUE-lora_nodemcu
+#
+DEF lora_nodemcu-rescue_LM1117-3.3-RESCUE-lora_nodemcu U 0 30 Y Y 1 F N
+F0 "U" 100 -250 50 H V C CNN
+F1 "lora_nodemcu-rescue_LM1117-3.3-RESCUE-lora_nodemcu" 0 250 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+$FPLIST
+ SOT-223*
+ TO-263*
+ TO-252*
+$ENDFPLIST
+DRAW
+S -200 -200 200 200 0 1 10 f
+X GND/ADJ 1 0 -300 100 U 50 50 1 1 W
+X VO 2 300 75 100 L 50 50 1 1 w
+X VI 3 -300 0 100 R 50 50 1 1 W
+X VO 4 300 -100 100 L 50 50 1 1 w
+ENDDRAW
+ENDDEF
+#
+# lora_nodemcu-rescue_L_Core_Ferrite_Small-device
+#
+DEF lora_nodemcu-rescue_L_Core_Ferrite_Small-device L 0 10 N N 1 F N
+F0 "L" 50 40 50 H V L CNN
+F1 "lora_nodemcu-rescue_L_Core_Ferrite_Small-device" 50 -50 50 H V L CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+$FPLIST
+ Choke_*
+ *Coil*
+ Inductor_*
+ L_*
+$ENDFPLIST
+DRAW
+A 0 -60 20 -899 899 0 1 0 N 0 -80 0 -40
+A 0 -20 20 -899 899 0 1 0 N 0 -40 0 0
+A 0 20 20 -899 899 0 1 0 N 0 0 0 40
+A 0 60 20 -899 899 0 1 0 N 0 40 0 80
+P 2 0 1 0 30 -75 30 -65 N
+P 2 0 1 0 30 -55 30 -45 N
+P 2 0 1 0 30 -35 30 -25 N
+P 2 0 1 0 30 -15 30 -5 N
+P 2 0 1 0 30 5 30 15 N
+P 2 0 1 0 30 25 30 35 N
+P 2 0 1 0 30 45 30 55 N
+P 2 0 1 0 30 65 30 75 N
+P 2 0 1 0 40 -65 40 -75 N
+P 2 0 1 0 40 -45 40 -55 N
+P 2 0 1 0 40 -25 40 -35 N
+P 2 0 1 0 40 -5 40 -15 N
+P 2 0 1 0 40 15 40 5 N
+P 2 0 1 0 40 35 40 25 N
+P 2 0 1 0 40 55 40 45 N
+P 2 0 1 0 40 75 40 65 N
+X ~ 1 0 100 20 D 50 50 1 1 P
+X ~ 2 0 -100 20 U 50 50 1 1 P
+ENDDRAW
+ENDDEF
+#
+# lora_nodemcu-rescue_R-device
+#
+DEF lora_nodemcu-rescue_R-device R 0 0 N Y 1 F N
+F0 "R" 80 0 50 V V C CNN
+F1 "lora_nodemcu-rescue_R-device" 0 0 50 V V C CNN
+F2 "" -70 0 50 V I C CNN
+F3 "" 0 0 50 H I C CNN
+$FPLIST
+ R_*
+ R_*
+$ENDFPLIST
+DRAW
+S -40 -100 40 100 0 1 10 N
+X ~ 1 0 150 50 D 50 50 1 1 P
+X ~ 2 0 -150 50 U 50 50 1 1 P
+ENDDRAW
+ENDDEF
+#
+# lora_nodemcu-rescue_WeMos_mini-RESCUE-lora_nodemcu
+#
+DEF lora_nodemcu-rescue_WeMos_mini-RESCUE-lora_nodemcu U 0 40 Y Y 1 F N
+F0 "U" 0 500 60 H V C CNN
+F1 "lora_nodemcu-rescue_WeMos_mini-RESCUE-lora_nodemcu" 0 -500 60 H V C CNN
+F2 "" 550 -700 60 H V C CNN
+F3 "" 550 -700 60 H V C CNN
+DRAW
+S -300 450 300 -550 0 1 0 N
+X 5V 1 -500 350 200 R 50 50 1 1 W
+X A0 10 500 -250 200 L 50 50 1 1 B
+X D0 11 500 -150 200 L 50 50 1 1 B
+X D5 12 500 -50 200 L 50 50 1 1 B
+X D6 13 500 50 200 L 50 50 1 1 B
+X D7 14 500 150 200 L 50 50 1 1 B
+X D8 15 500 250 200 L 50 50 1 1 B
+X 3.3V 16 500 350 200 L 50 50 1 1 w
+X GND 2 -500 250 200 R 50 50 1 1 W
+X D4 3 -500 150 200 R 50 50 1 1 B
+X D3 4 -500 50 200 R 50 50 1 1 B
+X D2 5 -500 -50 200 R 50 50 1 1 B
+X D1 6 -500 -150 200 R 50 50 1 1 B
+X Rx 7 -500 -250 200 R 50 50 1 1 B
+X Tx 8 -500 -350 200 R 50 50 1 1 B
+X Rst 9 500 -350 200 L 50 50 1 1 B
+ENDDRAW
+ENDDEF
+#
+# power_+3.3V
+#
+DEF power_+3.3V #PWR 0 0 Y Y 1 F P
+F0 "#PWR" 0 -150 50 H I C CNN
+F1 "power_+3.3V" 0 140 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+ALIAS +3.3V
+DRAW
+P 2 0 1 0 -30 50 0 100 N
+P 2 0 1 0 0 0 0 100 N
+P 2 0 1 0 0 100 30 50 N
+X +3V3 1 0 0 0 U 50 50 1 1 W N
+ENDDRAW
+ENDDEF
+#
+# power_+5V
+#
+DEF power_+5V #PWR 0 0 Y Y 1 F P
+F0 "#PWR" 0 -150 50 H I C CNN
+F1 "power_+5V" 0 140 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+DRAW
+P 2 0 1 0 -30 50 0 100 N
+P 2 0 1 0 0 0 0 100 N
+P 2 0 1 0 0 100 30 50 N
+X +5V 1 0 0 0 U 50 50 1 1 W N
+ENDDRAW
+ENDDEF
+#
+# power_GND
+#
+DEF power_GND #PWR 0 0 Y Y 1 F P
+F0 "#PWR" 0 -250 50 H I C CNN
+F1 "power_GND" 0 -150 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+DRAW
+P 6 0 1 0 0 0 0 -50 50 -50 0 -100 -50 -50 0 -50 N
+X GND 1 0 0 0 D 50 50 1 1 W N
+ENDDRAW
+ENDDEF
+#
+# rfm95_RFM95
+#
+DEF rfm95_RFM95 U 0 40 Y Y 1 F N
+F0 "U" 50 50 60 H V C CNN
+F1 "rfm95_RFM95" 50 -50 60 H V C CNN
+F2 "" 0 0 60 H I C CNN
+F3 "" 0 0 60 H I C CNN
+DRAW
+S -350 450 450 -450 0 1 0 N
+X GND 1 -550 350 200 R 50 50 1 1 I
+X GND 10 650 250 200 L 50 50 1 1 I
+X DIO3 11 650 150 200 L 50 50 1 1 I
+X DIO4 12 650 50 200 L 50 50 1 1 I
+X 3.3V 13 650 -50 200 L 50 50 1 1 I
+X DIO0 14 650 -150 200 L 50 50 1 1 I
+X DIO1 15 650 -250 200 L 50 50 1 1 I
+X DIO2 16 650 -350 200 L 50 50 1 1 I
+X MISO 2 -550 250 200 R 50 50 1 1 I
+X MOSI 3 -550 150 200 R 50 50 1 1 I
+X SCK 4 -550 50 200 R 50 50 1 1 I
+X NSS 5 -550 -50 200 R 50 50 1 1 I
+X RESET 6 -550 -150 200 R 50 50 1 1 I
+X DIO5 7 -550 -250 200 R 50 50 1 1 I
+X GND 8 -550 -350 200 R 50 50 1 1 I
+X ANT 9 650 350 200 L 50 50 1 1 I
+ENDDRAW
+ENDDEF
+#
+#End Library
