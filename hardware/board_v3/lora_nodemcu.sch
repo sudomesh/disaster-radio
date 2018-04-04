@@ -138,13 +138,13 @@ $EndComp
 $Comp
 L Connector_Generic:Conn_01x02 J2
 U 1 1 5AA4CAA2
-P 3350 3550
-F 0 "J2" H 3270 3225 50  0000 C CNN
-F 1 "LiPo 18650" H 3270 3316 50  0000 C CNN
-F 2 "Battery:BatteryHolder_MPD_BH-18650-PC2" H 3350 3550 50  0001 C CNN
-F 3 "~" H 3350 3550 50  0001 C CNN
-	1    3350 3550
-	-1   0    0    1   
+P 2600 3450
+F 0 "J2" H 2600 3700 50  0000 C CNN
+F 1 "LiPo 18650" H 2550 3600 50  0000 C CNN
+F 2 "Battery:BatteryHolder_MPD_BH-18650-PC2" H 2600 3450 50  0001 C CNN
+F 3 "~" H 2600 3450 50  0001 C CNN
+	1    2600 3450
+	-1   0    0    -1  
 $EndComp
 $Comp
 L power:GND #PWR0104
@@ -160,12 +160,12 @@ $EndComp
 $Comp
 L Connector_Generic:Conn_01x02 J1
 U 1 1 5AA4DEE1
-P 3350 2400
-F 0 "J1" H 3270 2075 50  0000 C CNN
-F 1 "Solar Panel" H 3270 2166 50  0000 C CNN
-F 2 "Connector_Phoenix_MC:PhoenixContact_MCV_1,5_2-G-5.08_1x02_P5.08mm_Vertical" H 3350 2400 50  0001 C CNN
-F 3 "~" H 3350 2400 50  0001 C CNN
-	1    3350 2400
+P 2600 2400
+F 0 "J1" H 2520 2075 50  0000 C CNN
+F 1 "Solar Panel" H 2520 2166 50  0000 C CNN
+F 2 "disaster_radio:solar_panel_conn" H 2600 2400 50  0001 C CNN
+F 3 "~" H 2600 2400 50  0001 C CNN
+	1    2600 2400
 	-1   0    0    1   
 $EndComp
 $Comp
@@ -193,7 +193,7 @@ $EndComp
 Wire Wire Line
 	4300 2650 4300 2400
 Wire Wire Line
-	4300 2400 3550 2400
+	4300 2400 2800 2400
 Wire Wire Line
 	4300 2400 4450 2400
 Connection ~ 4300 2400
@@ -219,7 +219,7 @@ Wire Wire Line
 Wire Wire Line
 	4350 3850 4350 3550
 Wire Wire Line
-	4350 3550 3550 3550
+	4350 3550 2800 3550
 Wire Wire Line
 	4950 3250 4950 3450
 $Comp
@@ -387,36 +387,36 @@ Wire Wire Line
 $Comp
 L Connector_Generic:Conn_01x02 J3
 U 1 1 5AAC3057
-P 3450 5900
-F 0 "J3" H 3370 6117 50  0000 C CNN
-F 1 "RESET_BUTTON" H 3370 6026 50  0000 C CNN
-F 2 "Connector_Phoenix_MC:PhoenixContact_MCV_1,5_2-G-5.08_1x02_P5.08mm_Vertical" H 3450 5900 50  0001 C CNN
-F 3 "~" H 3450 5900 50  0001 C CNN
-	1    3450 5900
+P 2600 5900
+F 0 "J3" H 2520 6117 50  0000 C CNN
+F 1 "RESET_BUTTON" H 2520 6026 50  0000 C CNN
+F 2 "Connector_Phoenix_MC:PhoenixContact_MCV_1,5_2-G-5.08_1x02_P5.08mm_Vertical" H 2600 5900 50  0001 C CNN
+F 3 "~" H 2600 5900 50  0001 C CNN
+	1    2600 5900
 	-1   0    0    -1  
 $EndComp
 Wire Wire Line
-	3650 6000 5300 6000
+	2800 6000 5300 6000
 $Comp
 L Device:R_Small R1
 U 1 1 5AACACF4
-P 3900 5700
-F 0 "R1" H 3959 5746 50  0000 L CNN
-F 1 "10K" H 3959 5655 50  0000 L CNN
-F 2 "Resistor_SMD:R_0805_2012Metric_Pad1.15x1.50mm_HandSolder" H 3900 5700 50  0001 C CNN
-F 3 "~" H 3900 5700 50  0001 C CNN
-	1    3900 5700
+P 3050 5700
+F 0 "R1" H 3109 5746 50  0000 L CNN
+F 1 "10K" H 3109 5655 50  0000 L CNN
+F 2 "Resistor_SMD:R_0805_2012Metric_Pad1.15x1.50mm_HandSolder" H 3050 5700 50  0001 C CNN
+F 3 "~" H 3050 5700 50  0001 C CNN
+	1    3050 5700
 	1    0    0    -1  
 $EndComp
 $Comp
 L lora_nodemcu-cache:+3.3V #PWR0114
 U 1 1 5AACADA4
-P 3900 5350
-F 0 "#PWR0114" H 3900 5200 50  0001 C CNN
-F 1 "+3.3V" H 3915 5523 50  0000 C CNN
-F 2 "" H 3900 5350 50  0001 C CNN
-F 3 "" H 3900 5350 50  0001 C CNN
-	1    3900 5350
+P 3050 5350
+F 0 "#PWR0114" H 3050 5200 50  0001 C CNN
+F 1 "+3.3V" H 3065 5523 50  0000 C CNN
+F 2 "" H 3050 5350 50  0001 C CNN
+F 3 "" H 3050 5350 50  0001 C CNN
+	1    3050 5350
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -446,11 +446,11 @@ $EndComp
 Wire Wire Line
 	4850 5350 4850 5600
 Wire Wire Line
-	3900 5350 3900 5600
+	3050 5350 3050 5600
 Wire Wire Line
-	3900 5800 3900 5900
+	3050 5800 3050 5900
 Wire Wire Line
-	3900 5900 3650 5900
+	3050 5900 2800 5900
 $Comp
 L Device:R_Small R7
 U 1 1 5AADAE92
@@ -627,17 +627,6 @@ Wire Wire Line
 	13050 6450 13050 6850
 Wire Wire Line
 	13050 6850 11700 6850
-$Comp
-L Connector_Generic:Conn_01x04 J5
-U 1 1 5AB95801
-P 12850 3500
-F 0 "J5" H 12929 3492 50  0000 L CNN
-F 1 "RGB_LED" H 12929 3401 50  0000 L CNN
-F 2 "Connector_Phoenix_MC:PhoenixContact_MCV_1,5_4-G-5.08_1x04_P5.08mm_Vertical" H 12850 3500 50  0001 C CNN
-F 3 "~" H 12850 3500 50  0001 C CNN
-	1    12850 3500
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	4900 6600 4900 7700
 Wire Wire Line
@@ -682,33 +671,33 @@ Wire Wire Line
 $Comp
 L Jumper:Jumper_2_Bridged JP1
 U 1 1 5AAA022A
-P 3900 2300
-F 0 "JP1" H 3900 2495 50  0000 C CNN
-F 1 "SOLAR_TP" H 3900 2404 50  0000 C CNN
-F 2 "Jumper:SolderJumper-2_P1.3mm_Bridged_Pad1.0x1.5mm" H 3900 2300 50  0001 C CNN
-F 3 "~" H 3900 2300 50  0001 C CNN
-	1    3900 2300
+P 3500 2300
+F 0 "JP1" H 3500 2495 50  0000 C CNN
+F 1 "SOLAR_TP" H 3500 2404 50  0000 C CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Bridged_Pad1.0x1.5mm" H 3500 2300 50  0001 C CNN
+F 3 "~" H 3500 2300 50  0001 C CNN
+	1    3500 2300
 	1    0    0    -1  
 $EndComp
 $Comp
 L Jumper:Jumper_2_Bridged JP2
 U 1 1 5AAA0488
-P 3900 3450
-F 0 "JP2" H 3900 3645 50  0000 C CNN
-F 1 "LiPo_TP" H 3900 3554 50  0000 C CNN
-F 2 "Jumper:SolderJumper-2_P1.3mm_Bridged_Pad1.0x1.5mm" H 3900 3450 50  0001 C CNN
-F 3 "~" H 3900 3450 50  0001 C CNN
-	1    3900 3450
+P 3500 3450
+F 0 "JP2" H 3500 3645 50  0000 C CNN
+F 1 "LiPo_TP" H 3500 3554 50  0000 C CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Bridged_Pad1.0x1.5mm" H 3500 3450 50  0001 C CNN
+F 3 "~" H 3500 3450 50  0001 C CNN
+	1    3500 3450
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	4100 3450 4300 3450
+	3700 3450 4300 3450
 Wire Wire Line
-	3700 3450 3550 3450
+	3300 3450 2800 3450
 Wire Wire Line
-	4100 2300 4450 2300
+	3700 2300 4450 2300
 Wire Wire Line
-	3700 2300 3550 2300
+	3300 2300 2800 2300
 $Comp
 L Device:R_Small R3
 U 1 1 5AAC2DAB
@@ -870,15 +859,9 @@ F 3 "~" H 10800 4100 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 Wire Wire Line
-	12650 3700 12100 3700
-Wire Wire Line
 	12100 3700 12100 4000
 Wire Wire Line
-	12650 3600 11450 3600
-Wire Wire Line
-	11450 3600 11450 4000
-Wire Wire Line
-	12650 3500 10800 3500
+	11450 3300 11450 4000
 Wire Wire Line
 	10800 3500 10800 4000
 $Comp
@@ -979,9 +962,9 @@ Wire Wire Line
 Connection ~ 11450 4950
 Wire Wire Line
 	11450 4950 11450 5100
-Text Label 11300 3500 0    50   ~ 0
+Text Label 10900 3500 0    50   ~ 0
 GREEN
-Text Label 11650 3600 0    50   ~ 0
+Text Label 11650 3300 0    50   ~ 0
 RED
 Text Label 12100 3850 0    50   ~ 0
 BLUE
@@ -1018,18 +1001,16 @@ Wire Wire Line
 $Comp
 L power:+BATT #PWR0125
 U 1 1 5ADE71D1
-P 12400 2900
-F 0 "#PWR0125" H 12400 2750 50  0001 C CNN
-F 1 "+BATT" H 12415 3073 50  0000 C CNN
-F 2 "" H 12400 2900 50  0001 C CNN
-F 3 "" H 12400 2900 50  0001 C CNN
-	1    12400 2900
+P 13550 3000
+F 0 "#PWR0125" H 13550 2850 50  0001 C CNN
+F 1 "+BATT" H 13565 3173 50  0000 C CNN
+F 2 "" H 13550 3000 50  0001 C CNN
+F 3 "" H 13550 3000 50  0001 C CNN
+	1    13550 3000
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	12400 2900 12400 3400
-Wire Wire Line
-	12400 3400 12650 3400
+	13550 3000 13550 3500
 $Comp
 L Device:R_Small R5
 U 1 1 5AAB9778
@@ -1169,10 +1150,10 @@ Connection ~ 4950 3450
 Wire Wire Line
 	5650 3450 5950 3450
 $Comp
-L Device:R_Small R?
+L Device:R_Small R15
 U 1 1 5AAECE0B
 P 8300 5350
-F 0 "R?" V 8400 5300 50  0000 L CNN
+F 0 "R15" V 8400 5300 50  0000 L CNN
 F 1 "10K" V 8200 5300 50  0000 L CNN
 F 2 "Resistor_SMD:R_0805_2012Metric_Pad1.15x1.50mm_HandSolder" H 8300 5350 50  0001 C CNN
 F 3 "~" H 8300 5350 50  0001 C CNN
@@ -1180,10 +1161,10 @@ F 3 "~" H 8300 5350 50  0001 C CNN
 	0    1    -1   0   
 $EndComp
 $Comp
-L Device:R_Small R?
+L Device:R_Small R16
 U 1 1 5AAED216
 P 8650 5500
-F 0 "R?" V 8750 5450 50  0000 L CNN
+F 0 "R16" V 8750 5450 50  0000 L CNN
 F 1 "10K" V 8550 5450 50  0000 L CNN
 F 2 "Resistor_SMD:R_0805_2012Metric_Pad1.15x1.50mm_HandSolder" H 8650 5500 50  0001 C CNN
 F 3 "~" H 8650 5500 50  0001 C CNN
@@ -1198,4 +1179,89 @@ Wire Wire Line
 	11050 5350 8400 5350
 Wire Wire Line
 	11700 5500 8750 5500
+$Comp
+L Mechanical:Mounting_Hole MK1
+U 1 1 5ABC6521
+P 1850 8950
+F 0 "MK1" H 1950 8996 50  0000 L CNN
+F 1 "Mounting_Hole" H 1950 8905 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 1850 8950 50  0001 C CNN
+F 3 "" H 1850 8950 50  0001 C CNN
+	1    1850 8950
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:Mounting_Hole MK3
+U 1 1 5ABC68A6
+P 2700 8950
+F 0 "MK3" H 2800 8996 50  0000 L CNN
+F 1 "Mounting_Hole" H 2800 8905 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 2700 8950 50  0001 C CNN
+F 3 "" H 2700 8950 50  0001 C CNN
+	1    2700 8950
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:Mounting_Hole MK2
+U 1 1 5ABC6A8E
+P 1850 9300
+F 0 "MK2" H 1950 9346 50  0000 L CNN
+F 1 "Mounting_Hole" H 1950 9255 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 1850 9300 50  0001 C CNN
+F 3 "" H 1850 9300 50  0001 C CNN
+	1    1850 9300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:Mounting_Hole MK4
+U 1 1 5ABC6A95
+P 2700 9300
+F 0 "MK4" H 2800 9346 50  0000 L CNN
+F 1 "Mounting_Hole" H 2800 9255 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 2700 9300 50  0001 C CNN
+F 3 "" H 2700 9300 50  0001 C CNN
+	1    2700 9300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:LED_ARGB D1
+U 1 1 5ABCE072
+P 13100 3500
+F 0 "D1" H 13100 3997 50  0000 C CNN
+F 1 "LED_ARGB" H 13100 3906 50  0000 C CNN
+F 2 "LED_THT:LED_D5.0mm-4" H 13100 3450 50  0001 C CNN
+F 3 "~" H 13100 3450 50  0001 C CNN
+	1    13100 3500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	13300 3500 13550 3500
+Wire Wire Line
+	11450 3300 12900 3300
+Wire Wire Line
+	10800 3500 12900 3500
+Wire Wire Line
+	12100 3700 12900 3700
+Wire Notes Line
+	1600 8700 1600 9500
+Wire Notes Line
+	1600 9500 3500 9500
+Wire Notes Line
+	3500 9500 3500 8700
+Wire Notes Line
+	3500 8700 1600 8700
+Text Label 5700 2300 0    50   ~ 0
+BATT_TP
+Text Label 4200 3450 2    50   ~ 0
+LIPO_TP
+Text Label 3950 2300 0    50   ~ 0
+SOLAR_TP
+Text Label 2800 2300 0    50   ~ 0
+SOLAR_CONN
+Text Label 2800 3450 0    50   ~ 0
+LIPO_CONN
+Text Label 6300 5000 0    50   ~ 0
+3V3_ESP
+Text Label 11700 7150 0    50   ~ 0
+3V3_RFM
 $EndSCHEMATC
