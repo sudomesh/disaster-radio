@@ -102,13 +102,21 @@ On the USB-to-serial adapter you should be able to find a pin or connection poin
 
 In `settings.mk` make sure to comment the lines for the WeMos D1 Mini and uncomment the lines for the solar module. You'll have to do the same for the lines in `firmware/firmware.ino` defining `csPin`, `resetPin`, and `irqPin`.
 
-Now you can use `make flash` and `make flash_fs` normally, however note that you will have to reset the board after flashing.
+Now you can use `make flash` and `make flash_fs` normally, however note that you will have to manually reset the board after each flashing operation.
 
 After running `make flash_fs` you may get an error that looks like this:
 
 ```
 A fatal error occurred: Timed out waiting for packet header
 make: *** [flash_fs] Error 2
+```
+
+If you run into a problem where the `make flash_fs` seems to complete but the files aren't readable by the firmware, try this:
+
+```
+make erase_flash
+make flash_fs
+make flash
 ```
 
 You can safely ignore this error.
