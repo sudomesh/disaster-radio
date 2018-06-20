@@ -25,9 +25,20 @@ AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 AsyncEventSource events("/events");
 
+int loraInitialized = 0; // has the LoRa radio been initialized?
+
+// for solar-powered module use these settings:
+const int csPin = 2;          // LoRa radio chip select, GPIO2
+const int resetPin = 5;       // LoRa radio reset (hooked to LED, unused)
+const int irqPin = 16;        // interrupt pin for receive callback?, GPIO16
+
+// for wemos d1 mini board use these settings:
+/*
 const int csPin = 15;          // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
-const int resetPin = 5;       // LoRa radio reset, GPIO0 = D3
+const int resetPin = 5;       // LoRa radio reset, GPIO0 = D3 
 const int irqPin = 4;        // interrupt pin for receive callback?, GPIO2 = D4
+*/
+
 //TODO: switch to volatile byte for interrupt
 
 byte localAddress;     // assigned to last byte of mac address in setup
@@ -212,7 +223,9 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 	    Serial.print(dumpLog());
 	    
             //transmit message over LoRa
-            sendMessage(msg, msg_length);
+            if(loraInitialized) {
+              sendMessage(msg, msg_length);
+            }
 
             //echoing message to ws
             if(echo_on){
@@ -231,7 +244,9 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             }
 
             //set LoRa back into receive mode
-            LoRa.receive();
+            if(loraInitialized) {
+              LoRa.receive();
+            }           
         } 
         else {
 
@@ -382,13 +397,17 @@ void loraSetup(){
 
     if (!LoRa.begin(915E6)) {             // initialize ratio at 915 MHz
         Serial.printf("LoRa init failed. Check your connections.\r\n");
-        while (true);                       // if failed, do nothing
+//        while (true);                       // if failed, do nothing
+          return;
     }
 
     LoRa.setSPIFrequency(100E3);
     LoRa.setSpreadingFactor(9);           // ranges from 6-12,default 7 see API docs
     LoRa.onReceive(onReceive);
     LoRa.receive();
+
+    loraInitialized = 1;
+
     Serial.printf("LoRa init succeeded.\r\n");
     Serial.printf("local address: %02x\r\n", localAddress);
     Serial.printf("%s\r\n", macaddr);
