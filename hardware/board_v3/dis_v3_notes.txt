@@ -1,0 +1,20 @@
+@disaster radio board v3 notes
+
+@fixes
+
+@todos
+
+@notes
+
+mppt set voltage on CN3971 module, set by 
+	Vmppt = 1.205 x (1 + R1 / R2) (according to module to silkscreen)
+	note that (R3 is R1, R4 is R2) as specified in cn3791 datasheet
+easy calculation with R2 = 10K
+	R1 = ((Vmppt / 1.205) - 1) * 10K
+	e.g for 6V,  Vmppt R1 = 39.8KOhms (closes common value is 39kohm)
+
+current limit 
+	Ich = 120mV / R5 (note R5 is Rcs in datasheet, it is the very big resistor)
+	R5 = 0.04 Ohms
+	Ich = 3A 
+	this seems way, way to high
