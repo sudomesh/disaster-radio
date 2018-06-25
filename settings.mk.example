@@ -3,16 +3,23 @@
 UPLOAD_PORT = /dev/ttyUSB0
 
 # speed to use for uploading to ESP8266
-UPLOAD_SPEED = 921600 
-
-# to list possible boards use: make list_boards
-BOARD = d1_mini
+#UPLOAD_SPEED = 9600
+UPLOAD_SPEED = 460800
+#UPLOAD_SPEED = 115200
+#UPLOAD_SPEED = 921600
 
 FS_DIR = web/static/
 
-# reset method used to reset the board
-# can be: none, ck, nodemcu or wifio
-#UPLOAD_RESET = nodemcu
+# to list possible boards use: make list_boards
+BOARD = generic
 
-# Flash size and portion of flash taken by spiffs
-#FLASH_DEF = 4M3M
+# to list possible flash defs for current board use: list_flash_defs
+FLASH_DEF = 1M512
+UPLOAD_RESET = none
+
+
+# for wemos d1 mini instead use these settings:
+
+#BOARD = d1_mini
+#FLASH_DEF = 4M1M
+#UPLOAD_RESET = nodemcu
