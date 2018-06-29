@@ -48,7 +48,7 @@ cp settings.mk.example settings.mk # create initial personal settings file
 sudo pip install esptool
 ```
 
-Then edit `settings.mk` to suit your needs. If you are flashing the a board based on the wemos d1 mini (with built-in usb) then you will probably not have to edit anything in `settings.mk` but make sure `UPLOAD_PORT` is set to the correct device which may vary depending on your operating system and which other devices you have connected.
+Then edit `settings.mk` to suit your needs. If you are flashing a board based on the wemos d1 mini (with built-in usb) then you will probably not have to edit anything in `settings.mk` but make sure `UPLOAD_PORT` is set to the correct device which may vary depending on your operating system and which other devices you have connected.
   
 # Building firmware
 

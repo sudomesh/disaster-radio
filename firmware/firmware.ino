@@ -27,16 +27,17 @@ AsyncEventSource events("/events");
 
 int loraInitialized = 0; // has the LoRa radio been initialized?
 
-// for solar-powered module use these settings:
-const int csPin = 2;          // LoRa radio chip select, GPIO2
-const int resetPin = 5;       // LoRa radio reset (hooked to LED, unused)
-const int irqPin = 16;        // interrupt pin for receive callback?, GPIO16
 
-// for wemos d1 mini board use these settings:
-/*
+// for portable node (wemos d1 mini) use these settings:
 const int csPin = 15;          // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
 const int resetPin = 5;       // LoRa radio reset, GPIO0 = D3 
 const int irqPin = 4;        // interrupt pin for receive callback?, GPIO2 = D4
+
+// for solar-powered module use these settings:
+/*
+const int csPin = 2;          // LoRa radio chip select, GPIO2
+const int resetPin = 5;       // LoRa radio reset (hooked to LED, unused)
+const int irqPin = 16;        // interrupt pin for receive callback?, GPIO16
 */
 
 //TODO: switch to volatile byte for interrupt
@@ -44,7 +45,7 @@ const int irqPin = 4;        // interrupt pin for receive callback?, GPIO2 = D4
 byte localAddress;     // assigned to last byte of mac address in setup
 byte destination = 0xFF;      // destination to send to default broadcast
 
-bool echo_on = true;
+bool echo_on = false;
 
 /*
   FORWARD-DEFINED FUNCTIONS
@@ -97,6 +98,7 @@ void clearLog() {
   CALLBACK FUNCTIONS
 */
 void onReceive(int packetSize) {
+     Serial.printf("GOT PACKET!\r\n");
     if (packetSize == 0) return;          // if there's no packet, return
 
     // read packet header bytes:
@@ -220,7 +222,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             //send ack to websocket
             ws.binary(client->id(), msg_id, 3);
 
-	    Serial.print(dumpLog());
+//	    Serial.print(dumpLog());
 	    
             //transmit message over LoRa
             if(loraInitialized) {
@@ -420,6 +422,9 @@ void setup(){
     Serial.begin(115200);
     Serial.setDebugOutput(true);
 
+    pinMode(csPin, OUTPUT);
+    pinMode(irqPin, INPUT);
+
     wifiSetup();
 
     spiffsSetup();
@@ -431,10 +436,21 @@ void setup(){
     loraSetup();
 }
 
-int interval = 30000;          // interval between sends
+int interval = 1000;          // interval between sends
 long lastSendTime = 0; // time of last packet send
 
 void loop(){
+
+  int packetSize;
+
+    if (millis() - lastSendTime > interval) {
+      int packetSize = LoRa.parsePacket();
+      Serial.printf("checking for data: %d\r\n", packetSize); 
+      if(packetSize) {
+        onReceive(packetSize);
+      }
+      lastSendTime = millis();
+    }
 
     /* uncomment to enable BEACON mode
     if (millis() - lastSendTime > interval) {
