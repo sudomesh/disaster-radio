@@ -2,6 +2,13 @@
 
 set -e
 
+# get makeEspArduino
+git clone https://github.com/plerup/makeEspArduino
+cd makeEspArduino
+git checkout tags/4.13.0
+cp makeEspArduino.mk ../Makefile
+cd ../
+
 # install esp8266-arduino build environment
 git clone https://github.com/esp8266/Arduino.git esp8266-arduino
 cd esp8266-arduino/
