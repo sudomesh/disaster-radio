@@ -1,3 +1,5 @@
+#define FS_NO_GLOBALS
+
 #include <ESP8266WiFi.h>
 #include <FS.h>
 #include <Hash.h>
@@ -7,6 +9,7 @@
 #include <SPIFFSEditor.h>
 #include <SPI.h>
 #include <LoRa.h>
+#include <SD.h>
 
 #define HEADERSIZE 4 
 #define BUFFERSIZE 252
@@ -27,9 +30,8 @@ AsyncEventSource events("/events");
 
 int loraInitialized = 0; // has the LoRa radio been initialized?
 
-
 // for portable node (wemos d1 mini) use these settings:
-const int csPin = 15;          // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
+const int loraChipSelect = 15; // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
 const int resetPin = 5;       // LoRa radio reset, GPIO0 = D3 
 const int irqPin = 4;        // interrupt pin for receive callback?, GPIO2 = D4
 
@@ -39,6 +41,8 @@ const int csPin = 2;          // LoRa radio chip select, GPIO2
 const int resetPin = 5;       // LoRa radio reset (hooked to LED, unused)
 const int irqPin = 16;        // interrupt pin for receive callback?, GPIO16
 */
+
+const int SDChipSelect = 2;
 
 //TODO: switch to volatile byte for interrupt
 
@@ -60,7 +64,7 @@ void sendMessage(char* outgoing, int outgoing_length) {
 
 void storeMessage(char* message, int message_length) {
   //store full message in log file
-  File log = SPIFFS.open("/log.txt", "a");
+  fs::File log = SPIFFS.open("/log.txt", "a");
   if(!log){
     Serial.printf("file open failed");
   }
@@ -74,7 +78,7 @@ void storeMessage(char* message, int message_length) {
 //TODO conver string to char array
 String dumpLog() {
   String dump = "";
-  File log = SPIFFS.open("/log.txt", "r");
+  fs::File log = SPIFFS.open("/log.txt", "r");
   if(!log){
     Serial.printf("file open failed");
   }  
@@ -89,7 +93,7 @@ String dumpLog() {
 }
 
 void clearLog() {
-  File log = SPIFFS.open("/log.txt", "w");
+  fs::File log = SPIFFS.open("/log.txt", "w");
   log.close();
 }
 
@@ -206,7 +210,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 	    */
 	    
 	    //store full message in log file
-	    File log = SPIFFS.open("/log.txt", "a");
+	    fs::File log = SPIFFS.open("/log.txt", "a");
 	    if(!log){
 	      Serial.printf("file open failed");
 	    }
@@ -258,6 +262,22 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
     }
 }
 
+void writeDataToSD(){
+    File myFile;
+    myFile = SD.open("test.txt", FILE_WRITE);
+    // if the file opened okay, write to it:
+    if (myFile) {
+        Serial.print("Writing to test.txt...");
+        myFile.println("testing 1, 2, 3.");
+        // close the file:
+        myFile.close();
+        Serial.println("done.");
+    } else {
+        // if the file didn't open, print an error:
+        Serial.println("error opening test.txt");
+    }
+}
+
 
 /*
   SETUP FUNCTIONS
@@ -277,7 +297,7 @@ void spiffsSetup(){
         Serial.print("ok\r\n");
         if (SPIFFS.exists("/index.html")) {
             Serial.printf("The file exists!\r\n");
-            File f = SPIFFS.open("/index.html", "r");
+            fs::File f = SPIFFS.open("/index.html", "r");
             if (!f) {
                 Serial.printf("Some thing went wrong trying to open the file...\r\n");
             }
@@ -395,7 +415,7 @@ void loraSetup(){
     localAddress = mac[0];
 
     // override the default CS, reset, and IRQ pins (optional)
-    LoRa.setPins(csPin, resetPin, irqPin); // set CS, reset, IRQ pin
+    LoRa.setPins(loraChipSelect, resetPin, irqPin); // set CS, reset, IRQ pin
 
     if (!LoRa.begin(915E6)) {             // initialize ratio at 915 MHz
         Serial.printf("LoRa init failed. Check your connections.\r\n");
@@ -422,8 +442,23 @@ void setup(){
     Serial.begin(115200);
     Serial.setDebugOutput(true);
 
-    pinMode(csPin, OUTPUT);
+    pinMode(loraChipSelect, OUTPUT);
+    pinMode(SDChipSelect, OUTPUT);
     pinMode(irqPin, INPUT);
+
+    digitalWrite(loraChipSelect, HIGH);
+    digitalWrite(SDChipSelect, LOW); // select SD card first, to initialize
+
+    Serial.print("\r\nWaiting for SD card to initialise...");
+    if (SD.begin(SDChipSelect)) { // CS is D8 in this example
+        Serial.println("Initialisation completed");
+    }
+    else{
+        Serial.println("Initialising failed!");
+    }
+
+    digitalWrite(SDChipSelect, HIGH);
+    digitalWrite(loraChipSelect, LOW); // select LoRa, unless writing to SD
 
     wifiSetup();
 
@@ -434,6 +469,7 @@ void setup(){
     webServerSetup();
 
     loraSetup();
+
 }
 
 int interval = 1000;          // interval between sends
@@ -441,19 +477,16 @@ long lastSendTime = 0; // time of last packet send
 
 void loop(){
 
-  int packetSize;
+    int packetSize;
 
     if (millis() - lastSendTime > interval) {
-      int packetSize = LoRa.parsePacket();
-      Serial.printf("checking for data: %d\r\n", packetSize); 
-      if(packetSize) {
-        onReceive(packetSize);
-      }
-      lastSendTime = millis();
-    }
+        int packetSize = LoRa.parsePacket();
+        Serial.printf("checking for data: %d\r\n", packetSize); 
+        if(packetSize) {
+            onReceive(packetSize);
+        }
 
-    /* uncomment to enable BEACON mode
-    if (millis() - lastSendTime > interval) {
+        /* uncomment to enable BEACON mode
         int test_length = 26;
         char test_message[252] = "FFc|<morgan> HeLoRa World! ";   // send a message
         Serial.printf("Sending:");
@@ -462,8 +495,8 @@ void loop(){
         }
         Serial.printf("\r\n");
         sendMessage(test_message, test_length);
-        lastSendTime = millis();            // timestamp the message
-        interval = random(2000) + 1000;    // 2-3 seconds
-    }*/ 
+        */
 
+        lastSendTime = millis();
+    }
 }

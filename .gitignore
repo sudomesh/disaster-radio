@@ -8,5 +8,5 @@ web/static/build/*.js
 web/static/build/*.css
 web/static/build/*.gz
 web/node_modules
-
+makeEspArduino/
 

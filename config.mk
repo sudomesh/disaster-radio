@@ -10,5 +10,6 @@ LIBS = ./libs/ESPAsyncTCP \
 	$(ESP_LIBS)/ESP8266WiFi \
 	$(ESP_LIBS)/Hash \
 	$(ESP_LIBS)/SPI \
-	$(ESP_LIBS)/ESP8266mDNS
+	$(ESP_LIBS)/ESP8266mDNS \
+	$(ESP_LIBS)/SD
 
