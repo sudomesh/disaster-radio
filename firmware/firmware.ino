@@ -10,6 +10,7 @@
 #include <SPI.h>
 #include <LoRa.h>
 #include <SD.h>
+#include "AsyncSDServer.ino"
 
 #define HEADERSIZE 4 
 #define BUFFERSIZE 252
@@ -29,6 +30,7 @@ AsyncWebSocket ws("/ws");
 AsyncEventSource events("/events");
 
 int loraInitialized = 0; // has the LoRa radio been initialized?
+int retransmitEnabled = 1;
 
 // for portable node (wemos d1 mini) use these settings:
 const int loraChipSelect = 15; // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
@@ -98,6 +100,20 @@ void clearLog() {
 }
 
 
+char* stringToCharArray(String command){
+    if(command.length()!=0){
+        char *p = const_cast<char*>(command.c_str());
+        return p;
+    }
+}
+
+void printCharArray(char *buf, int len){
+    for(int i = 0 ; i < len ; i++){
+        Serial.printf("%c", buf[i]);
+    }
+    Serial.printf("\r\n");
+}
+
 /*
   CALLBACK FUNCTIONS
 */
@@ -119,29 +135,25 @@ void onReceive(int packetSize) {
         incomingLength++;
     }
 
-    /* TODO: fix error check once garbling solved
-    if (incomingLength != i) {   // check length for error
-      Serial.printf("error: message length does not match length\r\n");
-      return;                             // skip rest of function
-    }*/
-
-    // if the recipient isn't this device or broadcast,
-    /*if (recipient != localAddress && recipient != 0xFF) {
-        Serial.printf("This message is not for me.\r\n");
-        return;                             // skip rest of function
-    }*/
-
     Serial.printf("RSSI: %f\r\n", LoRa.packetRssi());
     Serial.printf("Snr: %f\r\n", LoRa.packetSnr());
 
-    for(int i = 0 ; i < incomingLength ; i++){
-        Serial.printf("%c", incoming[i]);
-    }
-    Serial.printf("\r\n");
+    printCharArray(incoming, incomingLength);
 
     storeMessage(incoming, incomingLength);
     
     ws.binaryAll(incoming, incomingLength);
+    String hash = sha1(incoming, incomingLength);
+    char *hashIncoming = stringToCharArray(hash);
+    int hashLength = hash.length();
+
+    printCharArray(hashIncoming, hashLength);
+    //hashTable[hashEntry] = hashIncoming;
+
+    if(retransmitEnabled){
+        sendMessage(incoming, incomingLength);
+        ws.binaryAll("99c|retransmitting message", 26);
+    }
    
 }
 
@@ -187,7 +199,6 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             msg_length++;
             msg[msg_length] = '\0';
 
-	    
             //parse message id 
             memcpy( msg_id, msg, 2 );
             msg_id[2] = '!';
@@ -200,33 +211,33 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             usr_id_length = usr_id_stop - 5;
 
             //print message info to serial
-            /*Serial.printf("Message Length: %d\r\n", msg_length);
+            Serial.printf("Message Length: %d\r\n", msg_length);
             Serial.printf("Message ID: %02d%02d %c\r\n", msg_id[0], msg_id[1], msg_id[2]);
             Serial.printf("Message:");
             for( int i = 0 ; i <= msg_length ; i++){
                 Serial.printf("%c", msg[i]);
             }
             Serial.printf("\r\n");
-	    */
-	    
-	    //store full message in log file
-	    fs::File log = SPIFFS.open("/log.txt", "a");
-	    if(!log){
-	      Serial.printf("file open failed");
-	    }
-	    //TODO msg_id is hex bytes not chars? adapt storeMessage function
-	    log.printf("%02d%02d", msg_id[0], msg_id[1]);
-	    for(int i = 2 ; i <= msg_length ; i++){
-	      log.printf("%c", msg[i]);
-	    }
-	    log.printf("\n");
-	    log.close();
+            /*
+            //store full message in log file
+            fs::File log = SPIFFS.open("/log.txt", "a");
+            if(!log){
+              Serial.printf("file open failed");
+            }
+            //TODO msg_id is hex bytes not chars? adapt storeMessage function
+            log.printf("%02d%02d", msg_id[0], msg_id[1]);
+            for(int i = 2 ; i <= msg_length ; i++){
+              log.printf("%c", msg[i]);
+            }
+            log.printf("\n");
+            log.close();
+            */
 
-	    //TODO delay ack based on estimated transmit time
+            //TODO delay ack based on estimated transmit time
             //send ack to websocket
             ws.binary(client->id(), msg_id, 3);
 
-//	    Serial.print(dumpLog());
+            //Serial.print(dumpLog());
 	    
             //transmit message over LoRa
             if(loraInitialized) {
@@ -264,7 +275,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
 void writeDataToSD(){
     File myFile;
-    myFile = SD.open("test.txt", FILE_WRITE);
+    myFile = SD.open("index.html", FILE_WRITE);
     // if the file opened okay, write to it:
     if (myFile) {
         Serial.print("Writing to test.txt...");
@@ -290,6 +301,30 @@ void wifiSetup(){
     WiFi.mode(WIFI_AP);
     //WiFi.softAPConfig(local_IP, gateway, netmask);
     WiFi.softAP(ssid);
+}
+
+void SDcardSetup(){
+    Serial.print("\r\nWaiting for SD card to initialise...");
+    if (SD.begin(SDChipSelect, 32000000)) { // CS is D8 in this example
+        Serial.print("SD Card initialized");
+        Serial.print("\r\n");
+        File entry;
+        File dir = SD.open("/");
+        dir.rewindDirectory();
+        Serial.print("ROOT DIRECTORY:");
+        Serial.print("\r\n");
+        while(true){
+            entry = dir.openNextFile();
+            if (!entry) break;
+            Serial.printf("%s, type: %s, size: %ld", entry.name(), (entry.isDirectory())?"dir":"file", entry.size());
+            entry.close();
+            Serial.print("\r\n");
+        }
+        dir.close();
+    } else{
+        Serial.print("SD Card Not Found!");
+        Serial.print("\r\n");
+    }
 }
 
 void spiffsSetup(){
@@ -328,40 +363,38 @@ void mdnsSetup(){
 }
 
 void webServerSetup(){
+
     ws.onEvent(onWsEvent);
     server.addHandler(&ws);
 
     events.onConnect([](AsyncEventSourceClient *client){
         client->send("hello!",NULL,millis(),1000);
     });
+
     server.addHandler(&events);
 
-    server.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send(200, "text/plain", String(ESP.getFreeHeap()));
-    });
-
-    //server.serveStatic("/dump", SPIFFS, "/log.txt");
-
-    server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
+    server.addHandler(new AsyncStaticSDWebHandler("/", SD, "/"));
 
     server.onNotFound([](AsyncWebServerRequest *request){
-        Serial.printf("NOT_FOUND: ");
+        os_printf("NOT_FOUND: ");
         if(request->method() == HTTP_GET)
-        Serial.printf("GET");
+        os_printf("GET");
         else if(request->method() == HTTP_POST)
-        Serial.printf("POST");
+        os_printf("POST");
         else if(request->method() == HTTP_DELETE)
-        Serial.printf("DELETE");
+        os_printf("DELETE");
         else if(request->method() == HTTP_PUT)
-        Serial.printf("PUT");
+        os_printf("PUT");
         else if(request->method() == HTTP_PATCH)
-        Serial.printf("PATCH");
+        os_printf("PATCH");
         else if(request->method() == HTTP_HEAD)
-        Serial.printf("HEAD");
+        os_printf("HEAD");
         else if(request->method() == HTTP_OPTIONS)
-        Serial.printf("OPTIONS");
+        os_printf("OPTIONS");
         else
-        Serial.printf("UNKNOWN");
+        os_printf("UNKNOWN");
+        os_printf(" http://%s%s\n", request->host().c_str(), request->url().c_str());
+
         Serial.printf(" http://%s%s\r\n", request->host().c_str(), request->url().c_str());
 
         if(request->contentLength()){
@@ -391,14 +424,6 @@ void webServerSetup(){
         request->send(404);
     });
 
-    server.onFileUpload([](AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final){
-        if(!index)
-        Serial.printf("UploadStart: %s\r\n", filename.c_str());
-        Serial.printf("%s", (const char*)data);
-        if(final)
-        Serial.printf("UploadEnd: %s (%u)\r\n", filename.c_str(), index+len);
-    });
-
     server.onRequestBody([](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
         if(!index)
         Serial.printf("BodyStart: %u\r\n", total);
@@ -408,6 +433,7 @@ void webServerSetup(){
     });
 
     server.begin();
+
 }
 
 
@@ -446,27 +472,23 @@ void setup(){
     pinMode(SDChipSelect, OUTPUT);
     pinMode(irqPin, INPUT);
 
+    //SPIenable("SD");
     digitalWrite(loraChipSelect, HIGH);
     digitalWrite(SDChipSelect, LOW); // select SD card first, to initialize
 
-    Serial.print("\r\nWaiting for SD card to initialise...");
-    if (SD.begin(SDChipSelect)) { // CS is D8 in this example
-        Serial.println("Initialisation completed");
-    }
-    else{
-        Serial.println("Initialising failed!");
-    }
-
-    digitalWrite(SDChipSelect, HIGH);
-    digitalWrite(loraChipSelect, LOW); // select LoRa, unless writing to SD
+    SDcardSetup();
 
     wifiSetup();
 
-    spiffsSetup();
+    //spiffsSetup();
 
     mdnsSetup();
 
     webServerSetup();
+
+    //SPIenable("LORA");
+    digitalWrite(loraChipSelect, LOW);
+    digitalWrite(SDChipSelect, HIGH); // select SD card first, to initialize
 
     loraSetup();
 
@@ -476,7 +498,7 @@ int interval = 1000;          // interval between sends
 long lastSendTime = 0; // time of last packet send
 
 void loop(){
-
+/*
     int packetSize;
 
     if (millis() - lastSendTime > interval) {
@@ -486,7 +508,7 @@ void loop(){
             onReceive(packetSize);
         }
 
-        /* uncomment to enable BEACON mode
+        //uncomment to enable BEACON mode
         int test_length = 26;
         char test_message[252] = "FFc|<morgan> HeLoRa World! ";   // send a message
         Serial.printf("Sending:");
@@ -495,8 +517,8 @@ void loop(){
         }
         Serial.printf("\r\n");
         sendMessage(test_message, test_length);
-        */
 
         lastSendTime = millis();
     }
+    */
 }
