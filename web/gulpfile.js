@@ -10,9 +10,6 @@ gulp.task('build:js', js.build);
 
 gulp.task('watch:js', js.watch);
 
-// with hot module reloading
-gulp.task('hot:js', js.hot);
-
 gulp.task('build:css', function() {
   return gulp.src('./src/css/*.scss')
     .pipe(sass().on('error', sass.logError))
@@ -35,5 +32,3 @@ gulp.task('build:html', function() {
 gulp.task('build', ['build:js', 'build:css']);
 
 gulp.task('watch', ['watch:js', 'watch:css']);
-
-gulp.task('hot', ['hot:js', 'watch:css']);

@@ -5,7 +5,6 @@ var path = require('path');
 var colors = require('colors');
 var browserify = require('browserify');
 var watchify = require('watchify');
-var hmr = require('browserify-hmr');
 var minimist = require('minimist');
 
 function getTime() {
@@ -73,11 +72,6 @@ function build(opts) {
     b.plugin(watchify);
   }
 
-  if(opts.hot) {
-    console.log("Hot module reloading enabled".yellow);
-    b.plugin(hmr);
-  }
-
   b.on('update', function(time) {
     onBuildStart();  
   });
@@ -105,8 +99,7 @@ if (require.main === module) {
       d: 'dev'
     },
     boolean: [
-      'dev',
-      'hot'
+      'dev'
     ],
     default: {}
   });
@@ -121,13 +114,6 @@ if (require.main === module) {
     watch: function(opts) {
       opts = opts || opts;
       opts.dev = true;
-      return build(opts);
-    },
-
-    hot: function(opts) {
-      opts = opts || opts;
-      opts.dev = true;
-      opts.hot = true;
       return build(opts);
     }
   }

@@ -26,13 +26,7 @@ Then in a browser open http://localhost:8000/
 # Developing
 
 ```
-npm run dev # starts simulator server and auto-builder with HMR
-```
-
-or if you don't like HMR:
-
-```
-./bin/dev.js --cold
+npm run dev # starts simulator server and auto-builder
 ```
 
 # Uploading to ESP8266

@@ -14,12 +14,10 @@ var spawn = require('child_process').spawn;
 
 var argv = minimist(process.argv.slice(2), {
   boolean: [
-    'cold'
   ]
 });
 
-var gulpTask = 'hot';
-if(argv.cold) gulpTask = 'watch';
+var gulpTask = 'watch';
 
 // the '--color' argument is intercepted by the the 'colors' node module
 var builder = spawn(path.join(path.join(path.dirname(require.resolve('gulp')), 'bin', 'gulp.js')), [gulpTask, '--color']);
