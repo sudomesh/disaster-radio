@@ -10,6 +10,12 @@ cp settings.js.example settings.js
 
 # Building and running
 
+The first time you build you need to do:
+
+```
+npm run build-css
+```
+
 ```
 npm run build # build the js and css
 npm start # run the simulator server
