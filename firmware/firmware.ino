@@ -58,6 +58,7 @@ void sendMessage(char* outgoing, int outgoing_length) {
     LoRa.endPacket();
 }
 
+
 void storeMessage(char* message, int message_length) {
   //store full message in log file
   File log = SPIFFS.open("/log.txt", "a");
@@ -401,10 +402,14 @@ void loraSetup(){
         Serial.printf("LoRa init failed. Check your connections.\r\n");
 //        while (true);                       // if failed, do nothing
           return;
-    }
+   }
 
     LoRa.setSPIFrequency(100E3);
-    LoRa.setSpreadingFactor(9);           // ranges from 6-12,default 7 see API docs
+    LoRa.setSpreadingFactor(9); // ranges from 6-12,default 7 see API docs
+    LoRa.setSignalBandwidth(250E3);
+    LoRa.setCodingRate4(5); // coding rate 4/5
+//    LoRa.enableCrc();
+
     LoRa.onReceive(onReceive);
     LoRa.receive();
 

@@ -76,7 +76,6 @@ module.exports = function(uriPath, opts) {
     data = data.slice(2);
 
     if(opts.debug) console.log("[websocket rx]", this._toHex(id), data.toString('utf8'))
-
     // is this an ACK?
     if((data.slice(0, 1).toString('utf8') === '!') && (data.length === 1)) {
       var sentCb = this._sentCallbacks[id];
@@ -92,22 +91,13 @@ module.exports = function(uriPath, opts) {
       return;
     } 
 
+    data = data.slice(2, data.length - 1);
+
     var i, l, namespace, split;
     for(i=0; i < this._listeners.length; i++) {
       l = this._listeners[i]
-      if(data.indexOf(l.namespace) !== 0) continue;
-      if(!(split = data.indexOf('|'))) {
-        console.error("invalid message received: no namespace")
-        continue;
-      }
-      if(data.length < split + 2) {
-        console.error("invalid message received: empty message")
-        continue;
-      }
 
-      namespace = data.slice(0, split);
-      data = data.slice(split + 1);
-      l.callback(namespace, data);
+      l.callback('c', '<greycat> ' + data);
     }
   };
 
