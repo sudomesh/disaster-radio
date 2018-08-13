@@ -25,9 +25,9 @@ function init() {
   app.socket = new Socket('/ws', {debug: true});
 
   app.socket.connect(function(err, isConnected) {
+    if(err) console.error(err);    
 
     console.log("connected:", isConnected);
-    if(err) console.error(err);    
 
   });
   
@@ -42,12 +42,6 @@ function init() {
   }
 }
 
-
-
-// hot module reloading
-if(module.hot) {
-  module.hot.accept();
-}
 
 init();
 
