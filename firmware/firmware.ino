@@ -31,6 +31,7 @@ AsyncWebSocket ws("/ws");
 AsyncEventSource events("/events");
 
 int loraInitialized = 0; // has the LoRa radio been initialized?
+int sdInitialized = 0; // has the LoRa radio been initialized?
 int retransmitEnabled = 1;
 
 // for portable node (wemos d1 mini) use these settings:
@@ -121,6 +122,16 @@ void sendMessage(char* outgoing, int outgoingLength) {
     LoRa.receive();
 }
 
+void printToWS(char message[252], int messageLength){
+
+    char msg[256] = "99c|";  
+    int length = messageLength + HEADERSIZE;
+    for (int i = 0 ; i < messageLength ; i++){
+        msg[i+HEADERSIZE] = message[i]; 
+    }
+    ws.binaryAll(msg, length);
+}
+
 void storeMessage(char* message, int messageLength) {
     //store full message in log file
     File log = SD.open("/log.txt", FILE_WRITE);
@@ -135,7 +146,6 @@ void storeMessage(char* message, int messageLength) {
     log.close();
 }
 
-//TODO conver string to char array
 String dumpLog() {
     String dump = "";
     File log = SD.open("/log.txt", FILE_READ);
@@ -211,6 +221,16 @@ void onReceive(int packetSize) {
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
     if(type == WS_EVT_CONNECT){
         Serial.printf("ws[%s][%u] connect\r\n", server->url(), client->id());
+        printToWS("Welcome to DISASTER RADIO", 26);
+        if(echo_on){
+            printToWS("echo enabled, to turn off, enter '$' after logging in", 54);
+        }
+        if(!sdInitialized){
+            printToWS("WARNING: SD card not found, functionality may be limited", 57);
+        }
+        if(!loraInitialized){
+            printToWS("WARNING: LoRa radio not found, functionality may be limited", 60);
+        }
         client->ping();
     } else if(type == WS_EVT_DISCONNECT){
         Serial.printf("ws[%s][%u] disconnect: %u\r\n", server->url(), client->id());
@@ -269,32 +289,18 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
                 Serial.printf("%c", msg[i]);
             }
             Serial.printf("\r\n");
-            /*
-            //store full message in log file
-            fs::File log = SPIFFS.open("/log.txt", "a");
-            if(!log){
-              Serial.printf("file open failed");
-            }
-            //TODO msg_id is hex bytes not chars? adapt storeMessage function
-            log.printf("%02d%02d", msg_id[0], msg_id[1]);
-            for(int i = 2 ; i <= msg_length ; i++){
-              log.printf("%c", msg[i]);
-            }
-            log.printf("\n");
-            log.close();
-            */
 
             //TODO delay ack based on estimated transmit time
             //send ack to websocket
             ws.binary(client->id(), msg_id, 3);
 
             //Serial.print(dumpLog());
-
 	    
             //transmit message over LoRa
             if(loraInitialized) {
               sendMessage(msg, msg_length);
             }
+
 
             //echoing message to ws
             if(echo_on){
@@ -313,38 +319,13 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
                 */
                 ws.binaryAll(msg, msg_length);
             }
-
-            //set LoRa back into receive mode
-            /*
-            if(loraInitialized) {
-              LoRa.receive();
-            }           
-            */
         } 
         else {
-
             //TODO message is comprised of multiple frames or the frame is split into multiple packets
 
         }
     }
 }
-
-void writeDataToSD(){
-    File myFile;
-    myFile = SD.open("index.html", FILE_WRITE);
-    // if the file opened okay, write to it:
-    if (myFile) {
-        Serial.print("Writing to test.txt...");
-        myFile.println("testing 1, 2, 3.");
-        // close the file:
-        myFile.close();
-        Serial.println("done.");
-    } else {
-        // if the file didn't open, print an error:
-        Serial.println("error opening test.txt");
-    }
-}
-
 
 /*
   SETUP FUNCTIONS
@@ -359,11 +340,24 @@ void wifiSetup(){
     WiFi.softAP(ssid);
 }
 
-void SDcardSetup(){
+void mdnsSetup(){
+    if(!MDNS.begin("disaster")){
+        Serial.printf("Error setting up mDNS\r\n");
+        while(1) {
+            delay(1000);
+        }
+    }
+    Serial.printf("mDNS responder started\r\n");
+
+    MDNS.addService("http", "tcp", 80);
+}
+
+void sdCardSetup(){
     Serial.print("\r\nWaiting for SD card to initialise...");
     if (SD.begin(SDChipSelect, 32000000)) { // CS is D8 in this example
         Serial.print("SD Card initialized");
         Serial.print("\r\n");
+        sdInitialized = 1;
         File entry;
         File dir = SD.open("/");
         dir.rewindDirectory();
@@ -406,17 +400,6 @@ void spiffsSetup(){
     }
 }
 
-void mdnsSetup(){
-  if(!MDNS.begin("disaster")){
-    Serial.printf("Error setting up mDNS\r\n");
-    while(1) {
-      delay(1000);
-    }
-  }
-  Serial.printf("mDNS responder started\r\n");
-      
-  MDNS.addService("http", "tcp", 80);
-}
 
 void webServerSetup(){
 
@@ -429,9 +412,33 @@ void webServerSetup(){
 
     server.addHandler(&events);
 
-    server.addHandler(new AsyncStaticSDWebHandler("/", SD, "/"));
+    if(sdInitialized){
+        server.addHandler(new AsyncStaticSDWebHandler("/", SD, "/"));
+    }else{
+        server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
+    }
 
     server.onNotFound([](AsyncWebServerRequest *request){
+        Serial.printf("NOT_FOUND: ");
+        if(request->method() == HTTP_GET)
+        Serial.printf("GET");
+        else if(request->method() == HTTP_POST)
+        Serial.printf("POST");
+        else if(request->method() == HTTP_DELETE)
+        Serial.printf("DELETE");
+        else if(request->method() == HTTP_PUT)
+        Serial.printf("PUT");
+        else if(request->method() == HTTP_PATCH)
+        Serial.printf("PATCH");
+        else if(request->method() == HTTP_HEAD)
+        Serial.printf("HEAD");
+        else if(request->method() == HTTP_OPTIONS)
+        Serial.printf("OPTIONS");
+        else
+        Serial.printf("UNKNOWN");
+        Serial.printf(" http://%s%s\r\n", request->host().c_str(), request->url().c_str());
+
+        /*
         os_printf("NOT_FOUND: ");
         if(request->method() == HTTP_GET)
         os_printf("GET");
@@ -450,6 +457,7 @@ void webServerSetup(){
         else
         os_printf("UNKNOWN");
         os_printf(" http://%s%s\n", request->host().c_str(), request->url().c_str());
+        */
 
         Serial.printf(" http://%s%s\r\n", request->host().c_str(), request->url().c_str());
 
@@ -501,8 +509,7 @@ void loraSetup(){
 
     if (!LoRa.begin(915E6)) {             // initialize ratio at 915 MHz
         Serial.printf("LoRa init failed. Check your connections.\r\n");
-//        while (true);                       // if failed, do nothing
-          return;
+        return;
     }
 
     LoRa.setSPIFrequency(100E3);
@@ -529,13 +536,16 @@ void setup(){
     pinMode(SDChipSelect, OUTPUT);
     pinMode(irqPin, INPUT);
 
-    SPIenable(0); //SD
-
-    SDcardSetup();
 
     wifiSetup();
-
     mdnsSetup();
+
+    SPIenable(0); //SD
+    sdCardSetup();
+
+    if(!sdInitialized){
+        spiffsSetup();
+    }    
 
     webServerSetup();
 
@@ -543,7 +553,7 @@ void setup(){
 
 }
 
-int interval = 10000 + random(5000);    // 2-3 seconds
+int interval = 10000 + random(5000);    // 5-15 seconds
 long lastSendTime = 0; // time of last packet send
 
 void loop(){
