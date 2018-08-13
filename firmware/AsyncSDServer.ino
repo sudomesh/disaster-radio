@@ -1,28 +1,14 @@
 /*
- * Example how to serve files from an SD-card using Me No Dev's async webserver for the ESP8266.
+ * This is library to serve files from an SD-card using Me No Dev's async webserver for the ESP8266.
  * See https://github.com/me-no-dev/ESPAsyncWebServer
  *
- * Basically I copied the code for serving static files from SPIFFS and modified it for the SD library.
- * To resolve conflicts between SPIFFS and SD File classes I had to include the sd namespace in SD.h and SD.cpp in packages/esp8266/hardware/esp8266/2.3.0/libraries/SD/src.
- * So in SD.h put "namespace sd { ... }; using namespace sd;" around everything excluding the # preprocessor directives.
- * And in SD.cpp put "namespace sd { ... };" around everything excluding the # preprocessor directives.
+ * Adapted from an example by pim-borst, https://gist.github.com/pim-borst/17934bfd4454caea3ba4f74366c2135c
  *
- * Also, don't forget to fill in your WiFi SSID and password and put an index.htm file on your SD card.
+ * Notes: 
+ * In your main script you must specific #define FS_NO_GLOBALS, otherwise there is a namespace conflict between the SPIFFS and SD "File" type
+ * Files and directories being served from the SD must follow an 8dot3 naming scheme, so no "html" files only "htm"
  */
-/*
-#include <ESP8266WiFi.h>
-#include <FS.h> 
-#include <ESPAsyncTCP.h>
-#include <ESPAsyncWebServer.h>
-AsyncWebServer server(80);
 
-const char* hostName = "asyncsd";
-const char* ssid = "******";
-const char* password = "********";
-const char* sdFile = "/index.htm";
-#include "SPI.h"
-#include "SD.h"
-*/
 
 bool SD_exists(SDClass &sd, String path) {
   // For some reason SD.exists(filename) reboots the ESP...
@@ -375,83 +361,3 @@ static void _u0_putc(char c){
   while(((U0S >> USTXC) & 0x7F) != 0);
   U0F = c;
 }
-
-/*
-void initSerial(){
-  Serial.begin(115200);
-  ets_install_putc1((void *) &_u0_putc);
-  system_set_os_print(1);
-}
-
-void initWiFi(){
-  WiFi.hostname(hostName);
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    os_printf("STA: Failed!\n");
-  }
-}
-
-bool initSD(){
-  if (SD.begin(SS, 32000000)){
-    File entry;
-    File dir = SD.open("/");
-    dir.rewindDirectory();
-    while(true){
-      entry = dir.openNextFile();
-      if (!entry) break;
-      Serial.printf("SD File: %s, type: %s, size: %ld\n", entry.name(), (entry.isDirectory())?"dir":"file", entry.size());
-      entry.close();
-    }
-    dir.close();
-    Serial.println();
-    return true;
-  } else
-    Serial.println("SD Card Not Found!");
-  return false;
-}
-*/
-
-/* example script
-void setup(){
-  initSerial();
-//  SPIFFS.begin();
-  initWiFi();
-  initSD();
-
-  server.addHandler(new AsyncStaticSDWebHandler(sdFile, SD, sdFile));
-
-  server.onNotFound([](AsyncWebServerRequest *request){
-    os_printf("NOT_FOUND: ");
-    if(request->method() == HTTP_GET)
-      os_printf("GET");
-    else if(request->method() == HTTP_POST)
-      os_printf("POST");
-    else if(request->method() == HTTP_DELETE)
-      os_printf("DELETE");
-    else if(request->method() == HTTP_PUT)
-      os_printf("PUT");
-    else if(request->method() == HTTP_PATCH)
-      os_printf("PATCH");
-    else if(request->method() == HTTP_HEAD)
-      os_printf("HEAD");
-    else if(request->method() == HTTP_OPTIONS)
-      os_printf("OPTIONS");
-    else
-      os_printf("UNKNOWN");
-    os_printf(" http://%s%s\n", request->host().c_str(), request->url().c_str());
-    request->send(404);
-  });
-  server.begin();
-}
-
-static uint32_t lastTest = 0;
-
-void loop(){
-  uint32_t newTest = ESP.getFreeHeap();
-  if(newTest  != lastTest){
-    lastTest = newTest;
-    os_printf("%u\r\n", newTest);
-  }
-}
-*/

@@ -438,29 +438,6 @@ void webServerSetup(){
         Serial.printf("UNKNOWN");
         Serial.printf(" http://%s%s\r\n", request->host().c_str(), request->url().c_str());
 
-        /*
-        os_printf("NOT_FOUND: ");
-        if(request->method() == HTTP_GET)
-        os_printf("GET");
-        else if(request->method() == HTTP_POST)
-        os_printf("POST");
-        else if(request->method() == HTTP_DELETE)
-        os_printf("DELETE");
-        else if(request->method() == HTTP_PUT)
-        os_printf("PUT");
-        else if(request->method() == HTTP_PATCH)
-        os_printf("PATCH");
-        else if(request->method() == HTTP_HEAD)
-        os_printf("HEAD");
-        else if(request->method() == HTTP_OPTIONS)
-        os_printf("OPTIONS");
-        else
-        os_printf("UNKNOWN");
-        os_printf(" http://%s%s\n", request->host().c_str(), request->url().c_str());
-        */
-
-        Serial.printf(" http://%s%s\r\n", request->host().c_str(), request->url().c_str());
-
         if(request->contentLength()){
             Serial.printf("_CONTENT_TYPE: %s\r\n", request->contentType().c_str());
             Serial.printf("_CONTENT_LENGTH: %u\r\n", request->contentLength());
