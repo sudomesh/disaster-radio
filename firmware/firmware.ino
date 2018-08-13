@@ -14,6 +14,7 @@
 
 #define HEADERSIZE 4 
 #define BUFFERSIZE 252
+#define SHA1_LEN 40 
 
 byte mac[6];
 char macaddr[14];
@@ -51,60 +52,110 @@ const int SDChipSelect = 2;
 byte localAddress;     // assigned to last byte of mac address in setup
 byte destination = 0xFF;      // destination to send to default broadcast
 
-bool echo_on = false;
+bool echo_on = true;
+
+char hashTable[256][40];
+int hashEntry = 0;
+
+char incomingBuffer[8][256];
+int incomingBufferLength[8];
+int bufferEntry = 0;
 
 /*
   FORWARD-DEFINED FUNCTIONS
 */
-void sendMessage(char* outgoing, int outgoing_length) {
-    LoRa.beginPacket();
-    for( int i = 0 ; i < outgoing_length ; i++){
-        LoRa.write(outgoing[i]);
+
+void SPIenable(int opt){
+    switch (opt){
+        case 0: // select SD
+            Serial.printf("enabling SD card");
+            Serial.printf("\r\n");
+            digitalWrite(loraChipSelect, HIGH);
+            digitalWrite(SDChipSelect, LOW); 
+            break;
+        case 1: // select LORA 
+            Serial.printf("enabling LoRa radio");
+            Serial.printf("\r\n");
+            digitalWrite(loraChipSelect, LOW);
+            digitalWrite(SDChipSelect, HIGH); // select SD card first, to initialize
+            break;
     }
-    LoRa.endPacket();
 }
 
-void storeMessage(char* message, int message_length) {
-  //store full message in log file
-  fs::File log = SPIFFS.open("/log.txt", "a");
-  if(!log){
-    Serial.printf("file open failed");
-  }
-  for(int i = 0 ; i <= message_length ; i++){
-    log.printf("%c", message[i]);
-  }
-  log.printf("\n");
-  log.close();
+bool isHashNew(char incoming[SHA1_LEN]){
+    bool hashNew = true;
+    for( int i = 0 ; i <= hashEntry ; i++){
+        if(strcmp(incoming, hashTable[i]) == 0){
+            hashNew = false; 
+        }
+    }
+    if( hashNew ){
+        Serial.printf("New message, retransmit");
+        Serial.printf("\r\n");
+        for( int i = 0 ; i < SHA1_LEN ; i++){
+            hashTable[hashEntry][i] = incoming[i];
+        }
+        hashEntry++;
+    }
+    return hashNew;
+}
+
+void sendMessage(char* outgoing, int outgoingLength) {
+
+    char hashOutgoing[SHA1_LEN];
+    String hash = sha1(outgoing, outgoingLength);
+    hash.toCharArray(hashOutgoing, SHA1_LEN);
+
+    // do not send message if already transmitted once
+    if(!isHashNew(hashOutgoing)){
+        return;
+    }
+    
+    LoRa.beginPacket();
+    for( int i = 0 ; i < outgoingLength ; i++){
+        LoRa.write(outgoing[i]);
+        Serial.printf("%c", outgoing[i]);
+    }
+    Serial.printf("\r\n");
+    LoRa.endPacket();
+    LoRa.receive();
+}
+
+void storeMessage(char* message, int messageLength) {
+    //store full message in log file
+    File log = SD.open("/log.txt", FILE_WRITE);
+    if(!log){
+        Serial.printf("file open failed");
+        Serial.printf("\r\n");
+    }
+    for(int i = 0 ; i <= messageLength ; i++){
+        log.printf("%c", message[i]);
+    }
+    log.printf("\n");
+    log.close();
 }
 
 //TODO conver string to char array
 String dumpLog() {
-  String dump = "";
-  fs::File log = SPIFFS.open("/log.txt", "r");
-  if(!log){
-    Serial.printf("file open failed");
-  }  
-  Serial.print("reading log file: \r\n");
-  while (log.available()){
-    //TODO replace string with char array
-    String s = log.readStringUntil('\n');
-    dump += s;
-    dump += "\r\n";
-  }
-  return dump;
+    String dump = "";
+    File log = SD.open("/log.txt", FILE_READ);
+    if(!log){
+        Serial.printf("file open failed");
+        Serial.printf("\r\n");
+    }  
+    Serial.print("reading log file: \r\n");
+    while (log.available()){
+        //TODO replace string with char array
+        String s = log.readStringUntil('\n');
+        dump += s;
+        dump += "\r\n";
+    }
+    return dump;
 }
 
 void clearLog() {
-  fs::File log = SPIFFS.open("/log.txt", "w");
-  log.close();
-}
-
-
-char* stringToCharArray(String command){
-    if(command.length()!=0){
-        char *p = const_cast<char*>(command.c_str());
-        return p;
-    }
+    File log = SD.open("/log.txt", FILE_WRITE);
+    log.close();
 }
 
 void printCharArray(char *buf, int len){
@@ -143,18 +194,18 @@ void onReceive(int packetSize) {
     storeMessage(incoming, incomingLength);
     
     ws.binaryAll(incoming, incomingLength);
-    String hash = sha1(incoming, incomingLength);
-    char *hashIncoming = stringToCharArray(hash);
-    int hashLength = hash.length();
 
-    printCharArray(hashIncoming, hashLength);
-    //hashTable[hashEntry] = hashIncoming;
+    //printCharArray(hashIncoming, 40);
 
     if(retransmitEnabled){
-        sendMessage(incoming, incomingLength);
-        ws.binaryAll("99c|retransmitting message", 26);
+        Serial.printf("adding message to buffer");
+        Serial.printf("\r\n");
+        incomingBufferLength[bufferEntry] = incomingLength;
+        for( int i = 0 ; i < incomingLength ; i++){
+            incomingBuffer[bufferEntry][i] = incoming[i];    
+        }
+        bufferEntry++;
     }
-   
 }
 
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
@@ -238,6 +289,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             ws.binary(client->id(), msg_id, 3);
 
             //Serial.print(dumpLog());
+
 	    
             //transmit message over LoRa
             if(loraInitialized) {
@@ -246,6 +298,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
             //echoing message to ws
             if(echo_on){
+                /*
                 char echo[256]; 
                 char prepend[7] = "<echo>";
                 int prepend_length= 6;
@@ -257,13 +310,16 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
                     echo[4+prepend_length+i] = msg[i+usr_id_stop+1];
                 }
                 int echo_length = prepend_length - usr_id_length + msg_length - 1;
-                ws.binaryAll(echo, echo_length);
+                */
+                ws.binaryAll(msg, msg_length);
             }
 
             //set LoRa back into receive mode
+            /*
             if(loraInitialized) {
               LoRa.receive();
             }           
+            */
         } 
         else {
 
@@ -461,6 +517,7 @@ void loraSetup(){
     Serial.printf("%s\r\n", macaddr);
 }
 
+
 /*
   START MAIN
 */
@@ -472,43 +529,57 @@ void setup(){
     pinMode(SDChipSelect, OUTPUT);
     pinMode(irqPin, INPUT);
 
-    //SPIenable("SD");
-    digitalWrite(loraChipSelect, HIGH);
-    digitalWrite(SDChipSelect, LOW); // select SD card first, to initialize
+    SPIenable(0); //SD
 
     SDcardSetup();
 
     wifiSetup();
 
-    //spiffsSetup();
-
     mdnsSetup();
 
     webServerSetup();
-
-    //SPIenable("LORA");
-    digitalWrite(loraChipSelect, LOW);
-    digitalWrite(SDChipSelect, HIGH); // select SD card first, to initialize
 
     loraSetup();
 
 }
 
-int interval = 1000;          // interval between sends
+int interval = 10000 + random(5000);    // 2-3 seconds
 long lastSendTime = 0; // time of last packet send
 
 void loop(){
-/*
+
     int packetSize;
 
     if (millis() - lastSendTime > interval) {
+        Serial.printf("checking buffer");
+        Serial.printf("\r\n");
+        if (bufferEntry > 0){
+            Serial.printf("removing from buffer and retransmiting");
+            Serial.printf("\r\n");
+            int retransmitLength = incomingBufferLength[bufferEntry-1];
+            char retransmit[retransmitLength];
+            for( int i = 0 ; i < retransmitLength ; i++){
+                retransmit[i] = incomingBuffer[bufferEntry-1][i];
+                Serial.printf("%c", retransmit[i]);
+                incomingBuffer[bufferEntry-1][i] = 0;
+            }
+            Serial.printf("\r\n");
+            bufferEntry--;
+            if(loraInitialized){
+                sendMessage(retransmit, retransmitLength);
+            }
+            interval = 10000 + random(5000);    // 2-3 seconds
+        }
+        /*
         int packetSize = LoRa.parsePacket();
         Serial.printf("checking for data: %d\r\n", packetSize); 
         if(packetSize) {
             onReceive(packetSize);
         }
+        */
 
         //uncomment to enable BEACON mode
+        /*
         int test_length = 26;
         char test_message[252] = "FFc|<morgan> HeLoRa World! ";   // send a message
         Serial.printf("Sending:");
@@ -517,8 +588,8 @@ void loop(){
         }
         Serial.printf("\r\n");
         sendMessage(test_message, test_length);
+        */
 
         lastSendTime = millis();
     }
-    */
 }
