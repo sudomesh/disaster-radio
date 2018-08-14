@@ -179,7 +179,7 @@ void printCharArray(char *buf, int len){
   CALLBACK FUNCTIONS
 */
 void onReceive(int packetSize) {
-     Serial.printf("GOT PACKET!\r\n");
+
     if (packetSize == 0) return;          // if there's no packet, return
 
     // read packet header bytes:
@@ -196,10 +196,12 @@ void onReceive(int packetSize) {
         incomingLength++;
     }
 
-    Serial.printf("RSSI: %f\r\n", LoRa.packetRssi());
-    Serial.printf("Snr: %f\r\n", LoRa.packetSnr());
-
+    Serial.printf("PACKET|");
     printCharArray(incoming, incomingLength);
+    Serial.printf("\r\n");
+
+//    Serial.printf("RSSI: %f\r\n", LoRa.packetRssi());
+//    Serial.printf("Snr: %f\r\n", LoRa.packetSnr());
 
     storeMessage(incoming, incomingLength);
     
