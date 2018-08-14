@@ -32,7 +32,11 @@ AsyncEventSource events("/events");
 
 int loraInitialized = 0; // has the LoRa radio been initialized?
 int sdInitialized = 0; // has the LoRa radio been initialized?
+
 int retransmitEnabled = 1;
+int pollingEnabled = 0;
+int beaconModeEnabled = 0;
+int hashingEnabled = 1;
 
 // for portable node (wemos d1 mini) use these settings:
 const int loraChipSelect = 15; // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
@@ -91,7 +95,7 @@ bool isHashNew(char incoming[SHA1_LEN]){
         }
     }
     if( hashNew ){
-        Serial.printf("New message, retransmit");
+        Serial.printf("New message received");
         Serial.printf("\r\n");
         for( int i = 0 ; i < SHA1_LEN ; i++){
             hashTable[hashEntry][i] = incoming[i];
@@ -103,14 +107,23 @@ bool isHashNew(char incoming[SHA1_LEN]){
 
 void sendMessage(char* outgoing, int outgoingLength) {
 
-    char hashOutgoing[SHA1_LEN];
-    String hash = sha1(outgoing, outgoingLength);
-    hash.toCharArray(hashOutgoing, SHA1_LEN);
-
-    // do not send message if already transmitted once
-    if(!isHashNew(hashOutgoing)){
+    
+    if(!loraInitialized){
         return;
     }
+
+    if(hashingEnabled){
+        // do not send message if already transmitted once
+        char hashOutgoing[SHA1_LEN];
+        String hash = sha1(outgoing, outgoingLength);
+        hash.toCharArray(hashOutgoing, SHA1_LEN);
+
+        if(!isHashNew(hashOutgoing)){
+            return;
+        }
+    }
+
+    Serial.printf("Sending: ");
     
     LoRa.beginPacket();
     for( int i = 0 ; i < outgoingLength ; i++){
@@ -175,18 +188,68 @@ void printCharArray(char *buf, int len){
     Serial.printf("\r\n");
 }
 
+void addToBuffer(char message[256], int length){
+    if(bufferEntry > 7){
+        bufferEntry = 0;
+    }
+    Serial.printf("adding message to buffer");
+    Serial.printf("\r\n");
+    incomingBufferLength[bufferEntry] = length;
+    for( int i = 0 ; i < length ; i++){
+        incomingBuffer[bufferEntry][i] = message[i];    
+    }
+    bufferEntry++;
+}
+
+void handleMessage(char message[256], int length){
+
+    ws.binaryAll(message, length);
+    if(retransmitEnabled){
+        addToBuffer(message, length);
+    }
+}
+
+void handleHopCounter(char buffer[256], int length){
+
+    int hops = buffer[4]-'0'; //convert char to int by subtracting ASCII value of zero
+    // this will only work for <10 hops
+    char origin[14];
+    for( int i = 0 ; i < 14 ; i++){
+        origin[i] = buffer[6+i];
+    }
+    hops++;
+
+    char message[256];
+    char retransmit[256];
+
+    sprintf(message, "%d hop from %s", hops, origin);
+    sprintf(retransmit, "FFh|%d,%s", hops, origin);
+
+    printToWS(message, 29);
+
+    if(hashingEnabled){
+        // do not send message if already transmitted once
+        buffer[4] = '*'; //convert char to int by subtracting ASCII value of zero
+        char bufferHash[SHA1_LEN];
+        String hash = sha1(buffer, length);
+        hash.toCharArray(bufferHash, SHA1_LEN);
+
+        if(!isHashNew(bufferHash)){
+            return;
+        }
+    }
+    
+    if(retransmitEnabled){
+        addToBuffer(retransmit, length);
+    }
+}
+
 /*
   CALLBACK FUNCTIONS
 */
 void onReceive(int packetSize) {
 
     if (packetSize == 0) return;          // if there's no packet, return
-
-    // read packet header bytes:
-    //int recipient = LoRa.read();          // recipient address
-    //byte sender = LoRa.read();            // sender address
-    //byte incomingMsgId = LoRa.read();     // incoming msg ID
-    //byte incomingLength = LoRa.read();    // incoming msg length
 
     char incoming[BUFFERSIZE];                 // payload of packet
 
@@ -196,27 +259,35 @@ void onReceive(int packetSize) {
         incomingLength++;
     }
 
+    char type = incoming[2];
+    Serial.printf("message type: %c", type);
+    Serial.printf("\r\n");
+
     Serial.printf("PACKET|");
     printCharArray(incoming, incomingLength);
     Serial.printf("\r\n");
 
-//    Serial.printf("RSSI: %f\r\n", LoRa.packetRssi());
-//    Serial.printf("Snr: %f\r\n", LoRa.packetSnr());
-
     storeMessage(incoming, incomingLength);
-    
-    ws.binaryAll(incoming, incomingLength);
 
-    //printCharArray(hashIncoming, 40);
-
-    if(retransmitEnabled){
-        Serial.printf("adding message to buffer");
-        Serial.printf("\r\n");
-        incomingBufferLength[bufferEntry] = incomingLength;
-        for( int i = 0 ; i < incomingLength ; i++){
-            incomingBuffer[bufferEntry][i] = incoming[i];    
-        }
-        bufferEntry++;
+    switch(type){
+        case 'c':
+            Serial.printf("received chat message");
+            Serial.printf("\r\n");
+            handleMessage(incoming, incomingLength);
+            break;
+        case 'm':
+            Serial.printf("received map message");
+            Serial.printf("\r\n");
+            handleMessage(incoming, incomingLength);
+            break;
+        case 'h':
+            Serial.printf("received hop message");
+            Serial.printf("\r\n");
+            handleHopCounter(incoming, incomingLength);
+            break;
+        default:
+            Serial.printf("Error: Unknown message type");
+            Serial.printf("\r\n");
     }
 }
 
@@ -296,13 +367,8 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             //send ack to websocket
             ws.binary(client->id(), msg_id, 3);
 
-            //Serial.print(dumpLog());
-	    
             //transmit message over LoRa
-            if(loraInitialized) {
-              sendMessage(msg, msg_length);
-            }
-
+            sendMessage(msg, msg_length);
 
             //echoing message to ws
             if(echo_on){
@@ -503,7 +569,6 @@ void loraSetup(){
     Serial.printf("%s\r\n", macaddr);
 }
 
-
 /*
   START MAIN
 */
@@ -540,44 +605,46 @@ void loop(){
     int packetSize;
 
     if (millis() - lastSendTime > interval) {
-        Serial.printf("checking buffer");
-        Serial.printf("\r\n");
-        if (bufferEntry > 0){
-            Serial.printf("removing from buffer and retransmiting");
+        if (retransmitEnabled){
+            Serial.printf("checking buffer");
             Serial.printf("\r\n");
-            int retransmitLength = incomingBufferLength[bufferEntry-1];
-            char retransmit[retransmitLength];
-            for( int i = 0 ; i < retransmitLength ; i++){
-                retransmit[i] = incomingBuffer[bufferEntry-1][i];
-                Serial.printf("%c", retransmit[i]);
-                incomingBuffer[bufferEntry-1][i] = 0;
-            }
-            Serial.printf("\r\n");
-            bufferEntry--;
-            if(loraInitialized){
+            if (bufferEntry > 0){
+                Serial.printf("removing from buffer and retransmiting");
+                Serial.printf("\r\n");
+                int retransmitLength = incomingBufferLength[bufferEntry-1];
+                char retransmit[retransmitLength];
+                for( int i = 0 ; i < retransmitLength ; i++){
+                    retransmit[i] = incomingBuffer[bufferEntry-1][i];
+                    Serial.printf("%c", retransmit[i]);
+                    incomingBuffer[bufferEntry-1][i] = 0;
+                }
+                Serial.printf("\r\n");
+                bufferEntry--;
                 sendMessage(retransmit, retransmitLength);
             }
-            interval = 10000 + random(5000);    // 2-3 seconds
         }
-        /*
-        int packetSize = LoRa.parsePacket();
-        Serial.printf("checking for data: %d\r\n", packetSize); 
-        if(packetSize) {
-            onReceive(packetSize);
-        }
-        */
 
-        //uncomment to enable BEACON mode
-        /*
-        int test_length = 26;
-        char test_message[252] = "FFc|<morgan> HeLoRa World! ";   // send a message
-        Serial.printf("Sending:");
-        for( int i = 0 ; i <= test_length ; i++){
-            Serial.printf("%c", test_message[i]);
+        if (pollingEnabled){
+            int packetSize = LoRa.parsePacket();
+            Serial.printf("checking for data: %d\r\n", packetSize); 
+            if(packetSize) {
+                onReceive(packetSize);
+            }
         }
-        Serial.printf("\r\n");
-        sendMessage(test_message, test_length);
-        */
+
+        if (beaconModeEnabled){
+            int test_length = 6;
+            char test_message[256] = "FFh|0,";   // send a message
+            for(int i = 0 ; i < 14 ; i++){
+                test_message[test_length] = macaddr[i];
+                test_length++;
+            }
+            Serial.printf("Sending: %s", test_message);
+            Serial.printf("\r\n");
+            sendMessage(test_message, test_length);
+        }
+        
+        interval = 10000 + random(5000);    // 2-3 seconds
 
         lastSendTime = millis();
     }
