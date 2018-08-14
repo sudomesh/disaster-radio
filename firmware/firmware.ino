@@ -33,7 +33,7 @@ AsyncEventSource events("/events");
 int loraInitialized = 0; // has the LoRa radio been initialized?
 int sdInitialized = 0; // has the LoRa radio been initialized?
 
-int retransmitEnabled = 1;
+int retransmitEnabled = 0;
 int pollingEnabled = 0;
 int beaconModeEnabled = 0;
 int hashingEnabled = 1;
@@ -57,7 +57,7 @@ const int SDChipSelect = 2;
 byte localAddress;     // assigned to last byte of mac address in setup
 byte destination = 0xFF;      // destination to send to default broadcast
 
-bool echo_on = true;
+bool echo_on = false;
 
 char hashTable[256][40];
 int hashEntry = 0;
@@ -471,6 +471,7 @@ void spiffsSetup(){
 
 void webServerSetup(){
 
+
     ws.onEvent(onWsEvent);
     server.addHandler(&ws);
 
@@ -481,11 +482,11 @@ void webServerSetup(){
     server.addHandler(&events);
 
     if(sdInitialized){
-        server.addHandler(new AsyncStaticSDWebHandler("/", SD, "/"));
+        server.addHandler(new AsyncStaticSDWebHandler("/", SD, "/", "max-age=604800"));
     }else{
-        server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
+        server.serveStatic("/", SPIFFS, "/").setCacheControl("max-age=604800");
     }
-
+    
     server.onNotFound([](AsyncWebServerRequest *request){
         Serial.printf("NOT_FOUND: ");
         if(request->method() == HTTP_GET)
