@@ -131,14 +131,28 @@ void onReceive(int packetSize) {
     Serial.printf("RSSI: %f\r\n", LoRa.packetRssi());
     Serial.printf("Snr: %f\r\n", LoRa.packetSnr());
 
-    for(int i = 0 ; i < incomingLength ; i++){
-        Serial.printf("%c", incoming[i]);
+    char message[256];
+    char add[11] = "<greycat> ";
+    for(int i = 0 ; i < 4 ; i++ ){
+        message[i]=incoming[i];
+    }
+
+    for(int i = 0 ; i < 10 ; i++ ){
+        message[i+4]=add[i];
+    }
+
+    for(int i = 4 ; i < incomingLength ; i++ ){
+        message[i+10]=incoming[i];
+    }
+
+    for(int i = 0 ; i < incomingLength+10 ; i++){
+        Serial.printf("%c", message[i]);
     }
     Serial.printf("\r\n");
 
     storeMessage(incoming, incomingLength);
     
-    ws.binaryAll(incoming, incomingLength);
+    ws.binaryAll(message, incomingLength+10);
    
 }
 
@@ -185,11 +199,6 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             msg[msg_length] = '\0';
 
             char transmit[256];
-            /*
-            for(int i = 0 ; i < 4 ; i++ ){
-                transmit[i]=msg[i];
-            }
-            */
 
             for(int i = 0 ; i < 7 ; i++ ){
                 transmit[i]='_';
