@@ -184,7 +184,21 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             msg_length++;
             msg[msg_length] = '\0';
 
-	    
+            char transmit[256];
+            /*
+            for(int i = 0 ; i < 4 ; i++ ){
+                transmit[i]=msg[i];
+            }
+            */
+
+            for(int i = 0 ; i < 7 ; i++ ){
+                transmit[i]='_';
+            }
+
+            for(int i = 4 ; i < msg_length ; i++ ){
+                transmit[i+4]=msg[i];
+            }
+
             //parse message id 
             memcpy( msg_id, msg, 2 );
             msg_id[2] = '!';
@@ -196,38 +210,14 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             }
             usr_id_length = usr_id_stop - 5;
 
-            //print message info to serial
-            /*Serial.printf("Message Length: %d\r\n", msg_length);
-            Serial.printf("Message ID: %02d%02d %c\r\n", msg_id[0], msg_id[1], msg_id[2]);
-            Serial.printf("Message:");
-            for( int i = 0 ; i <= msg_length ; i++){
-                Serial.printf("%c", msg[i]);
-            }
-            Serial.printf("\r\n");
-	    */
 	    
-	    //store full message in log file
-	    File log = SPIFFS.open("/log.txt", "a");
-	    if(!log){
-	      Serial.printf("file open failed");
-	    }
-	    //TODO msg_id is hex bytes not chars? adapt storeMessage function
-	    log.printf("%02d%02d", msg_id[0], msg_id[1]);
-	    for(int i = 2 ; i <= msg_length ; i++){
-	      log.printf("%c", msg[i]);
-	    }
-	    log.printf("\n");
-	    log.close();
-
-	    //TODO delay ack based on estimated transmit time
+	        //TODO delay ack based on estimated transmit time
             //send ack to websocket
             ws.binary(client->id(), msg_id, 3);
 
-//	    Serial.print(dumpLog());
-	    
             //transmit message over LoRa
             if(loraInitialized) {
-              sendMessage(msg, msg_length);
+              sendMessage(transmit, msg_length+4);
             }
 
             //echoing message to ws
