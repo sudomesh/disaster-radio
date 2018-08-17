@@ -448,9 +448,9 @@ void sdCardSetup(){
 void spiffsSetup(){
     if (SPIFFS.begin()) {
         Serial.print("ok\r\n");
-        if (SPIFFS.exists("/index.html")) {
+        if (SPIFFS.exists("/index.htm")) {
             Serial.printf("The file exists!\r\n");
-            fs::File f = SPIFFS.open("/index.html", "r");
+            fs::File f = SPIFFS.open("/index.htm", "r");
             if (!f) {
                 Serial.printf("Some thing went wrong trying to open the file...\r\n");
             }
@@ -484,7 +484,7 @@ void webServerSetup(){
     if(sdInitialized){
         server.addHandler(new AsyncStaticSDWebHandler("/", SD, "/", "max-age=604800"));
     }else{
-        server.serveStatic("/", SPIFFS, "/").setCacheControl("max-age=604800");
+        server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.htm");
     }
     
     server.onNotFound([](AsyncWebServerRequest *request){
