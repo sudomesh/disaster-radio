@@ -13,16 +13,18 @@ The general layout and flow of hardware, firmware, and software can be seen belo
 
 # Hardware Connections  
 
-NodeMCU/ESP8266 | SX1276   
-----------------|--------
-D1/GPIO5/OUT | RESET
-D2/GPIO4/INT | DIO0   
-D5/GPIO14/SCK | SCK  
-D6/GPIO12/MISO | MISO   
-D7/GPIO13/MOSI | MOSI   
-D8/GPIO15/SS | NSS     
+NodeMCU/ESP8266 | LoRa Transceiver | SD Card |
+----------------|--------|---------|
+D1/GPIO5/OUT | RESET | _NC_ 
+D2/GPIO4/INT | DIO0 | _NC_ 
+D4/GPIO2/CS | _NC_ | SS 
+D5/GPIO14/SCK | SCK | SCK 
+D6/GPIO12/MISO | MISO | MISO  
+D7/GPIO13/MOSI | MOSI | MOSI  
+D8/GPIO15/CS | NSS | _NC_   
   
 DIO0 sends an interrupt from the LoRa chip upon Tx/Rx Ready on the radio. 
+Chip selects can be used to explicitly switch between the LoRa tranceiver and the SD card; however, the SD card should be enabled by default, as the LoRa interrupt appears to handle enabling the tranceiver (note: this still needs to be thoroughly tested, what happens if you receive an interrupt while loading from the SD?).
 
 # Websocket
 
@@ -147,6 +149,8 @@ If building doesn't work then try this first:
 ```
 touch web/static/*
 ```
+
+If using an SD card model, copy the contents of `web/static/` to the root of a fat32 formatted SD card.
 
 # Testing the firmware and web app  
 See [firmware/README.md](https://github.com/sudomesh/disaster-radio/tree/master/firmware)

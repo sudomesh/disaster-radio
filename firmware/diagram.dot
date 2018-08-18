@@ -6,7 +6,7 @@ digraph G {
         Serial [label = "Serial", shape=box];
         WiFi [label = "WiFi", shape=box];
         mDNS [label = "mDNS", shape=box];
-        SPIFFs [label = "SPIFFs", shape=box];
+        SPIFFs [label = "SD or SPIFFs", shape=box];
         WebServer [label = "Web Server", shape=box];
         LoRa [label = "LoRa", shape=box];
         Serial -> WiFi -> mDNS -> SPIFFs -> WebServer -> LoRa;
@@ -24,8 +24,7 @@ digraph G {
         color=green;
         log [label = "Log files"];
         Apps [label = "Pre-loaded Apps"];
-        labeljust = l;
-        label = "SPIFFS"
+        label = "SD or SPIFFS"
     }
     subgraph cluster4 {
         node [style=filled,color=white];

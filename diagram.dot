@@ -1,18 +1,34 @@
 digraph G {
     antenna [shape=ellipse];
-    LoRa [label = "LoRa tranciever", shape=box];
 
     subgraph cluster0 {
         node [style=filled,color=white];
         color=blue;
+
+        subgraph cluster6 {
+            node [style=filled, shape=box, style=filled, color=lightgrey];
+            LoRa [label = "RFM95 transceiver"];
+            labeljust = l;
+            color=lightgrey;
+            label = "LoRa module";
+        }
+
         antenna -> LoRa [dir=both]
         LoRa -> LoRaSR [dir=both,label = "SPI"];
+
+        subgraph cluster2 {
+            node [style=filled, shape=box, style=filled, color=lightgrey];
+            SDfiles [label = "Static Web App\n\n Vector Map Tiles"];
+            labeljust = l;
+            color=lightgrey;
+            label = "SD card file system";
+        }
 
         subgraph cluster1 {
             node [style=filled,color=white];
             style=filled;
             color=lightgrey;
-            subgraph cluster2 {
+            subgraph cluster3 {
                 node [style=filled,color=white];
                 color=red;
                 LoRaSR [label = "LoRa send/receive"];
@@ -22,23 +38,26 @@ digraph G {
                 label = "firmware";
             }
             FS -> WebServer;
-            subgraph cluster3 {
+            subgraph cluster4 {
                 node [style=filled,color=white];
                 color=green;
-                FS [label = "JavaScript/Preact"];
+                FS [label = "Static Web App"];
                 labeljust = l;
-                label = "file system"
+                label = "on-board file system"
             }
+            WiFiAntenna [label="WiFi Antenna",shape=box,style=filled,color=blue];
             labeljust = l;
             label = "ESP8266";
         }
+        SDfiles -> WebServer [dir=both,label = "SPI"]; 
+        WebServer -> WiFiAntenna;
         label = "disaster.node1";
     }
-    WebServer -> JS [dir=both, label="websocket over WiFi"];
-    subgraph cluster4 {
+    WiFiAntenna -> JS [dir=both, label="websocket connection"];
+    subgraph cluster5 {
         node [style=filled,color=white];
         color=yellow;
-        JS [shape=none,label = "Running JavaScript/Preact"]
+        JS [shape=none,label = "Running Web App"]
         JS -> maps [dir=both];
         JS -> apps [dir=both];
         JS -> chat [dir=both];
