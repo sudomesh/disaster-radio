@@ -10,11 +10,11 @@
  */
 
 
-bool SD_exists(SDClass &sd, String path) {
+bool SD_exists(fs::FS &fs, const char* path) {
   // For some reason SD.exists(filename) reboots the ESP...
   // So we test by opening the file
   bool exists = false;
-  File test = sd.open(path);
+  File test = fs.open(path);
   if(test){
     test.close();
     exists = true;
@@ -63,16 +63,16 @@ void AsyncSDFileResponse::_setContentType(const String& path){
   else _contentType = "text/plain";
 }
 
-AsyncSDFileResponse::AsyncSDFileResponse(SDClass &sd, const String& path, const String& contentType, bool download){
+AsyncSDFileResponse::AsyncSDFileResponse(fs::FS &fs, const String& path, const String& contentType, bool download){
   _code = 200;
   _path = path;
   
-  if(!download && !SD_exists(sd, _path) && SD_exists(sd, _path+".gz")){
+  if(!download && !SD_exists(fs, _path) && SD_exists(fs, _path+".gz")){
     _path = _path+".gz";
     addHeader("Content-Encoding", "gzip");
   }
 
-  _content = sd.open(_path, FILE_READ);
+  _content = fs.open(_path, FILE_READ);
   _contentLength = _content.size();
   _sourceIsValid = _content;
 

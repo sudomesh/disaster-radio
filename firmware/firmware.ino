@@ -1,11 +1,11 @@
 #define FS_NO_GLOBALS
 
-#include <ESP8266WiFi.h>
+#include <WiFi.h>
 #include <FS.h>
-#include <Hash.h>
-#include <ESPAsyncTCP.h>
+//#include <Hash.h>
+#include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <ESP8266mDNS.h>
+//#include <ESP8266mDNS.h>
 #include <SPIFFSEditor.h>
 #include <SPI.h>
 #include <LoRa.h>
@@ -36,7 +36,7 @@ int sdInitialized = 0; // has the LoRa radio been initialized?
 int retransmitEnabled = 0;
 int pollingEnabled = 0;
 int beaconModeEnabled = 0;
-int hashingEnabled = 1;
+int hashingEnabled = 0;
 
 // for portable node (wemos d1 mini) use these settings:
 const int loraChipSelect = 15; // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
@@ -113,6 +113,7 @@ void sendMessage(char* outgoing, int outgoingLength) {
     }
 
     if(hashingEnabled){
+/*
         // do not send message if already transmitted once
         char hashOutgoing[SHA1_LEN];
         String hash = sha1(outgoing, outgoingLength);
@@ -121,6 +122,7 @@ void sendMessage(char* outgoing, int outgoingLength) {
         if(!isHashNew(hashOutgoing)){
             return;
         }
+*/
     }
 
     Serial.printf("Sending: ");
@@ -228,6 +230,7 @@ void handleHopCounter(char buffer[256], int length){
     printToWS(message, 29);
 
     if(hashingEnabled){
+/*
         // do not send message if already transmitted once
         buffer[4] = '*'; //convert char to int by subtracting ASCII value of zero
         char bufferHash[SHA1_LEN];
@@ -237,6 +240,7 @@ void handleHopCounter(char buffer[256], int length){
         if(!isHashNew(bufferHash)){
             return;
         }
+*/
     }
     
     if(retransmitEnabled){
@@ -399,6 +403,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
   SETUP FUNCTIONS
 */
 void wifiSetup(){
+
     WiFi.macAddress(mac);
     sprintf(macaddr, "%02x%02x%02x%02x%02x%02x", mac[5], mac[4], mac[3], mac[2], mac[1], mac [0]);
     strcat(ssid, macaddr);
@@ -408,6 +413,7 @@ void wifiSetup(){
     WiFi.softAP(ssid);
 }
 
+/*
 void mdnsSetup(){
     if(!MDNS.begin("disaster")){
         Serial.printf("Error setting up mDNS\r\n");
@@ -419,6 +425,7 @@ void mdnsSetup(){
 
     MDNS.addService("http", "tcp", 80);
 }
+*/
 
 void sdCardSetup(){
     Serial.print("\r\nWaiting for SD card to initialise...");
@@ -583,7 +590,7 @@ void setup(){
 
 
     wifiSetup();
-    mdnsSetup();
+//    mdnsSetup();
 
     SPIenable(0); //SD
     sdCardSetup();

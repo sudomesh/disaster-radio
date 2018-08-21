@@ -5,14 +5,14 @@ set -e
 # get makeEspArduino
 git clone https://github.com/plerup/makeEspArduino
 cd makeEspArduino
-git checkout tags/4.13.0
+git checkout tags/4.14.1
 cp makeEspArduino.mk ../Makefile
 cd ../
 
-# install esp8266-arduino build environment
-git clone https://github.com/esp8266/Arduino.git esp8266-arduino
-cd esp8266-arduino/
-git checkout tags/2.4.0-rc1
+# install arduino-esp32 build environment
+git clone https://github.com/espressif/arduino-esp32 arduino-esp32
+cd arduino-esp32/
+git checkout tags/1.0.0
 cd tools/
 python get.py
 cd ../../
@@ -20,15 +20,15 @@ cd ../../
 # install ESPAsyncTCP and ESPAsyncWebserver
 mkdir -p libs
 cd libs/
-git clone https://github.com/me-no-dev/ESPAsyncTCP
-cd ESPAsyncTCP/
-git checkout 991f855109d8038ed2cf0b5fb89792fcfa23549c
+git clone https://github.com/me-no-dev/AsyncTCP
+cd AsyncTCP/
+git checkout 5453ec2e3fdd9beb92b8423878008b57be7805e6
 cd ../
 git clone https://github.com/me-no-dev/ESPAsyncWebServer
 cd ESPAsyncWebServer/
-git checkout e6c432e56327c166bb71dbc0317654790dcbe3af
+git checkout bed4146ec647fd1cdfd1d2485724369c92cab8e6
 cd ../
 git clone https://github.com/sandeepmistry/arduino-LoRa
 cd arduino-LoRa/
-git checkout 7f1ca664499e2406ac03ceca9b22c4406a921cda
+git checkout tags/0.5.0
 cd ../../
