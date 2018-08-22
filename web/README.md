@@ -31,7 +31,7 @@ npm run dev # starts simulator server and auto-builder
 
 # Uploading to ESP8266
 
-After building with npm, the web app can be uploaded with `make flash_fs'
+After building with npm, the web app can be uploaded with `make flash_fs` from repository root
 
 
 
