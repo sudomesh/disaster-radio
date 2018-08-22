@@ -38,10 +38,11 @@ int pollingEnabled = 0;
 int beaconModeEnabled = 0;
 int hashingEnabled = 0;
 
-// for portable node (wemos d1 mini) use these settings:
-const int loraChipSelect = 15; // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
-const int resetPin = 5;       // LoRa radio reset, GPIO0 = D3 
-const int irqPin = 4;        // interrupt pin for receive callback?, GPIO2 = D4
+// for portable ESP32 node use these settings:
+// uses VSPI bus (M0SI = 23, MISO = 19, SCK = 18, SS = 5)
+const int loraChipSelect = 5; // LoRa radio chip select, GPIO5
+const int resetPin = 14;       // LoRa radio reset, GPIO14 
+const int irqPin = 2;        // interrupt pin for receive callback, GPIO2
 
 // for solar-powered module use these settings:
 /*
