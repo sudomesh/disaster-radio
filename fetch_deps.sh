@@ -2,6 +2,12 @@
 
 set -e
 
+if [ -d makeEspArduino ]; then rm -rf makeEspArduino; fi
+if [ -d esp8266-arduino ]; then rm -rf esp8266-arduino; fi
+if [ -d libs/ESPAsyncTCP ]; then rm -rf libs/ESPAsyncTCP; fi
+if [ -d libs/ESPAsyncWebServer ]; then rm -rf libs/ESPAsyncWebServer; fi
+if [ -d libs/arduino-LoRa ]; then rm -rf libs/arduino-LoRa; fi
+
 # get makeEspArduino
 git clone https://github.com/plerup/makeEspArduino
 cd makeEspArduino
@@ -30,5 +36,5 @@ git checkout e6c432e56327c166bb71dbc0317654790dcbe3af
 cd ../
 git clone https://github.com/sandeepmistry/arduino-LoRa
 cd arduino-LoRa/
-git checkout 7f1ca664499e2406ac03ceca9b22c4406a921cda
+git checkout dff276e26845727049a48a624d0eb2b545f3bb6a
 cd ../../

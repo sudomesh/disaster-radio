@@ -35,8 +35,11 @@ int sdInitialized = 0; // has the LoRa radio been initialized?
 
 int retransmitEnabled = 0;
 int pollingEnabled = 0;
-int beaconModeEnabled = 0;
 int hashingEnabled = 1;
+int asyncTx = 1;
+
+int beaconModeEnabled = 0;
+int beaconInterval = 30000;
 
 // for portable node (wemos d1 mini) use these settings:
 const int loraChipSelect = 15; // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
@@ -65,6 +68,7 @@ int hashEntry = 0;
 char incomingBuffer[8][256];
 int incomingBufferLength[8];
 int bufferEntry = 0;
+int bufferInterval = 5000;
 
 /*
   FORWARD-DEFINED FUNCTIONS
@@ -131,7 +135,7 @@ void sendMessage(char* outgoing, int outgoingLength) {
         Serial.printf("%c", outgoing[i]);
     }
     Serial.printf("\r\n");
-    LoRa.endPacket();
+    LoRa.endPacket(asyncTx);
     LoRa.receive();
 }
 
@@ -241,6 +245,49 @@ void handleHopCounter(char buffer[256], int length){
     
     if(retransmitEnabled){
         addToBuffer(retransmit, length);
+    }
+}
+
+
+long lastCheckTime = millis();
+void checkBuffer(){
+    if (millis() - lastCheckTime > bufferInterval) {
+        if (retransmitEnabled){
+            Serial.printf("checking buffer");
+            Serial.printf("\r\n");
+            if (bufferEntry > 0){
+                Serial.printf("removing from buffer and retransmiting");
+                Serial.printf("\r\n");
+                int retransmitLength = incomingBufferLength[bufferEntry-1];
+                char retransmit[retransmitLength];
+                for( int i = 0 ; i < retransmitLength ; i++){
+                    retransmit[i] = incomingBuffer[bufferEntry-1][i];
+                    Serial.printf("%c", retransmit[i]);
+                    incomingBuffer[bufferEntry-1][i] = 0;
+                }
+                Serial.printf("\r\n");
+                bufferEntry--;
+                sendMessage(retransmit, retransmitLength);
+            }
+        }
+        lastCheckTime = millis();
+    }
+}
+
+long lastBeaconTime = millis();
+void transmitBeacon(){
+    if (millis() - lastBeaconTime > beaconInterval) {
+        int test_length = 6;
+        char test_message[256] = "FFh|0,";   // send a message
+        for(int i = 0 ; i < 14 ; i++){
+            test_message[test_length] = macaddr[i];
+            test_length++;
+        }
+        Serial.printf("Sending: %s", test_message);
+        Serial.printf("\r\n");
+        sendMessage(test_message, test_length);
+
+        lastBeaconTime = millis();
     }
 }
 
@@ -605,48 +652,31 @@ void loop(){
 
     int packetSize;
 
-    if (millis() - lastSendTime > interval) {
-        if (retransmitEnabled){
-            Serial.printf("checking buffer");
-            Serial.printf("\r\n");
-            if (bufferEntry > 0){
-                Serial.printf("removing from buffer and retransmiting");
-                Serial.printf("\r\n");
-                int retransmitLength = incomingBufferLength[bufferEntry-1];
-                char retransmit[retransmitLength];
-                for( int i = 0 ; i < retransmitLength ; i++){
-                    retransmit[i] = incomingBuffer[bufferEntry-1][i];
-                    Serial.printf("%c", retransmit[i]);
-                    incomingBuffer[bufferEntry-1][i] = 0;
-                }
-                Serial.printf("\r\n");
-                bufferEntry--;
-                sendMessage(retransmit, retransmitLength);
-            }
+    if(LoRa.beginPacket() == 0){
+        // do stuff while LoRa packet is being sent
+        //Serial.print("transmitting a packet...\r\n");
+        //delay(100);
+        return;
+    }else{
+        // do stuff when LoRa packet is NOT being sent
+        checkBuffer(); 
+
+        if (beaconModeEnabled){
+            transmitBeacon();
         }
 
         if (pollingEnabled){
-            int packetSize = LoRa.parsePacket();
-            Serial.printf("checking for data: %d\r\n", packetSize); 
-            if(packetSize) {
-                onReceive(packetSize);
+            
+            if (millis() - lastSendTime > interval) {
+
+                int packetSize = LoRa.parsePacket();
+                Serial.printf("checking for data: %d\r\n", packetSize); 
+                if(packetSize) {
+                    onReceive(packetSize);
+                }
+                lastSendTime = millis();
+
             }
         }
-
-        if (beaconModeEnabled){
-            int test_length = 6;
-            char test_message[256] = "FFh|0,";   // send a message
-            for(int i = 0 ; i < 14 ; i++){
-                test_message[test_length] = macaddr[i];
-                test_length++;
-            }
-            Serial.printf("Sending: %s", test_message);
-            Serial.printf("\r\n");
-            sendMessage(test_message, test_length);
-        }
-        
-        interval = 10000 + random(5000);    // 2-3 seconds
-
-        lastSendTime = millis();
     }
 }
