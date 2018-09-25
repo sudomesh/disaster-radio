@@ -6,7 +6,7 @@ $white: rgba(220,220,220,1);
 body {
     font-family: sans-serif;
     margin: 20px;
-    background: rgba(0,0,0,1);
+    background: rgba(33,33,33,1);
     color: $white;
 }
 
@@ -64,4 +64,56 @@ h1 {
     background-color: black;
     border: 0;
     border-top: 1px solid gray;
+}
+
+#nickInput {
+    margin: 100px auto;
+    margin-bottom: 10px;
+    width: 80%;    
+    padding: 20px;
+    display: block;
+    color: #0fba00;
+    font-family: monospace;
+    font-size: 20px;
+    background-color: black;
+    border: 0;
+    text-align: center;
+}
+
+#joinSubmit {
+    margin: 60px auto;
+    width: 40%;    
+    padding: 20px;
+    display: block;
+    color: #0fba00;
+    font-family: monospace;
+    font-size: 25px;
+    background-color: black;
+    border: 0;
+}
+
+#chatForm {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  body {
+    margin: 0;
+  }
+  #chat {
+    max-width: 100%;
+    color: #0fba00;
+    font-family: monospace;
+    font-size: 25px;
+  }
+  #chatInput {
+    width: 100%;
+    max-width: 100%;
+    margin: 20px auto;
+    padding: 5px;
+    font-size: 25px;
+    background-color: black;
+    border: 0;
+  }
+
 }

@@ -24,13 +24,33 @@ module.exports = function(Component) {
     receive(namespace, data) {
       app.actions.chat.showMessage(data.toString('utf8'));
     }
+    
+    join(e) {
+      e.preventDefault()
+
+      var inp = document.getElementById('nickInput');
+
+      app.actions.chat.join(inp.value, function(err) {
+        if(err) {
+          console.error(err);
+          return;
+        }
+
+        document.getElementById('joinForm').style.display = 'none';
+        document.getElementById('chatForm').style.display = 'block';
+        document.getElementById('chatInput').focus();
+      });
+    }
 
     send(e) {
       e.preventDefault()
       var inp = document.getElementById('chatInput')
 
       app.actions.chat.sendMessage(inp.value, function(err) {
-        if(err) return;
+        if(err) {
+          console.error(err);
+          return;
+        }
 
         inp.value = '';
         inp.placeholder = '';
@@ -49,11 +69,16 @@ module.exports = function(Component) {
       }, this)
 
 		  return <div>
-        <form id="chatForm" action="/chat" method="POST" onsubmit={this.send}>
+        <form id="joinForm" onsubmit={this.join.bind(this)}>
+          <input id="nickInput" type="text" placeholder="Enter your name to join" autofocus />
+          <input id="joinSubmit" type="submit" value="Join" />
+        </form>
+
+        <form id="chatForm" action="/chat" method="POST" onsubmit={this.send.bind(this)}>
           <div id="chat">
             {messages}
           </div>
-          <input id="chatInput" type="text" name="msg" placeholder="Enter you name or alias" autofocus />
+          <input id="chatInput" type="text" name="msg"/>
         </form>
       </div>
 	  }

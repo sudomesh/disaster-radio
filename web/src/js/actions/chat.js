@@ -16,24 +16,22 @@ var self = module.exports = {
     app.changeState({chat: {messages: msgs}});
   },
 
-  join: function(nick) {
+  join: function(nick, cb) {
     app.changeState({
       user: { 
         name: nick
       }
     })
+    this.sendMessage("~ " + nick + " joined the channel", cb, 'status');
   },
 
-  sendMessage: function(msg, cb) {
+  sendMessage: function(msg, cb, type) {
     if(!msg.trim()) return cb(new Error("You must supply a (non-whitespace) message/nick"));
 
-    var type = 'self';
 
-    if(!app.state.user || !app.state.user.name) {
-      self.join(msg);
-      msg = '~ ' + msg + ' joined the channel';
-      type = 'status';
-    } else {
+    type = type || 'self';
+
+    if(type !== 'status') {
       msg = '<'+app.state.user.name+'> ' + msg;
     }
 
