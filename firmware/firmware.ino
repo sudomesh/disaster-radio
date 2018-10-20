@@ -33,13 +33,11 @@ AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 AsyncEventSource events("/events");
 
-int loraInitialized = 0; // has the LoRa radio been initialized?
 int sdInitialized = 0; // has the LoRa radio been initialized?
 
 int retransmitEnabled = 0;
 int pollingEnabled = 0;
 int hashingEnabled = 1;
-int asyncTx = 1;
 
 int beaconModeEnabled = 0;
 int beaconInterval = 30000;
@@ -110,36 +108,6 @@ bool isHashNew(char incoming[SHA1_LEN]){
     return hashNew;
 }
 
-void sendMessage(char* outgoing, int outgoingLength) {
-
-    
-    if(!loraInitialized){
-        return;
-    }
-
-    if(hashingEnabled){
-        // do not send message if already transmitted once
-        char hashOutgoing[SHA1_LEN];
-        String hash = sha1(outgoing, outgoingLength);
-        hash.toCharArray(hashOutgoing, SHA1_LEN);
-
-        if(!isHashNew(hashOutgoing)){
-            return;
-        }
-    }
-
-    Serial.printf("Sending: ");
-    
-    LoRa.beginPacket();
-    for( int i = 0 ; i < outgoingLength ; i++){
-        LoRa.write(outgoing[i]);
-        Serial.printf("%c", outgoing[i]);
-    }
-    Serial.printf("\r\n");
-    LoRa.endPacket(asyncTx);
-    LoRa.receive();
-}
-
 void printToWS(char message[252], int messageLength){
 
     char msg[256] = "99c|";  
@@ -193,78 +161,9 @@ void printCharArray(char *buf, int len){
     Serial.printf("\r\n");
 }
 
-void addToBuffer(char message[256], int length){
-    if(bufferEntry > 7){
-        bufferEntry = 0;
-    }
-    Serial.printf("adding message to buffer");
-    Serial.printf("\r\n");
-    incomingBufferLength[bufferEntry] = length;
-    for( int i = 0 ; i < length ; i++){
-        incomingBuffer[bufferEntry][i] = message[i];    
-    }
-    bufferEntry++;
-}
-
 void handleMessage(char message[256], int length){
 
     ws.binaryAll(message, length);
-    if(retransmitEnabled){
-        addToBuffer(message, length);
-    }
-}
-
-void handleHopCounter(char buffer[256], int length){
-
-    int hops = buffer[4]-'0'; //convert char to int by subtracting ASCII value of zero
-    // this will only work for <10 hops
-    char origin[14];
-    for( int i = 0 ; i < 14 ; i++){
-        origin[i] = buffer[6+i];
-    }
-    hops++;
-
-    char message[256];
-    char retransmit[256];
-
-    sprintf(message, "%d hop from %s", hops, origin);
-    sprintf(retransmit, "FFh|%d,%s", hops, origin);
-
-    printToWS(message, 29);
-
-    if(hashingEnabled){
-        // do not send message if already transmitted once
-        buffer[4] = '*'; //convert char to int by subtracting ASCII value of zero
-        char bufferHash[SHA1_LEN];
-        String hash = sha1(buffer, length);
-        hash.toCharArray(bufferHash, SHA1_LEN);
-
-        if(!isHashNew(bufferHash)){
-            return;
-        }
-    }
-    
-    if(retransmitEnabled){
-        addToBuffer(retransmit, length);
-    }
-}
-
-
-long lastBeaconTime = millis();
-void transmitBeacon(){
-    if (millis() - lastBeaconTime > beaconInterval) {
-        int test_length = 6;
-        char test_message[256] = "FFh|0,";   // send a message
-        for(int i = 0 ; i < 14 ; i++){
-            test_message[test_length] = macaddr[i];
-            test_length++;
-        }
-        Serial.printf("Sending: %s", test_message);
-        Serial.printf("\r\n");
-        sendMessage(test_message, test_length);
-
-        lastBeaconTime = millis();
-    }
 }
 
 /*
@@ -282,17 +181,11 @@ void onReceive(int packetSize) {
         incomingLength++;
     }
 
-    char type = incoming[2];
-    Serial.printf("message type: %c", type);
-    Serial.printf("\r\n");
-
-    Serial.printf("PACKET|");
-    printCharArray(incoming, incomingLength);
-    Serial.printf("\r\n");
+    struct Packet packet = packet_received(incoming, incomingLength);
 
     storeMessage(incoming, incomingLength);
 
-    switch(type){
+    switch(packet.type){
         case 'c':
             Serial.printf("received chat message");
             Serial.printf("\r\n");
@@ -302,11 +195,6 @@ void onReceive(int packetSize) {
             Serial.printf("received map message");
             Serial.printf("\r\n");
             handleMessage(incoming, incomingLength);
-            break;
-        case 'h':
-            Serial.printf("received hop message");
-            Serial.printf("\r\n");
-            handleHopCounter(incoming, incomingLength);
             break;
         default:
             Serial.printf("Error: Unknown message type");
@@ -391,7 +279,8 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             ws.binary(client->id(), msg_id, 3);
 
             //transmit message over LoRa
-            sendMessage(msg, msg_length);
+			//struct Packet packet = buildPacket();
+            //pushToBuffer(packet);
 
             //echoing message to ws
             if(echo_on){
@@ -621,7 +510,7 @@ void setup(){
 
 }
 
-int interval = 10000 + random(5000);    // 5-15 seconds
+int routingInterval = 10000 + random(5000);    // 5-15 seconds
 long lastSendTime = 0; // time of last packet send
 
 void loop(){
@@ -630,32 +519,23 @@ void loop(){
 
     if(LoRa.beginPacket() == 0){
         // do stuff while LoRa packet is being sent
-        //Serial.print("transmitting a packet...\r\n");
-        //delay(100);
         return;
     }else{
         // do stuff when LoRa packet is NOT being sent
         checkBuffer(); 
 
-        transmitRoutes();
-        /*
-        if (beaconModeEnabled){
-            transmitBeacon();
-        }
-        */
-
+        transmitRoutes(routingInterval);
+		/*
         if (pollingEnabled){
-            
             if (millis() - lastSendTime > interval) {
-
                 int packetSize = LoRa.parsePacket();
                 Serial.printf("checking for data: %d\r\n", packetSize); 
                 if(packetSize) {
                     onReceive(packetSize);
                 }
                 lastSendTime = millis();
-
             }
         }
+		*/
     }
 }

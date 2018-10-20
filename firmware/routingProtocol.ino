@@ -3,25 +3,9 @@
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
-//#include <openssl/sha.h>
-//#include "base.h"
-
-/*
-#include <ESP8266WiFi.h>
-#include <FS.h>
-#include <Hash.h>
-#include <ESPAsyncTCP.h>
-#include <ESPAsyncWebServer.h>
-#include <ESP8266mDNS.h>
-#include <SPIFFSEditor.h>
-#include <SPI.h>
 #include <LoRa.h>
-#include <SD.h>
-#include "AsyncSDServer.ino"
-*/
 
 #define DEBUG 0
-#define FS_NO_GLOBALS
 #define HEADER_LENGTH 16
 #define SHA1_LENGTH 40
 #define ADDR_LENGTH 6 
@@ -32,12 +16,8 @@ char macaddr[ADDR_LENGTH*2];
 
 // global sequence number
 uint8_t messageCount = 0;
-
-/*
-// mode switches
-int retransmitEnabled = 0;
-int hashingEnabled = 1;
-*/
+int loraInitialized = 0; // has the LoRa radio been initialized?
+int asyncTx = 1;
 
 // timeout intervals
 int _helloInterval = 10;
@@ -164,33 +144,44 @@ int isHashNew(uint8_t hash[SHA1_LENGTH]){
 
 int sendPacket(struct Packet packet) {
 
-    //if(!loraInitialized){
-    //    return;
-    //}
     uint8_t* sending = (uint8_t*) malloc(sizeof(packet));
     memcpy(sending, &packet, sizeof(packet));
+
     /*
+    int send = 1;
     if(hashingEnabled){
         // do not send message if already transmitted once
         //uint8_t hash[SHA1_LENGTH];
         //SHA1(sending, packet.totalLength, hash);
         //if(isHashNew(hash)){
-        //send_packet(sending, packet.totalLength);
+        //  send = 0;
         //}
     }
     */
-    messageCount++;
-    return messageCount;
-    /*
-    LoRa.beginPacket();
-    for( int i = 0 ; i < outgoingLength ; i++){
-        LoRa.write(outgoing[i]);
-        Serial.printf("%c", outgoing[i]);
+
+    if(!loraInitialized){
+        //send on simulator interface
+        //send_packet(sending, packet.totalLength);
+        return messageCount;
+
+    }else{
+        // send on LoRa interface
+        uint8_t* sending = (uint8_t*) malloc(sizeof(packet));
+        memcpy(sending, &packet, sizeof(packet));
+
+        Serial.printf("Sending: ");
+        
+        LoRa.beginPacket();
+        for( int i = 0 ; i < packet.totalLength ; i++){
+            LoRa.write(sending[i]);
+            Serial.printf("%c", sending[i]);
+        }
+        Serial.printf("\r\n");
+        LoRa.endPacket(asyncTx);
+        LoRa.receive();
+        messageCount++;
+        return messageCount;
     }
-    Serial.printf("\r\n");
-    LoRa.endPacket();
-    LoRa.receive();
-    */
 }
 
 void pushToBuffer(struct Packet packet){
@@ -533,7 +524,7 @@ void parseChatPacket(struct Packet packet){
     }
 }
     
-int packet_received(char* data, size_t len) {
+struct Packet packet_received(char* data, size_t len) {
 
     data[len] = '\0';
 
@@ -588,7 +579,7 @@ int packet_received(char* data, size_t len) {
             printPacketInfo(packet, metadata);
             Serial.printf("message type not found\n");
     }
-    return 0;
+    return packet;
 }
 
 long lastHelloTime = 0;
@@ -602,23 +593,15 @@ void transmitHello(){
         //TODO: add randomness to message to avoid hashisng issues
         uint8_t destination[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
         struct Packet helloMessage = buildPacket(1, mac, destination, messageCount, 'h', data, dataLength); 
-        uint8_t* sending = (uint8_t*) malloc(sizeof(helloMessage));
-        memcpy(sending, &helloMessage, sizeof(helloMessage));
-        //send_packet(sending, helloMessage.totalLength);
-        messageCount++;
+        sendPacket(helloMessage);
         lastHelloTime = time(NULL);
-        debug_printf("Sending beacon: ");
-        for(int i = 0 ; i < helloMessage.totalLength ; i++){
-            debug_printf("%02x", sending[i]);
-        }
-        debug_printf("\r\n");
     }
 }
 
 long lastRouteTime = 0;
-void transmitRoutes(){
+void transmitRoutes(int interval){
 
-    if (time(NULL) - lastRouteTime > routeInterval()) {
+    if (time(NULL) - lastRouteTime > interval) {
         uint8_t data[240];
         int dataLength = 0;
         debug_printf("number of routes before transmit: %d\n", routeEntry);
@@ -648,16 +631,8 @@ void transmitRoutes(){
         debug_printf("\n");
         uint8_t destination[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
         struct Packet routeMessage = buildPacket(1, mac, destination, messageCount, 'r', data, dataLength); 
-        uint8_t* sending = (uint8_t*)  malloc(sizeof(routeMessage));
-        memcpy(sending, &routeMessage, sizeof(routeMessage));
-        //send_packet(sending, routeMessage.totalLength);
-        messageCount++;
+        sendPacket(routeMessage);
         lastRouteTime = time(NULL);
-        debug_printf("Sending routes: ");
-        for(int i = 0 ; i < routeMessage.totalLength ; i++){
-            debug_printf("%02x", sending[i]);
-        }
-        debug_printf("\n");
     }
 }
 
@@ -692,16 +667,9 @@ void transmitToRandomRoute(){
             dataLength++;
         }
         struct Packet randomMessage = buildPacket(32, mac, destination, messageCount, 'c', data, dataLength); 
-        uint8_t* sending = (uint8_t*) malloc(sizeof(randomMessage));
-        memcpy(sending, &randomMessage, sizeof(randomMessage));
-        //send_packet(sending, randomMessage.totalLength);
+        sendPacket(randomMessage);
         messageCount++;
         lastMessageTime = time(NULL);
-        Serial.printf("Sending a message: ");
-        for(int i = 0 ; i < randomMessage.totalLength ; i++){
-            Serial.printf("%02x", sending[i]);
-        }
-        Serial.printf("\r\n");
     }
 }
 
