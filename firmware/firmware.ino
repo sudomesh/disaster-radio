@@ -11,13 +11,16 @@
 #include <LoRa.h>
 #include <SD.h>
 #include "AsyncSDServer.ino"
+#include "routingProtocol.ino"
 
 #define HEADERSIZE 4 
 #define BUFFERSIZE 252
 #define SHA1_LEN 40 
 
+/*
 byte mac[6];
-char macaddr[14];
+char macaddr[12];
+*/
 char ssid[32] = "disaster.radio ";
 const char * hostName = "disaster-node";
 
@@ -67,8 +70,6 @@ int hashEntry = 0;
 
 char incomingBuffer[8][256];
 int incomingBufferLength[8];
-int bufferEntry = 0;
-int bufferInterval = 5000;
 
 /*
   FORWARD-DEFINED FUNCTIONS
@@ -248,31 +249,6 @@ void handleHopCounter(char buffer[256], int length){
     }
 }
 
-
-long lastCheckTime = millis();
-void checkBuffer(){
-    if (millis() - lastCheckTime > bufferInterval) {
-        if (retransmitEnabled){
-            Serial.printf("checking buffer");
-            Serial.printf("\r\n");
-            if (bufferEntry > 0){
-                Serial.printf("removing from buffer and retransmiting");
-                Serial.printf("\r\n");
-                int retransmitLength = incomingBufferLength[bufferEntry-1];
-                char retransmit[retransmitLength];
-                for( int i = 0 ; i < retransmitLength ; i++){
-                    retransmit[i] = incomingBuffer[bufferEntry-1][i];
-                    Serial.printf("%c", retransmit[i]);
-                    incomingBuffer[bufferEntry-1][i] = 0;
-                }
-                Serial.printf("\r\n");
-                bufferEntry--;
-                sendMessage(retransmit, retransmitLength);
-            }
-        }
-        lastCheckTime = millis();
-    }
-}
 
 long lastBeaconTime = millis();
 void transmitBeacon(){
@@ -661,9 +637,12 @@ void loop(){
         // do stuff when LoRa packet is NOT being sent
         checkBuffer(); 
 
+        transmitRoutes();
+        /*
         if (beaconModeEnabled){
             transmitBeacon();
         }
+        */
 
         if (pollingEnabled){
             
