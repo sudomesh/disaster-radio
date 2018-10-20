@@ -485,6 +485,7 @@ void loraSetup(){
 /*
   START MAIN
 */
+long startTime;
 void setup(){
     Serial.begin(115200);
     Serial.setDebugOutput(true);
@@ -503,7 +504,8 @@ void setup(){
     if(!sdInitialized){
         spiffsSetup();
     }    
-
+    startTime = getTime();
+    lastRouteTime = startTime;
     webServerSetup();
 
     loraSetup();
@@ -521,6 +523,7 @@ void loop(){
         // do stuff while LoRa packet is being sent
         return;
     }else{
+        Serial.printf("learning... %d\r", getTime() - startTime);
         // do stuff when LoRa packet is NOT being sent
         checkBuffer(); 
 

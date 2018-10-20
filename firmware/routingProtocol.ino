@@ -6,6 +6,7 @@
 #include <LoRa.h>
 
 #define DEBUG 0
+#define LORA 1
 #define HEADER_LENGTH 16
 #define SHA1_LENGTH 40
 #define ADDR_LENGTH 6 
@@ -50,7 +51,17 @@ int maxRandomDelay() {
     return simulationTime(_maxRandomDelay);
 }
 
+int getTime(){
+
+    if(LORA){
+        return millis();
+    }else{
+        return time(NULL);
+    }
+}
+
 int debug_printf(const char* format, ...) {
+
     if(DEBUG){
         int ret;
         va_list args;
@@ -146,7 +157,6 @@ int sendPacket(struct Packet packet) {
 
     uint8_t* sending = (uint8_t*) malloc(sizeof(packet));
     memcpy(sending, &packet, sizeof(packet));
-
     /*
     int send = 1;
     if(hashingEnabled){
@@ -158,7 +168,6 @@ int sendPacket(struct Packet packet) {
         //}
     }
     */
-
     if(!loraInitialized){
         //send on simulator interface
         //send_packet(sending, packet.totalLength);
@@ -229,31 +238,33 @@ struct Packet buildPacket( uint8_t ttl, uint8_t src[6], uint8_t dest[6], uint8_t
     return packet;
 }
 
-void printPacketInfo(struct Packet packet, struct Metadata metadata){
-
-    Serial.printf("\n");
-    Serial.printf("Packet Received: \n");
+void printMetadata(struct Metadata metadata){
     Serial.printf("RSSI: %x\n", metadata.rssi);
     Serial.printf("SNR: %x\n", metadata.snr);
-    Serial.printf("ttl: %d\n", packet.ttl);
-    Serial.printf("length: %d\n", packet.totalLength);
+}
+
+void printPacketInfo(struct Packet packet){
+
+    Serial.printf("\r\n");
+    Serial.printf("ttl: %d\r\n", packet.ttl);
+    Serial.printf("length: %d\r\n", packet.totalLength);
     Serial.printf("source: ");
     for(int i = 0 ; i < ADDR_LENGTH ; i++){
         Serial.printf("%x", packet.source[i]);
     }
-    Serial.printf("\n");
+    Serial.printf("\r\n");
     Serial.printf("destination: ");
     for(int i = 0 ; i < ADDR_LENGTH ; i++){
         Serial.printf("%x", packet.destination[i]);
     }
-    Serial.printf("\n");
-    Serial.printf("sequence: %02x\n", packet.sequence);
-    Serial.printf("type: %c\n", packet.type);
+    Serial.printf("\r\n");
+    Serial.printf("sequence: %02x\r\n", packet.sequence);
+    Serial.printf("type: %c\r\n", packet.type);
     Serial.printf("data: ");
     for(int i = 0 ; i < packet.totalLength-HEADER_LENGTH ; i++){
         Serial.printf("%02x", packet.data[i]);
     }
-    Serial.printf("\n");
+    Serial.printf("\r\n");
 }
 
 void printNeighborTable(){
@@ -553,7 +564,7 @@ struct Packet packet_received(char* data, size_t len) {
     };
     memcpy(packet.data, byteData + HEADER_LENGTH, packet.totalLength-HEADER_LENGTH);
 
-    //printPacketInfo(packet, metadata);
+    //printPacketInfo(packet);
     
     switch(packet.type){
         case 'h' :
@@ -576,7 +587,7 @@ struct Packet packet_received(char* data, size_t len) {
             Serial.printf("this is a map message\n");
             break;
         default :
-            printPacketInfo(packet, metadata);
+            printPacketInfo(packet);
             Serial.printf("message type not found\n");
     }
     return packet;
@@ -585,7 +596,7 @@ struct Packet packet_received(char* data, size_t len) {
 long lastHelloTime = 0;
 void transmitHello(){
 
-    if (time(NULL) - lastHelloTime > helloInterval()) {
+    if (getTime() - lastHelloTime > helloInterval()) {
         //uint8_t data[240];
         uint8_t data[240] = "Hola";
         //sprintf(data, "%s %s", message, macaddr);
@@ -594,21 +605,18 @@ void transmitHello(){
         uint8_t destination[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
         struct Packet helloMessage = buildPacket(1, mac, destination, messageCount, 'h', data, dataLength); 
         sendPacket(helloMessage);
-        lastHelloTime = time(NULL);
+        lastHelloTime = getTime();
     }
 }
 
 long lastRouteTime = 0;
 void transmitRoutes(int interval){
 
-    if (time(NULL) - lastRouteTime > interval) {
+    if (getTime() - lastRouteTime > interval) {
         uint8_t data[240];
         int dataLength = 0;
+        Serial.printf("transmitting routes\r\n");
         debug_printf("number of routes before transmit: %d\n", routeEntry);
-        if (routeEntry == 0){
-            lastRouteTime = time(NULL);
-            return;
-        }
         int routesPerPacket = routeEntry;
         if (routeEntry >= MAX_ROUTES_PER_PACKET-1){
             routesPerPacket = MAX_ROUTES_PER_PACKET-1;
@@ -631,19 +639,20 @@ void transmitRoutes(int interval){
         debug_printf("\n");
         uint8_t destination[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
         struct Packet routeMessage = buildPacket(1, mac, destination, messageCount, 'r', data, dataLength); 
+        printPacketInfo(routeMessage);
         sendPacket(routeMessage);
-        lastRouteTime = time(NULL);
+        lastRouteTime = getTime();
     }
 }
 
 long lastMessageTime = 0;
 void transmitToRandomRoute(){
 
-    if (time(NULL) - lastMessageTime > messageInterval()) {
+    if (getTime() - lastMessageTime > messageInterval()) {
 
         if (routeEntry == 0){
             Serial.printf("trying to send but I have no routes ");
-            lastMessageTime = time(NULL);
+            lastMessageTime = getTime();
             return;
         }
         int choose = rand()%routeEntry;
@@ -669,97 +678,7 @@ void transmitToRandomRoute(){
         struct Packet randomMessage = buildPacket(32, mac, destination, messageCount, 'c', data, dataLength); 
         sendPacket(randomMessage);
         messageCount++;
-        lastMessageTime = time(NULL);
+        lastMessageTime = getTime();
     }
 }
 
-/*
-void wifiSetup(){
-
-    //WiFi.macAddress(mac);
-    // generate random mac address
-    //srand(time(NULL) + getpid());
-    for (int i = 0; i < ADDR_LENGTH ; i++){
-        mac[i] = rand()%256;
-    }
-    // MAC address comes in backwards on ESP8266
-    // reverse mac array
-    uint8_t tmp;
-    int start = 0;
-    int end = ADDR_LENGTH-1;
-    while (start < end) 
-    { 
-        tmp = mac[start];    
-        mac[start] = mac[end]; 
-        mac[end] = tmp; 
-        start++; 
-        end--; 
-    }    
-    sprintf(macaddr, "%02x%02x%02x%02x%02x%02x\0", mac[0], mac[1], mac[2], mac[3], mac[4], mac [5]);
-    debug_printf("%s\n", macaddr);
-    //strcat(ssid, macaddr);
-    //WiFi.hostname(hostName);
-    //WiFi.mode(WIFI_AP);
-    //WiFi.softAPConfig(local_IP, gateway, netmask);
-    //WiFi.softAP(ssid);
-}
-
-long startTime;
-int chance;
-void setup() {
-
-    Serial.begin(115200);
-    Serial.printf("initialized\n");
-    debug_printf("debuggin enabled\n");
-
-    wifiSetup();
-
-    // random wait at boot
-    int wait = rand()%maxRandomDelay();
-    Serial.printf("waiting %d s\n", wait);
-    //nsleep(wait, 0);
-
-    startTime = time(NULL);
-    lastHelloTime = time(NULL);
-    lastRouteTime = time(NULL);
-    _learningTimeout += wait;
-
-    chance=rand()%5;
-    if(chance == 3){
-        Serial.printf("I shall send a random message\n");
-    }
-}
-
-int state = 0;
-void loop() {
-
-    if(!LoRa.beginPacket()){
-        //debug_printf("transmit in progress please wait");
-    }else{
-        if(state == 0){
-            Serial.printf("learning... %d\r", time(NULL) - startTime);
-            printNeighborTable();
-            printRoutingTable();
-            transmitHello();
-            if(time(NULL) - startTime > discoveryTimeout()) {
-                state++;
-            }
-        }else if(state == 1){
-            Serial.printf("learning... %d\r", time(NULL) - startTime);
-            printNeighborTable();
-            printRoutingTable();
-            transmitRoutes();
-            if(time(NULL) - startTime > learningTimeout()) {
-                state++;
-                printNeighborTable();
-                printRoutingTable();
-            }
-        }else if(state == 2){
-            checkBuffer(); 
-            if(chance == 3){
-                transmitToRandomRoute();        
-            }
-        }
-    }
-}
-*/
