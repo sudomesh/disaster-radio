@@ -55,6 +55,10 @@ struct RoutingTableEntry{
     uint8_t metric;
 };
 
+uint8_t messageCount();
+int setLocalAddress(char* macString);
+uint8_t* localAddress();
+
 int isHashNew(char incoming[SHA1_LENGTH]);
 
 int send_packet(char* data, int len);
@@ -79,7 +83,7 @@ void printNeighborTable();
 
 void printRoutingTable();
 
-//void printAddress(uint8_t address[ADDR_LENGTH]);
+void printAddress(uint8_t address[ADDR_LENGTH]);
 
 //uint8_t calculatePacketLoss(int entry, uint8_t sequence);
 
@@ -103,11 +107,11 @@ void printRoutingTable();
 
 struct Packet packet_received(char* data, size_t len);
 
-void transmitHello();
+long transmitHello(long interval, long lastTime);
 
-void transmitRoutes(int interval);
+long transmitRoutes(long interval, long lastTime);
 
-void transmitToRandomRoute();
+long transmitToRandomRoute(long interval, long lastTime);
 
 
 

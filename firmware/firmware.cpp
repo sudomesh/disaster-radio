@@ -16,10 +16,9 @@
 #define HEADERSIZE 4 
 #define BUFFERSIZE 252
 
-uint8_t mac2[ADDR_LENGTH];
-char mac2addr[ADDR_LENGTH*2];
-//uint8_t messageCount;
-int loraInitialized2;
+uint8_t mac[ADDR_LENGTH];
+char macaddr[ADDR_LENGTH*2];
+int _loraInitialized = 0;
 
 char ssid[32] = "disaster.radio ";
 const char * hostName = "disaster-node";
@@ -58,7 +57,6 @@ const int SDChipSelect = 2;
 
 //TODO: switch to volatile byte for interrupt
 
-byte localAddress;     // assigned to last byte of mac2 address in setup
 byte destination = 0xFF;      // destination to send to default broadcast
 
 bool echo_on = false;
@@ -144,7 +142,7 @@ void printCharArray(char *buf, int len){
     Serial.printf("\r\n");
 }
 
-void handleMessage(char message[256], int length){
+void handleMessage(uint8_t message[240], uint8_t length){
 
     ws.binaryAll(message, length);
 }
@@ -167,17 +165,17 @@ void onReceive(int packetSize) {
     struct Packet packet = packet_received(incoming, incomingLength);
 
     storeMessage(incoming, incomingLength);
-
+    
     switch(packet.type){
         case 'c':
             Serial.printf("received chat message");
             Serial.printf("\r\n");
-            handleMessage(incoming, incomingLength);
+            handleMessage(packet.data, packet.totalLength-HEADER_LENGTH);
             break;
         case 'm':
             Serial.printf("received map message");
             Serial.printf("\r\n");
-            handleMessage(incoming, incomingLength);
+            handleMessage(packet.data, packet.totalLength-HEADER_LENGTH);
             break;
         default:
             Serial.printf("Error: Unknown message type");
@@ -195,7 +193,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
         if(!sdInitialized){
             printToWS("WARNING: SD card not found, functionality may be limited", 57);
         }
-        if(!loraInitialized2){
+        if(!_loraInitialized){
             printToWS("WARNING: LoRa radio not found, functionality may be limited", 60);
         }
         client->ping();
@@ -262,8 +260,11 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             ws.binary(client->id(), msg_id, 3);
 
             //transmit message over LoRa
-			//struct Packet packet = buildPacket();
-            //pushToBuffer(packet);
+            //uint8_t data[240] = "Hola";
+            //int dataLength = 4;
+            uint8_t destination[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+            struct Packet packet = buildPacket(1, mac, destination, messageCount(), 'c', data, msg_length); 
+            pushToBuffer(packet);
 
             //echoing message to ws
             if(echo_on){
@@ -294,9 +295,10 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
   SETUP FUNCTIONS
 */
 void wifiSetup(){
-    WiFi.macAddress(mac2);
-    sprintf(mac2addr, "%02x%02x%02x%02x%02x%02x", mac2[5], mac2[4], mac2[3], mac2[2], mac2[1], mac2 [0]);
-    strcat(ssid, mac2addr);
+    WiFi.macAddress(mac);
+    sprintf(macaddr, "%02x%02x%02x%02x%02x%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac [5]);
+    setLocalAddress(macaddr);
+    strcat(ssid, macaddr);
     WiFi.hostname(hostName);
     WiFi.mode(WIFI_AP);
     //WiFi.softAPConfig(local_IP, gateway, netmask);
@@ -365,7 +367,6 @@ void spiffsSetup(){
 
 
 void webServerSetup(){
-
 
     ws.onEvent(onWsEvent);
     server.addHandler(&ws);
@@ -441,9 +442,15 @@ void webServerSetup(){
 
 }
 
+int loraInitialized(){
+    if(_loraInitialized){
+        return 1;
+    }else{
+        return 0;
+    }
+}
 
 void loraSetup(){
-    localAddress = mac2[0];
 
     // override the default CS, reset, and IRQ pins (optional)
     LoRa.setPins(loraChipSelect, resetPin, irqPin); // set CS, reset, IRQ pin
@@ -458,17 +465,18 @@ void loraSetup(){
     LoRa.onReceive(onReceive);
     LoRa.receive();
 
-    loraInitialized2 = 1;
+    _loraInitialized = 1;
 
     Serial.printf("LoRa init succeeded.\r\n");
-    Serial.printf("local address: %02x\r\n", localAddress);
-    Serial.printf("%s\r\n", mac2addr);
 }
 
 /*
   START MAIN
 */
 long startTime;
+long lastRoutingTime; // time of last packet send
+int routingInterval = 10000 + random(5000);    // 5-15 seconds
+
 void setup(){
     Serial.begin(115200);
     Serial.setDebugOutput(true);
@@ -477,29 +485,26 @@ void setup(){
     pinMode(SDChipSelect, OUTPUT);
     pinMode(irqPin, INPUT);
 
-
     wifiSetup();
     mdnsSetup();
-
     SPIenable(0); //SD
     sdCardSetup();
-
     if(!sdInitialized){
         spiffsSetup();
     }    
-    startTime = getTime();
     webServerSetup();
-
     loraSetup();
 
+    uint8_t* myAddress = localAddress();
+    Serial.printf("local address: ");
+    printAddress(myAddress);
+    Serial.printf("\n");
+
+    startTime = getTime();
+    lastRoutingTime = startTime;
 }
 
-int routingInterval = 10000 + random(5000);    // 5-15 seconds
-long lastSendTime = 0; // time of last packet send
-
 void loop(){
-
-    int packetSize;
 
     if(LoRa.beginPacket() == 0){
         // do stuff while LoRa packet is being sent
@@ -508,19 +513,10 @@ void loop(){
         Serial.printf("learning... %d\r", getTime() - startTime);
         // do stuff when LoRa packet is NOT being sent
         checkBuffer(); 
-
-        transmitRoutes(routingInterval);
-		/*
-        if (pollingEnabled){
-            if (millis() - lastSendTime > interval) {
-                int packetSize = LoRa.parsePacket();
-                Serial.printf("checking for data: %d\r\n", packetSize); 
-                if(packetSize) {
-                    onReceive(packetSize);
-                }
-                lastSendTime = millis();
-            }
+        long timestamp = transmitRoutes(routingInterval, lastRoutingTime);
+        if(timestamp){
+            Serial.print("routes transmitted");
+            lastRoutingTime = timestamp;
         }
-		*/
     }
 }
