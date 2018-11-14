@@ -6,6 +6,8 @@
 
 @notes
 
+undervoltage lockout threshold is 3.1 to 4.4, minimum input voltage is 4.5V
+
 mppt set voltage on CN3971 module, set by 
 	Vmppt = 1.205 x (1 + R1 / R2) (according to module to silkscreen)
 	note that (R3 is R1, R4 is R2) as specified in cn3791 datasheet

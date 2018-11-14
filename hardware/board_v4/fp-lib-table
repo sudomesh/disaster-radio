@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name ESP8266)(type KiCad)(uri /media/fitz/Data/Dropbox/Projects/EE/disaster-radio/board_v3/kicad-ESP8266-master/ESP8266.pretty)(options "")(descr ""))
+  (lib (name disaster_radio)(type KiCad)(uri "$(KIPRJMOD)/disaster_radio.pretty")(options "")(descr ""))
+)

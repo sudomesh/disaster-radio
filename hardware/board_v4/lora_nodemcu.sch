@@ -1,0 +1,215 @@
+EESchema Schematic File Version 4
+LIBS:lora_nodemcu-cache
+EELAYER 26 0
+EELAYER END
+$Descr A3 16535 11693
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Connector_Generic:Conn_01x02 J2
+U 1 1 5AA4CAA2
+P 1350 1850
+F 0 "J2" H 1350 2100 50  0000 C CNN
+F 1 "LiPo 18650" H 1300 2000 50  0000 C CNN
+F 2 "Battery:BatteryHolder_MPD_BH-18650-PC2" H 1350 1850 50  0001 C CNN
+F 3 "~" H 1350 1850 50  0001 C CNN
+	1    1350 1850
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x02 J1
+U 1 1 5AA4DEE1
+P 1350 1450
+F 0 "J1" H 1270 1125 50  0000 C CNN
+F 1 "Solar Panel" H 1270 1216 50  0000 C CNN
+F 2 "disaster_radio:solar_panel_conn" H 1350 1450 50  0001 C CNN
+F 3 "~" H 1350 1450 50  0001 C CNN
+	1    1350 1450
+	-1   0    0    1   
+$EndComp
+$Comp
+L power:+BATT #PWR0125
+U 1 1 5ADE71D1
+P 13550 3000
+F 0 "#PWR0125" H 13550 2850 50  0001 C CNN
+F 1 "+BATT" H 13565 3173 50  0000 C CNN
+F 2 "" H 13550 3000 50  0001 C CNN
+F 3 "" H 13550 3000 50  0001 C CNN
+	1    13550 3000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	13550 3000 13550 3500
+$Comp
+L lora_nodemcu-rescue:Mounting_Hole-Mechanical MK1
+U 1 1 5ABC6521
+P 1850 8950
+F 0 "MK1" H 1950 8996 50  0000 L CNN
+F 1 "Mounting_Hole" H 1950 8905 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 1850 8950 50  0001 C CNN
+F 3 "" H 1850 8950 50  0001 C CNN
+	1    1850 8950
+	1    0    0    -1  
+$EndComp
+$Comp
+L lora_nodemcu-rescue:Mounting_Hole-Mechanical MK3
+U 1 1 5ABC68A6
+P 2700 8950
+F 0 "MK3" H 2800 8996 50  0000 L CNN
+F 1 "Mounting_Hole" H 2800 8905 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 2700 8950 50  0001 C CNN
+F 3 "" H 2700 8950 50  0001 C CNN
+	1    2700 8950
+	1    0    0    -1  
+$EndComp
+$Comp
+L lora_nodemcu-rescue:Mounting_Hole-Mechanical MK2
+U 1 1 5ABC6A8E
+P 1850 9300
+F 0 "MK2" H 1950 9346 50  0000 L CNN
+F 1 "Mounting_Hole" H 1950 9255 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 1850 9300 50  0001 C CNN
+F 3 "" H 1850 9300 50  0001 C CNN
+	1    1850 9300
+	1    0    0    -1  
+$EndComp
+$Comp
+L lora_nodemcu-rescue:Mounting_Hole-Mechanical MK4
+U 1 1 5ABC6A95
+P 2700 9300
+F 0 "MK4" H 2800 9346 50  0000 L CNN
+F 1 "Mounting_Hole" H 2800 9255 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 2700 9300 50  0001 C CNN
+F 3 "" H 2700 9300 50  0001 C CNN
+	1    2700 9300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:LED_ARGB D1
+U 1 1 5ABCE072
+P 13100 3500
+F 0 "D1" H 13100 3997 50  0000 C CNN
+F 1 "LED_ARGB" H 13100 3906 50  0000 C CNN
+F 2 "LED_THT:LED_D5.0mm-4" H 13100 3450 50  0001 C CNN
+F 3 "~" H 13100 3450 50  0001 C CNN
+	1    13100 3500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	13300 3500 13550 3500
+Wire Notes Line
+	1600 8700 1600 9500
+Wire Notes Line
+	1600 9500 3500 9500
+Wire Notes Line
+	3500 9500 3500 8700
+Wire Notes Line
+	3500 8700 1600 8700
+$Comp
+L disaster_radio:CN3791 U?
+U 1 1 5BEC3801
+P 3450 1700
+F 0 "U?" H 3450 964 50  0000 C CNN
+F 1 "CN3791" H 3450 873 50  0000 C CNN
+F 2 "" H 3450 1700 50  0001 C CNN
+F 3 "" H 3450 1700 50  0001 C CNN
+	1    3450 1700
+	1    0    0    -1  
+$EndComp
+$Comp
+L disaster_radio:ESP32 U?
+U 1 1 5BEE2399
+P 2700 5900
+F 0 "U?" H 2700 7737 60  0000 C CNN
+F 1 "ESP32" H 2700 7631 60  0000 C CNN
+F 2 "ESP32-footprints-Lib:ESP32" H 2700 4275 60  0001 C CNN
+F 3 "" H 3150 6800 60  0001 C CNN
+	1    2700 5900
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0128
+U 1 1 5AB442E3
+P 6200 8800
+F 0 "#PWR0128" H 6200 8550 50  0001 C CNN
+F 1 "GND" H 6205 8627 50  0000 C CNN
+F 2 "" H 6200 8800 50  0001 C CNN
+F 3 "" H 6200 8800 50  0001 C CNN
+	1    6200 8800
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:RF_Shield_One_Piece J6
+U 1 1 5AB442DC
+P 6200 8400
+F 0 "J6" H 6830 8391 50  0000 L CNN
+F 1 "RF_Shield_ESP-07S" H 6830 8300 50  0000 L CNN
+F 2 "RF_Shielding:Wuerth_36103305_30x30mm" H 6200 8300 50  0001 C CNN
+F 3 "~" H 6200 8300 50  0001 C CNN
+	1    6200 8400
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0127
+U 1 1 5AB4404A
+P 11100 8900
+F 0 "#PWR0127" H 11100 8650 50  0001 C CNN
+F 1 "GND" H 11105 8727 50  0000 C CNN
+F 2 "" H 11100 8900 50  0001 C CNN
+F 3 "" H 11100 8900 50  0001 C CNN
+	1    11100 8900
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:RF_Shield_One_Piece J7
+U 1 1 5AB43EB6
+P 11100 8500
+F 0 "J7" H 11730 8491 50  0000 L CNN
+F 1 "RF_Shield_RFM95" H 11730 8400 50  0000 L CNN
+F 2 "RF_Shielding:Wuerth_36103305_30x30mm" H 11100 8400 50  0001 C CNN
+F 3 "~" H 11100 8400 50  0001 C CNN
+	1    11100 8500
+	1    0    0    -1  
+$EndComp
+$Comp
+L disaster_radio:SX1276IMLTRT U?
+U 1 1 5BEE32F7
+P 5600 5800
+F 0 "U?" H 5600 7270 50  0000 C CNN
+F 1 "SX1276IMLTRT" H 5600 7179 50  0000 C CNN
+F 2 "QFN65P600X600X100-29N" H 5600 5800 50  0001 L BNN
+F 3 "SX1276IMLTRT" H 5600 5800 50  0001 L BNN
+F 4 "None" H 5600 5800 50  0001 L BNN "Field4"
+F 5 "Rf Ism Transceiver Fsk/gfsk/gmsk/msk/ook 3.3V Automotive 28-PIN QFN Ep T/r" H 5600 5800 50  0001 L BNN "Field5"
+F 6 "Unavailable" H 5600 5800 50  0001 L BNN "Field6"
+F 7 "VQFN-28 Semtech" H 5600 5800 50  0001 L BNN "Field7"
+F 8 "Semtech Corporation" H 5600 5800 50  0001 L BNN "Field8"
+	1    5600 5800
+	1    0    0    -1  
+$EndComp
+$Comp
+L disaster_radio:SX1276IMLTRT U?
+U 1 1 5BEE3441
+P 8600 5750
+F 0 "U?" H 8600 7220 50  0000 C CNN
+F 1 "SX1276IMLTRT" H 8600 7129 50  0000 C CNN
+F 2 "QFN65P600X600X100-29N" H 8600 5750 50  0001 L BNN
+F 3 "SX1276IMLTRT" H 8600 5750 50  0001 L BNN
+F 4 "None" H 8600 5750 50  0001 L BNN "Field4"
+F 5 "Rf Ism Transceiver Fsk/gfsk/gmsk/msk/ook 3.3V Automotive 28-PIN QFN Ep T/r" H 8600 5750 50  0001 L BNN "Field5"
+F 6 "Unavailable" H 8600 5750 50  0001 L BNN "Field6"
+F 7 "VQFN-28 Semtech" H 8600 5750 50  0001 L BNN "Field7"
+F 8 "Semtech Corporation" H 8600 5750 50  0001 L BNN "Field8"
+	1    8600 5750
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC
