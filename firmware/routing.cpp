@@ -133,15 +133,15 @@ int isHashNew(char incoming[SHA1_LENGTH]){
 int send_packet(char* data, int len){
 
     Serial.printf("Sending: ");
-    LoRa.beginPacket();
-    for( int i = 0 ; i < len ; i++){
-        LoRa.write(data[i]);
-        Serial.printf("%c", data[i]);
+    if(LoRa.beginPacket()){
+        for( int i = 0 ; i < len ; i++){
+            LoRa.write(data[i]);
+            Serial.printf("%02x", data[i]);
+        }
+        Serial.printf("\r\n");
+        LoRa.endPacket(1);
+        LoRa.receive();
     }
-    Serial.printf("\r\n");
-    LoRa.endPacket(1);
-    LoRa.receive();
-
 }
 #endif
 
@@ -585,16 +585,13 @@ struct Packet packet_received(char* data, size_t len) {
     
     // randomly generate RSSI and SNR values 
     // see https://github.com/sudomesh/disaster-radio-simulator/issues/3
-    uint8_t packet_rssi = rand() % (256 - 128) + 128;
-    uint8_t packet_snr = rand() % (256 - 128) + 128;
+    //uint8_t packet_rssi = rand() % (256 - 128) + 128;
+    //uint8_t packet_snr = rand() % (256 - 128) + 128;
     // articial packet loss
-    uint8_t packet_randomness = rand() % (256 - 128) + 128;
+    //uint8_t packet_randomness = rand() % (256 - 128) + 128;
 
-    struct Metadata metadata = {
-        packet_rssi,
-        packet_snr,
-        packet_randomness
-    };
+    
+    struct Metadata metadata;
     struct Packet packet = {
         byteData[0],
         byteData[1], 

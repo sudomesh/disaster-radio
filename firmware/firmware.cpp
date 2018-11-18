@@ -164,7 +164,7 @@ void onReceive(int packetSize) {
 
     struct Packet packet = packet_received(incoming, incomingLength);
 
-    storeMessage(incoming, incomingLength);
+    //storeMessage(incoming, incomingLength);
     
     switch(packet.type){
         case 'c':
@@ -176,6 +176,10 @@ void onReceive(int packetSize) {
             Serial.printf("received map message");
             Serial.printf("\r\n");
             handleMessage(packet.data, packet.totalLength-HEADER_LENGTH);
+            break;
+        case 'r':
+            Serial.printf("received routing message");
+            Serial.printf("\r\n");
             break;
         default:
             Serial.printf("Error: Unknown message type");
@@ -506,17 +510,11 @@ void setup(){
 
 void loop(){
 
-    if(LoRa.beginPacket() == 0){
-        // do stuff while LoRa packet is being sent
-        return;
-    }else{
-        Serial.printf("learning... %d\r", getTime() - startTime);
-        // do stuff when LoRa packet is NOT being sent
+        //Serial.printf("learning... %d\r", getTime() - startTime);
         checkBuffer(); 
         long timestamp = transmitRoutes(routingInterval, lastRoutingTime);
         if(timestamp){
             Serial.print("routes transmitted");
             lastRoutingTime = timestamp;
         }
-    }
 }
