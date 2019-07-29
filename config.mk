@@ -9,5 +9,7 @@ LIBS = ./libs/AsyncTCP \
 	./libs/arduino-LoRa \
 	$(ESP_LIBS)/WiFi \
 	$(ESP_LIBS)/SPI \
-	$(ESP_LIBS)/SD
-
+	$(ESP_LIBS)/SD \
+	$(ESP_LIBS)/ESPmDNS \
+	$(ESP_LIBS)/FS \
+	$(ESP_LIBS)/SPIFFS

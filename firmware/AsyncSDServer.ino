@@ -357,9 +357,10 @@ AsyncStaticSDWebHandler& AsyncWebServer::serveStatic(const char* uri, SDClass& s
 }
 */
 //????
-//extern "C" void system_set_os_print(uint8 onoff);
-//extern "C" void ets_install_putc1(void* routine);
 /*
+extern "C" void system_set_os_print(uint8 onoff);
+extern "C" void ets_install_putc1(void* routine);
+
 static void _u0_putc(char c){
   while(((U0S >> USTXC) & 0x7F) != 0);
   U0F = c;

@@ -2,12 +2,12 @@
 
 set -e
 
-rm -rf makeEspArduino arduino-esp32 libs
+rm -rf makeEspArduino arduino-esp32 libs Makefile
 
 # get makeEspArduino
 git clone https://github.com/plerup/makeEspArduino
 cd makeEspArduino
-git checkout tags/4.14.1
+git checkout tags/4.18.0
 cp makeEspArduino.mk ../Makefile
 cd ../
 
@@ -16,7 +16,7 @@ cd ../
 # install arduino-esp32 build environment
 git clone https://github.com/espressif/arduino-esp32 arduino-esp32
 cd arduino-esp32/
-git checkout tags/1.0.3-rc1 #??
+git checkout tags/1.0.1 #??
 cd tools/
 python get.py
 cd ../../
@@ -31,8 +31,6 @@ git clone https://github.com/me-no-dev/AsyncTCP
 cd AsyncTCP/
 git checkout c9df7cdda6302f509db9c09d9a514a45f9392105
 cd ../
-
-git clone https://github.com/madpilot/mDNSResolver
 
 git clone https://github.com/me-no-dev/ESPAsyncWebServer
 cd ESPAsyncWebServer/
