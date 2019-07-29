@@ -9,8 +9,10 @@
  * Files and directories being served from the SD must follow an 8dot3 naming scheme, so no "html" files only "htm"
  */
 
+//bool SD_exists(fs::FS &fs, const char* path) {
+bool SD_exists(fs::FS &fs, String path) {
 
-bool SD_exists(fs::FS &fs, const char* path) {
+//bool SD_exists(SDClass &sd, String path) {
   // For some reason SD.exists(filename) reboots the ESP...
   // So we test by opening the file
   bool exists = false;
@@ -29,7 +31,7 @@ class AsyncSDFileResponse: public AsyncAbstractResponse {
     void _setContentType(const String& path);
     bool _sourceIsValid;
   public:
-    AsyncSDFileResponse(SDClass &sd, const String& path, const String& contentType=String(), bool download=false);
+    AsyncSDFileResponse(fs::FS &fs, const String& path, const String& contentType=String(), bool download=false);
     AsyncSDFileResponse(File content, const String& path, const String& contentType=String(), bool download=false);
     ~AsyncSDFileResponse();
     bool _sourceValid() const { return _sourceIsValid; } 
@@ -133,7 +135,7 @@ class AsyncStaticSDWebHandler: public AsyncWebHandler {
     bool _fileExists(AsyncWebServerRequest *request, const String& path);
     uint8_t _countBits(const uint8_t value) const;
   protected:
-    SDClass _sd;
+    fs::FS _fs;
     String _uri;
     String _path;
     String _default_file;
@@ -143,7 +145,7 @@ class AsyncStaticSDWebHandler: public AsyncWebHandler {
     bool _gzipFirst;
     uint8_t _gzipStats;
   public:
-    AsyncStaticSDWebHandler(const char* uri, SDClass& sd, const char* path, const char* cache_control = NULL);
+    AsyncStaticSDWebHandler(const char* uri, fs::FS& fs, const char* path, const char* cache_control = NULL);
     virtual bool canHandle(AsyncWebServerRequest *request) override final;
     virtual void handleRequest(AsyncWebServerRequest *request) override final;
     AsyncStaticSDWebHandler& setIsDir(bool isDir);
@@ -157,8 +159,9 @@ class AsyncStaticSDWebHandler: public AsyncWebHandler {
   #endif
 };
 
-AsyncStaticSDWebHandler::AsyncStaticSDWebHandler(const char* uri, SDClass& sd, const char* path, const char* cache_control)
-  : _sd(sd), _uri(uri), _path(path), _default_file("index.htm"), _cache_control(cache_control), _last_modified("")
+
+AsyncStaticSDWebHandler::AsyncStaticSDWebHandler(const char* uri, fs::FS& fs, const char* path, const char* cache_control)
+  : _fs(fs), _uri(uri), _path(path), _default_file("index.htm"), _cache_control(cache_control), _last_modified("")
 {
   // Ensure leading '/'
   if (_uri.length() == 0 || _uri[0] != '/') _uri = "/" + _uri;
@@ -272,14 +275,14 @@ bool AsyncStaticSDWebHandler::_fileExists(AsyncWebServerRequest *request, const 
   //            file needs to be opened again in AsyncSDFileResponse(SDClass &sd, ...)
   //            request->_tempFile is of wrong fs::File type anyway...
   if (_gzipFirst) {
-    gzipFound = SD_exists(_sd, gzip);
+    gzipFound = SD_exists(_fs, gzip);
     if (!gzipFound){
-      fileFound = SD_exists(_sd, path);
+      fileFound = SD_exists(_fs, path);
     }
   } else {
-    fileFound = SD_exists(_sd, path);
+    fileFound = SD_exists(_fs, path);
     if (!fileFound){
-      gzipFound = SD_exists(_sd, gzip);
+      gzipFound = SD_exists(_fs, gzip);
     }
   }
 
@@ -317,7 +320,7 @@ void AsyncStaticSDWebHandler::handleRequest(AsyncWebServerRequest *request)
   free(request->_tempObject);
   request->_tempObject = NULL;
 
-  File _tempFile = _sd.open(filename);
+  File _tempFile = _fs.open(filename);
   if (_tempFile == true) {
     String etag = String(_tempFile.size());
     _tempFile.close();    
@@ -331,7 +334,7 @@ void AsyncStaticSDWebHandler::handleRequest(AsyncWebServerRequest *request)
     } else {
       // Cannot use new AsyncSDFileResponse(request->_tempFile, ...) here because request->_tempFile has not be opened
       // in AsyncStaticSDWebHandler::_fileExists and is of wrong type fs::File anyway.
-      AsyncWebServerResponse * response = new AsyncSDFileResponse(/* request->_tempFile, */ _sd, filename);
+      AsyncWebServerResponse * response = new AsyncSDFileResponse(/* request->_tempFile, */ _fs, filename);
       if (_last_modified.length())
         response->addHeader("Last-Modified", _last_modified);
       if (_cache_control.length()){
@@ -353,11 +356,12 @@ AsyncStaticSDWebHandler& AsyncWebServer::serveStatic(const char* uri, SDClass& s
   return *handler;
 }
 */
-
-extern "C" void system_set_os_print(uint8 onoff);
-extern "C" void ets_install_putc1(void* routine);
-
+//????
+//extern "C" void system_set_os_print(uint8 onoff);
+//extern "C" void ets_install_putc1(void* routine);
+/*
 static void _u0_putc(char c){
   while(((U0S >> USTXC) & 0x7F) != 0);
   U0F = c;
 }
+*/
