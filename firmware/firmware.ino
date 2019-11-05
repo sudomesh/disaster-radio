@@ -5,19 +5,24 @@
 //#include <Hash.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-//#include <ESP8266mDNS.h>
+#include <ESPmDNS.h>
 #include <SPIFFSEditor.h>
-#include <SPI.h>
+
+#include <SPIFFS.h>
+
 #include <LoRa.h>
 #include <SD.h>
+#include <SPI.h>
 #include "AsyncSDServer.ino"
+#include "routing.h"
 
 #define HEADERSIZE 4 
 #define BUFFERSIZE 252
-#define SHA1_LEN 40 
 
-byte mac[6];
-char macaddr[14];
+uint8_t mac[ADDR_LENGTH];
+char macaddr[ADDR_LENGTH*2];
+int _loraInitialized = 0;
+
 char ssid[32] = "disaster.radio ";
 const char * hostName = "disaster-node";
 
@@ -30,19 +35,19 @@ AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 AsyncEventSource events("/events");
 
-int loraInitialized = 0; // has the LoRa radio been initialized?
 int sdInitialized = 0; // has the LoRa radio been initialized?
 
 int retransmitEnabled = 0;
 int pollingEnabled = 0;
-int beaconModeEnabled = 0;
-int hashingEnabled = 0;
+int hashingEnabled = 1;
 
-// for portable ESP32 node use these settings:
-// uses VSPI bus (M0SI = 23, MISO = 19, SCK = 18, SS = 5)
-const int loraChipSelect = 5; // LoRa radio chip select, GPIO5
-const int resetPin = 14;       // LoRa radio reset, GPIO14 
-const int irqPin = 2;        // interrupt pin for receive callback, GPIO2
+int beaconModeEnabled = 0;
+int beaconInterval = 30000;
+
+// for portable node (esp32 TTGO v1.6 - see also below) use these settings:
+const int loraChipSelect = 18; // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
+const int resetPin = 23;       // LoRa radio reset, GPIO0 = D3 
+const int irqPin = 23;        // interrupt pin for receive callback?, GPIO2 = D4
 
 // for solar-powered module use these settings:
 /*
@@ -50,22 +55,20 @@ const int csPin = 2;          // LoRa radio chip select, GPIO2
 const int resetPin = 5;       // LoRa radio reset (hooked to LED, unused)
 const int irqPin = 16;        // interrupt pin for receive callback?, GPIO16
 */
-
 const int SDChipSelect = 2;
 
 //TODO: switch to volatile byte for interrupt
 
-byte localAddress;     // assigned to last byte of mac address in setup
 byte destination = 0xFF;      // destination to send to default broadcast
 
 bool echo_on = false;
 
-char hashTable[256][40];
-int hashEntry = 0;
-
-char incomingBuffer[8][256];
-int incomingBufferLength[8];
-int bufferEntry = 0;
+struct webSocketMessage {
+    uint8_t id;
+    uint8_t type;
+    uint8_t delimiter;
+    uint8_t data;
+};
 
 /*
   FORWARD-DEFINED FUNCTIONS
@@ -86,56 +89,6 @@ void SPIenable(int opt){
             digitalWrite(SDChipSelect, HIGH); // select SD card first, to initialize
             break;
     }
-}
-
-bool isHashNew(char incoming[SHA1_LEN]){
-    bool hashNew = true;
-    for( int i = 0 ; i <= hashEntry ; i++){
-        if(strcmp(incoming, hashTable[i]) == 0){
-            hashNew = false; 
-        }
-    }
-    if( hashNew ){
-        Serial.printf("New message received");
-        Serial.printf("\r\n");
-        for( int i = 0 ; i < SHA1_LEN ; i++){
-            hashTable[hashEntry][i] = incoming[i];
-        }
-        hashEntry++;
-    }
-    return hashNew;
-}
-
-void sendMessage(char* outgoing, int outgoingLength) {
-
-    
-    if(!loraInitialized){
-        return;
-    }
-
-    if(hashingEnabled){
-/*
-        // do not send message if already transmitted once
-        char hashOutgoing[SHA1_LEN];
-        String hash = sha1(outgoing, outgoingLength);
-        hash.toCharArray(hashOutgoing, SHA1_LEN);
-
-        if(!isHashNew(hashOutgoing)){
-            return;
-        }
-*/
-    }
-
-    Serial.printf("Sending: ");
-    
-    LoRa.beginPacket();
-    for( int i = 0 ; i < outgoingLength ; i++){
-        LoRa.write(outgoing[i]);
-        Serial.printf("%c", outgoing[i]);
-    }
-    Serial.printf("\r\n");
-    LoRa.endPacket();
-    LoRa.receive();
 }
 
 void printToWS(char message[252], int messageLength){
@@ -191,62 +144,9 @@ void printCharArray(char *buf, int len){
     Serial.printf("\r\n");
 }
 
-void addToBuffer(char message[256], int length){
-    if(bufferEntry > 7){
-        bufferEntry = 0;
-    }
-    Serial.printf("adding message to buffer");
-    Serial.printf("\r\n");
-    incomingBufferLength[bufferEntry] = length;
-    for( int i = 0 ; i < length ; i++){
-        incomingBuffer[bufferEntry][i] = message[i];    
-    }
-    bufferEntry++;
-}
-
-void handleMessage(char message[256], int length){
+void handleMessage(uint8_t message[240], uint8_t length){
 
     ws.binaryAll(message, length);
-    if(retransmitEnabled){
-        addToBuffer(message, length);
-    }
-}
-
-void handleHopCounter(char buffer[256], int length){
-
-    int hops = buffer[4]-'0'; //convert char to int by subtracting ASCII value of zero
-    // this will only work for <10 hops
-    char origin[14];
-    for( int i = 0 ; i < 14 ; i++){
-        origin[i] = buffer[6+i];
-    }
-    hops++;
-
-    char message[256];
-    char retransmit[256];
-
-    sprintf(message, "%d hop from %s", hops, origin);
-    sprintf(retransmit, "FFh|%d,%s", hops, origin);
-
-    printToWS(message, 29);
-
-    if(hashingEnabled){
-/*
-        // do not send message if already transmitted once
-        buffer[4] = '*'; //convert char to int by subtracting ASCII value of zero
-        char bufferHash[SHA1_LEN];
-        String hash = sha1(buffer, length);
-        hash.toCharArray(bufferHash, SHA1_LEN);
-
-        if(!isHashNew(bufferHash)){
-            return;
-        }
-*/
-    }
-    
-    if(retransmitEnabled){
-        addToBuffer(retransmit, length);
-    }
 }
 
 /*
@@ -264,31 +164,24 @@ void onReceive(int packetSize) {
         incomingLength++;
     }
 
-    char type = incoming[2];
-    Serial.printf("message type: %c", type);
-    Serial.printf("\r\n");
+    struct Packet packet = packet_received(incoming, incomingLength);
 
-    Serial.printf("PACKET|");
-    printCharArray(incoming, incomingLength);
-    Serial.printf("\r\n");
-
-    storeMessage(incoming, incomingLength);
-
-    switch(type){
+    //storeMessage(incoming, incomingLength);
+    
+    switch(packet.type){
         case 'c':
             Serial.printf("received chat message");
             Serial.printf("\r\n");
-            handleMessage(incoming, incomingLength);
+            handleMessage(packet.data, packet.totalLength-HEADER_LENGTH);
             break;
         case 'm':
             Serial.printf("received map message");
             Serial.printf("\r\n");
-            handleMessage(incoming, incomingLength);
+            handleMessage(packet.data, packet.totalLength-HEADER_LENGTH);
             break;
-        case 'h':
-            Serial.printf("received hop message");
+        case 'r':
+            Serial.printf("received routing message");
             Serial.printf("\r\n");
-            handleHopCounter(incoming, incomingLength);
             break;
         default:
             Serial.printf("Error: Unknown message type");
@@ -306,7 +199,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
         if(!sdInitialized){
             printToWS("WARNING: SD card not found, functionality may be limited", 57);
         }
-        if(!loraInitialized){
+        if(!_loraInitialized){
             printToWS("WARNING: LoRa radio not found, functionality may be limited", 60);
         }
         client->ping();
@@ -373,7 +266,11 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             ws.binary(client->id(), msg_id, 3);
 
             //transmit message over LoRa
-            sendMessage(msg, msg_length);
+            //uint8_t data[240] = "Hola";
+            //int dataLength = 4;
+            uint8_t destination[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+            struct Packet packet = buildPacket(1, mac, destination, messageCount(), 'c', data, msg_length); 
+            pushToBuffer(packet);
 
             //echoing message to ws
             if(echo_on){
@@ -404,17 +301,16 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
   SETUP FUNCTIONS
 */
 void wifiSetup(){
-
     WiFi.macAddress(mac);
-    sprintf(macaddr, "%02x%02x%02x%02x%02x%02x", mac[5], mac[4], mac[3], mac[2], mac[1], mac [0]);
+    sprintf(macaddr, "%02x%02x%02x%02x%02x%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac [5]);
+    setLocalAddress(macaddr);
     strcat(ssid, macaddr);
-    WiFi.hostname(hostName);
+    WiFi.setHostname(hostName);
     WiFi.mode(WIFI_AP);
     //WiFi.softAPConfig(local_IP, gateway, netmask);
     WiFi.softAP(ssid);
 }
 
-/*
 void mdnsSetup(){
     if(!MDNS.begin("disaster")){
         Serial.printf("Error setting up mDNS\r\n");
@@ -426,11 +322,20 @@ void mdnsSetup(){
 
     MDNS.addService("http", "tcp", 80);
 }
-*/
+
+SPIClass SDSPI(HSPI);
+ 
 
 void sdCardSetup(){
+    
     Serial.print("\r\nWaiting for SD card to initialise...");
-    if (SD.begin(SDChipSelect, 32000000)) { // CS is D8 in this example
+
+    /* for esp32 TTGO v1.6 */
+    SDSPI.begin(14, 2, 15, -1);
+//    SDSPI.begin(sck, miso, mosi, -1);
+    
+    if (SD.begin(13, SDSPI)) { 
+
         Serial.print("SD Card initialized");
         Serial.print("\r\n");
         sdInitialized = 1;
@@ -478,7 +383,6 @@ void spiffsSetup(){
 
 
 void webServerSetup(){
-
 
     ws.onEvent(onWsEvent);
     server.addHandler(&ws);
@@ -554,9 +458,15 @@ void webServerSetup(){
 
 }
 
+int loraInitialized(){
+    if(_loraInitialized){
+        return 1;
+    }else{
+        return 0;
+    }
+}
 
 void loraSetup(){
-    localAddress = mac[0];
 
     // override the default CS, reset, and IRQ pins (optional)
     LoRa.setPins(loraChipSelect, resetPin, irqPin); // set CS, reset, IRQ pin
@@ -571,16 +481,18 @@ void loraSetup(){
     LoRa.onReceive(onReceive);
     LoRa.receive();
 
-    loraInitialized = 1;
+    _loraInitialized = 1;
 
     Serial.printf("LoRa init succeeded.\r\n");
-    Serial.printf("local address: %02x\r\n", localAddress);
-    Serial.printf("%s\r\n", macaddr);
 }
 
 /*
   START MAIN
 */
+long startTime;
+long lastRoutingTime; // time of last packet send
+int routingInterval = 10000 + random(5000);    // 5-15 seconds
+
 void setup(){
     Serial.begin(115200);
     Serial.setDebugOutput(true);
@@ -589,72 +501,32 @@ void setup(){
     pinMode(SDChipSelect, OUTPUT);
     pinMode(irqPin, INPUT);
 
-
     wifiSetup();
-//    mdnsSetup();
-
+    mdnsSetup();
     SPIenable(0); //SD
     sdCardSetup();
-
     if(!sdInitialized){
         spiffsSetup();
     }    
-
     webServerSetup();
-
     loraSetup();
 
-}
+    uint8_t* myAddress = localAddress();
+    Serial.printf("local address: ");
+    printAddress(myAddress);
+    Serial.printf("\n");
 
-int interval = 10000 + random(5000);    // 5-15 seconds
-long lastSendTime = 0; // time of last packet send
+    startTime = getTime();
+    lastRoutingTime = startTime;
+}
 
 void loop(){
 
-    int packetSize;
-
-    if (millis() - lastSendTime > interval) {
-        if (retransmitEnabled){
-            Serial.printf("checking buffer");
-            Serial.printf("\r\n");
-            if (bufferEntry > 0){
-                Serial.printf("removing from buffer and retransmiting");
-                Serial.printf("\r\n");
-                int retransmitLength = incomingBufferLength[bufferEntry-1];
-                char retransmit[retransmitLength];
-                for( int i = 0 ; i < retransmitLength ; i++){
-                    retransmit[i] = incomingBuffer[bufferEntry-1][i];
-                    Serial.printf("%c", retransmit[i]);
-                    incomingBuffer[bufferEntry-1][i] = 0;
-                }
-                Serial.printf("\r\n");
-                bufferEntry--;
-                sendMessage(retransmit, retransmitLength);
-            }
+        //Serial.printf("learning... %d\r", getTime() - startTime);
+        checkBuffer(); 
+        long timestamp = transmitRoutes(routingInterval, lastRoutingTime);
+        if(timestamp){
+            Serial.print("routes transmitted");
+            lastRoutingTime = timestamp;
         }
-
-        if (pollingEnabled){
-            int packetSize = LoRa.parsePacket();
-            Serial.printf("checking for data: %d\r\n", packetSize); 
-            if(packetSize) {
-                onReceive(packetSize);
-            }
-        }
-
-        if (beaconModeEnabled){
-            int test_length = 6;
-            char test_message[256] = "FFh|0,";   // send a message
-            for(int i = 0 ; i < 14 ; i++){
-                test_message[test_length] = macaddr[i];
-                test_length++;
-            }
-            Serial.printf("Sending: %s", test_message);
-            Serial.printf("\r\n");
-            sendMessage(test_message, test_length);
-        }
-        
-        interval = 10000 + random(5000);    // 2-3 seconds
-
-        lastSendTime = millis();
-    }
 }

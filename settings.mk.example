@@ -11,5 +11,5 @@ UPLOAD_SPEED = 460800
 FS_DIR = web/static/
 
 CHIP=esp32
-BOARD=heltec_wifi_lora_32
+BOARD=ttgo-lora32-v1
 
