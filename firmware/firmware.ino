@@ -301,12 +301,12 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
   SETUP FUNCTIONS
 */
 void wifiSetup(){
+    WiFi.mode(WIFI_AP);
     WiFi.macAddress(mac);
     sprintf(macaddr, "%02x%02x%02x%02x%02x%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac [5]);
     setLocalAddress(macaddr);
     strcat(ssid, macaddr);
     WiFi.setHostname(hostName);
-    WiFi.mode(WIFI_AP);
     //WiFi.softAPConfig(local_IP, gateway, netmask);
     WiFi.softAP(ssid);
 }
