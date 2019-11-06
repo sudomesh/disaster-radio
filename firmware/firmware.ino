@@ -63,12 +63,17 @@ byte destination = 0xFF;      // destination to send to default broadcast
 
 bool echo_on = false;
 
-struct webSocketMessage {
-    uint8_t id;
+struct wsMessage {
+    uint8_t id[2];
     uint8_t type;
     uint8_t delimiter;
-    uint8_t data;
+    uint8_t data[240];
 };
+
+// tables and buffers
+struct Packet inBuffer[8];
+int inBufferEntry = 0;
+
 
 /*
   FORWARD-DEFINED FUNCTIONS
@@ -91,13 +96,16 @@ void SPIenable(int opt){
     }
 }
 
-void printToWS(char message[252], int messageLength){
+struct wsMessage buildWSMessage(char data[240], size_t length){
+    wsMessage message;
+    memset(&message, 0, sizeof(message));
+    memcpy(&message, data, length);
+    return message;
+}
 
-    char msg[256] = "99c|";  
-    int length = messageLength + HEADERSIZE;
-    for (int i = 0 ; i < messageLength ; i++){
-        msg[i+HEADERSIZE] = message[i]; 
-    }
+void sendToWS(struct wsMessage message, size_t length){
+    uint8_t msg[240];  
+    memcpy(msg, &message, length);
     ws.binaryAll(msg, length);
 }
 
@@ -144,10 +152,52 @@ void printCharArray(char *buf, int len){
     Serial.printf("\r\n");
 }
 
-void handleMessage(uint8_t message[240], uint8_t length){
+void pushToInBuffer(struct Packet packet){
+    if(inBufferEntry > 7){
+        inBufferEntry = 0;
+    }
 
-    ws.binaryAll(message, length);
+    memset(&inBuffer[inBufferEntry], 0, sizeof(inBuffer[inBufferEntry]));
+    memcpy(&inBuffer[inBufferEntry], &packet, sizeof(inBuffer[inBufferEntry]));
+    inBufferEntry++;
 }
+
+struct Packet popFromInBuffer(){
+    inBufferEntry--;
+    struct Packet pop;
+    memcpy(&pop, &inBuffer[inBufferEntry], sizeof(pop));
+    return pop; 
+}
+
+void checkInBuffer(){
+    if (inBufferEntry > 0){
+        struct Packet packet = popFromInBuffer();
+        struct wsMessage message;
+        switch(packet.type){
+            case 'c':
+                Serial.printf("received chat message");
+                Serial.printf("\r\n");
+                memcpy(&message, packet.data, packet.totalLength-HEADER_LENGTH);
+                sendToWS(message, packet.totalLength-HEADER_LENGTH);
+                break;
+            case 'm':
+                Serial.printf("received map message");
+                Serial.printf("\r\n");
+                memcpy(&message, packet.data, packet.totalLength-HEADER_LENGTH);
+                sendToWS(message, packet.totalLength-HEADER_LENGTH);
+                break;
+            case 'r':
+                Serial.printf("received routing message");
+                Serial.printf("\r\n");
+                break;
+            default:
+                Serial.printf("Error: Unknown message type");
+                Serial.printf("\r\n");
+        }
+    }
+    //else buffer is empty;
+}
+
 
 /*
   CALLBACK FUNCTIONS
@@ -155,52 +205,32 @@ void handleMessage(uint8_t message[240], uint8_t length){
 void onReceive(int packetSize) {
 
     if (packetSize == 0) return;          // if there's no packet, return
-
     char incoming[BUFFERSIZE];                 // payload of packet
-
     int incomingLength = 0;
     while (LoRa.available()) { 
         incoming[incomingLength] = (char)LoRa.read(); 
         incomingLength++;
     }
-
     struct Packet packet = packet_received(incoming, incomingLength);
-
-    //storeMessage(incoming, incomingLength);
-    
-    switch(packet.type){
-        case 'c':
-            Serial.printf("received chat message");
-            Serial.printf("\r\n");
-            handleMessage(packet.data, packet.totalLength-HEADER_LENGTH);
-            break;
-        case 'm':
-            Serial.printf("received map message");
-            Serial.printf("\r\n");
-            handleMessage(packet.data, packet.totalLength-HEADER_LENGTH);
-            break;
-        case 'r':
-            Serial.printf("received routing message");
-            Serial.printf("\r\n");
-            break;
-        default:
-            Serial.printf("Error: Unknown message type");
-            Serial.printf("\r\n");
-    }
+    pushToInBuffer(packet);
 }
 
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
     if(type == WS_EVT_CONNECT){
         Serial.printf("ws[%s][%u] connect\r\n", server->url(), client->id());
-        printToWS("Welcome to DISASTER RADIO", 26);
+        wsMessage message1 = buildWSMessage("FFc|Welcome to DISASTER RADIO", 29);
+        sendToWS(message1, 29);
         if(echo_on){
-            printToWS("echo enabled, to turn off, enter '$' after logging in", 54);
+            wsMessage message2 = buildWSMessage("FFc|echo enabled, to turn off, enter '$' after logging in", 57);
+            sendToWS(message2, 57);
         }
         if(!sdInitialized){
-            printToWS("WARNING: SD card not found, functionality may be limited", 57);
+            wsMessage message3 = buildWSMessage("FFc|WARNING: SD card not found, functionality may be limited", 60);
+            sendToWS(message3, 60);
         }
         if(!_loraInitialized){
-            printToWS("WARNING: LoRa radio not found, functionality may be limited", 60);
+            wsMessage message4 = buildWSMessage("FFc|WARNING: LoRa radio not found, functionality may be limited", 63);
+            sendToWS(message4, 63);
         }
         client->ping();
     } else if(type == WS_EVT_DISCONNECT){
@@ -266,8 +296,6 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             ws.binary(client->id(), msg_id, 3);
 
             //transmit message over LoRa
-            //uint8_t data[240] = "Hola";
-            //int dataLength = 4;
             uint8_t destination[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
             struct Packet packet = buildPacket(1, mac, destination, messageCount(), 'c', data, msg_length); 
             pushToBuffer(packet);
@@ -501,6 +529,8 @@ void setup(){
     pinMode(SDChipSelect, OUTPUT);
     pinMode(DIOPin, INPUT);
 
+    btStop(); //stop bluetooth as it may cause memory issues
+
     wifiSetup();
     mdnsSetup();
     SPIenable(0); //SD
@@ -521,9 +551,9 @@ void setup(){
 }
 
 void loop(){
-
         //Serial.printf("learning... %d\r", getTime() - startTime);
         checkBuffer(); 
+        checkInBuffer(); 
         /*long timestamp = transmitRoutes(routingInterval, lastRoutingTime);
         if(timestamp){
             Serial.print("routes transmitted");

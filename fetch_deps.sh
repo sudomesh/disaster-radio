@@ -16,7 +16,7 @@ cd ../
 # install arduino-esp32 build environment
 git clone https://github.com/espressif/arduino-esp32 arduino-esp32
 cd arduino-esp32/
-git checkout tags/1.0.1 #??
+git checkout tags/1.0.4
 cd tools/
 python get.py
 cd ../../
@@ -34,7 +34,7 @@ cd ../
 
 git clone https://github.com/me-no-dev/ESPAsyncWebServer
 cd ESPAsyncWebServer/
-git checkout bed4146ec647fd1cdfd1d2485724369c92cab8e6
+git checkout f13685ee97675be2ac9502d177d3024ebc49c1e0
 cd ../
 
 git clone https://github.com/sandeepmistry/arduino-LoRa
