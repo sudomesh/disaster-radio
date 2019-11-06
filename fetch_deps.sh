@@ -39,5 +39,5 @@ cd ../
 
 git clone https://github.com/sandeepmistry/arduino-LoRa
 cd arduino-LoRa/
-git checkout tags/0.5.0
+git checkout tags/0.6.1
 cd ../../

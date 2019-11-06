@@ -47,13 +47,13 @@ int beaconInterval = 30000;
 // for portable node (esp32 TTGO v1.6 - see also below) use these settings:
 const int loraChipSelect = 18; // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
 const int resetPin = 23;       // LoRa radio reset, GPIO0 = D3 
-const int irqPin = 23;        // interrupt pin for receive callback?, GPIO2 = D4
+const int DIOPin = 26;        // interrupt pin for receive callback?, GPIO2 = D4
 
 // for solar-powered module use these settings:
 /*
 const int csPin = 2;          // LoRa radio chip select, GPIO2
 const int resetPin = 5;       // LoRa radio reset (hooked to LED, unused)
-const int irqPin = 16;        // interrupt pin for receive callback?, GPIO16
+const int DIOPin = 16;        // interrupt pin for receive callback?, GPIO16
 */
 const int SDChipSelect = 2;
 
@@ -469,7 +469,7 @@ int loraInitialized(){
 void loraSetup(){
 
     // override the default CS, reset, and IRQ pins (optional)
-    LoRa.setPins(loraChipSelect, resetPin, irqPin); // set CS, reset, IRQ pin
+    LoRa.setPins(loraChipSelect, resetPin, DIOPin); // set CS, reset, IRQ pin
 
     if (!LoRa.begin(915E6)) {             // initialize ratio at 915 MHz
         Serial.printf("LoRa init failed. Check your connections.\r\n");
@@ -499,7 +499,7 @@ void setup(){
 
     pinMode(loraChipSelect, OUTPUT);
     pinMode(SDChipSelect, OUTPUT);
-    pinMode(irqPin, INPUT);
+    pinMode(DIOPin, INPUT);
 
     wifiSetup();
     mdnsSetup();
@@ -524,9 +524,9 @@ void loop(){
 
         //Serial.printf("learning... %d\r", getTime() - startTime);
         checkBuffer(); 
-        long timestamp = transmitRoutes(routingInterval, lastRoutingTime);
+        /*long timestamp = transmitRoutes(routingInterval, lastRoutingTime);
         if(timestamp){
             Serial.print("routes transmitted");
             lastRoutingTime = timestamp;
-        }
+        }*/
 }

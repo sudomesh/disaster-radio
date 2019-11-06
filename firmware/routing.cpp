@@ -139,7 +139,7 @@ int send_packet(char* data, int len){
             Serial.printf("%02x", data[i]);
         }
         Serial.printf("\r\n");
-        LoRa.endPacket();
+        LoRa.endPacket(1); // pass in 1 for async TX
         LoRa.receive();
     }
 }
