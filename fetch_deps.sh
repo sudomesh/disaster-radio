@@ -44,6 +44,5 @@ cd ../
 
 git clone https://github.com/sudomesh/LoRaLayer2
 cd LoRaLayer2/
-git checkout 0c9a9009c5964df5b0f07127cbeb4c4ce774345b
-rm src/Layer1_Sim.cpp src/Layer1_Sim.h # delete unneeded Simulator library to avoid conflicts
+git checkout 09356bbe06bc4066bf4fa77355da01fcb00df220
 cd ../../
