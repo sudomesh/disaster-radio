@@ -40,4 +40,10 @@ cd ../
 git clone https://github.com/sandeepmistry/arduino-LoRa
 cd arduino-LoRa/
 git checkout tags/0.6.1
+cd ../
+
+git clone https://github.com/sudomesh/LoRaLayer2
+cd LoRaLayer2/
+git checkout 0c9a9009c5964df5b0f07127cbeb4c4ce774345b
+rm src/Layer1_Sim.cpp src/Layer1_Sim.h # delete unneeded Simulator library to avoid conflicts
 cd ../../
