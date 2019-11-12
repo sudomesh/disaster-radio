@@ -13,7 +13,7 @@
     "clean": "rm static/build/*"
   },
   "dependencies": {
-    "ecstatic": "^2.2.1",
+    "ecstatic": "^2.2.2",
     "gulp-cssimport": "^6.0.0",
     "minimist": "^1.2.0",
     "routes": "^2.1.0",
