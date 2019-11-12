@@ -1,7 +1,6 @@
 (sym_lib_table
   (lib (name lora_nodemcu-cache)(type Legacy)(uri ${KIPRJMOD}/lora_nodemcu-cache.lib)(options "")(descr ""))
   (lib (name rfm95)(type Legacy)(uri ${KIPRJMOD}/schematic_symbols/rfm95.lib)(options "")(descr ""))
-  (lib (name ESP8266)(type Legacy)(uri ${KIPRJMOD}/kicad-ESP8266-master/ESP8266.lib)(options "")(descr ""))
   (lib (name disaster_radio)(type Legacy)(uri ${KIPRJMOD}/schematic_symbols/disaster_radio.lib)(options "")(descr ""))
   (lib (name lora_nodemcu-rescue)(type Legacy)(uri ${KIPRJMOD}/schematic_symbols/lora_nodemcu-rescue.lib)(options "")(descr ""))
 )
