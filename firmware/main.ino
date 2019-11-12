@@ -71,11 +71,6 @@ struct wsMessage {
     uint8_t data[240];
 };
 
-// tables and buffers
-struct Packet inBuffer[8];
-int inBufferEntry = 0;
-
-
 /*
   FORWARD-DEFINED FUNCTIONS
 */
@@ -153,26 +148,9 @@ void printCharArray(char *buf, int len){
     Serial.printf("\r\n");
 }
 
-void pushToInBuffer(struct Packet packet){
-    if(inBufferEntry > 7){
-        inBufferEntry = 0;
-    }
-
-    memset(&inBuffer[inBufferEntry], 0, sizeof(inBuffer[inBufferEntry]));
-    memcpy(&inBuffer[inBufferEntry], &packet, sizeof(inBuffer[inBufferEntry]));
-    inBufferEntry++;
-}
-
-struct Packet popFromInBuffer(){
-    inBufferEntry--;
-    struct Packet pop;
-    memcpy(&pop, &inBuffer[inBufferEntry], sizeof(pop));
-    return pop; 
-}
-
 void checkInBuffer(){
-    if (inBufferEntry > 0){
-        struct Packet packet = popFromInBuffer();
+    struct Packet packet = popFromInBuffer();
+    if (packet.totalLength > 0){
         struct wsMessage message;
         switch(packet.type){
             case 'c':
@@ -212,8 +190,7 @@ void onReceive(int packetSize) {
         incoming[incomingLength] = (char)LoRa.read(); 
         incomingLength++;
     }
-    struct Packet packet = packet_received(incoming, incomingLength);
-    pushToInBuffer(packet);
+    packet_received(incoming, incomingLength);
 }
 
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
@@ -299,7 +276,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             //transmit message over LoRa
             uint8_t destination[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
             struct Packet packet = buildPacket(1, mac, destination, messageCount(), 'c', data, msg_length); 
-            pushToBuffer(packet);
+            pushToOutBuffer(packet);
 
             //echoing message to ws
             if(echo_on){
@@ -553,7 +530,7 @@ void setup(){
 
 void loop(){
         //Serial.printf("learning... %d\r", getTime() - startTime);
-        checkBuffer(); 
+        checkOutBuffer(); 
         checkInBuffer(); 
         /*long timestamp = transmitRoutes(routingInterval, lastRoutingTime);
         if(timestamp){
