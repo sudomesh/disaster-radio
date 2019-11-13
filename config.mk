@@ -8,6 +8,7 @@ LIBS = ./libs/AsyncTCP \
 	./libs/ESPAsyncWebServer \
 	./libs/arduino-LoRa \
 	./libs/LoRaLayer2 \
+	./libs/AsyncSDServer \
 	$(ESP_LIBS)/WiFi \
 	$(ESP_LIBS)/SPI \
 	$(ESP_LIBS)/SD \
