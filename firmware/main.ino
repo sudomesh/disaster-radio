@@ -10,7 +10,6 @@
 
 #include <SPIFFS.h>
 
-#include <LoRa.h>
 #include <SD.h>
 #include <SPI.h>
 #include "AsyncSDServer.ino"
@@ -22,7 +21,6 @@
 
 uint8_t mac[ADDR_LENGTH];
 char macaddr[ADDR_LENGTH*2];
-int _loraInitialized = 0;
 
 char ssid[32] = "disaster.radio ";
 const char * hostName = "disaster-node";
@@ -45,17 +43,6 @@ int hashingEnabled = 1;
 int beaconModeEnabled = 0;
 int beaconInterval = 30000;
 
-// for portable node (esp32 TTGO v1.6 - see also below) use these settings:
-const int loraChipSelect = 18; // LoRa radio chip select, GPIO15 = D8 on WeMos D1 mini
-const int resetPin = 23;       // LoRa radio reset, GPIO0 = D3 
-const int DIOPin = 26;        // interrupt pin for receive callback?, GPIO2 = D4
-
-// for solar-powered module use these settings:
-/*
-const int csPin = 2;          // LoRa radio chip select, GPIO2
-const int resetPin = 5;       // LoRa radio reset (hooked to LED, unused)
-const int DIOPin = 16;        // interrupt pin for receive callback?, GPIO16
-*/
 const int SDChipSelect = 2;
 
 //TODO: switch to volatile byte for interrupt
@@ -80,13 +67,13 @@ void SPIenable(int opt){
         case 0: // select SD
             Serial.printf("enabling SD card");
             Serial.printf("\r\n");
-            digitalWrite(loraChipSelect, HIGH);
+            digitalWrite(loraCSPin(), HIGH);
             digitalWrite(SDChipSelect, LOW); 
             break;
         case 1: // select LORA 
             Serial.printf("enabling LoRa radio");
             Serial.printf("\r\n");
-            digitalWrite(loraChipSelect, LOW);
+            digitalWrite(loraCSPin(), LOW);
             digitalWrite(SDChipSelect, HIGH); // select SD card first, to initialize
             break;
     }
@@ -181,18 +168,6 @@ void checkInBuffer(){
 /*
   CALLBACK FUNCTIONS
 */
-void onReceive(int packetSize) {
-
-    if (packetSize == 0) return;          // if there's no packet, return
-    char incoming[BUFFERSIZE];                 // payload of packet
-    int incomingLength = 0;
-    while (LoRa.available()) { 
-        incoming[incomingLength] = (char)LoRa.read(); 
-        incomingLength++;
-    }
-    packet_received(incoming, incomingLength);
-}
-
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
     if(type == WS_EVT_CONNECT){
         Serial.printf("ws[%s][%u] connect\r\n", server->url(), client->id());
@@ -206,7 +181,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             wsMessage message3 = buildWSMessage("FFc|WARNING: SD card not found, functionality may be limited", 60);
             sendToWS(message3, 60);
         }
-        if(!_loraInitialized){
+        if(!loraInitialized()){
             wsMessage message4 = buildWSMessage("FFc|WARNING: LoRa radio not found, functionality may be limited", 63);
             sendToWS(message4, 63);
         }
@@ -464,34 +439,6 @@ void webServerSetup(){
 
 }
 
-int loraInitialized(){
-    if(_loraInitialized){
-        return 1;
-    }else{
-        return 0;
-    }
-}
-
-void loraSetup(){
-
-    // override the default CS, reset, and IRQ pins (optional)
-    LoRa.setPins(loraChipSelect, resetPin, DIOPin); // set CS, reset, IRQ pin
-
-    if (!LoRa.begin(915E6)) {             // initialize ratio at 915 MHz
-        Serial.printf("LoRa init failed. Check your connections.\r\n");
-        return;
-    }
-
-    LoRa.setSPIFrequency(100E3);
-    LoRa.setSpreadingFactor(9);           // ranges from 6-12,default 7 see API docs
-    LoRa.onReceive(onReceive);
-    LoRa.receive();
-
-    _loraInitialized = 1;
-
-    Serial.printf("LoRa init succeeded.\r\n");
-}
-
 /*
   START MAIN
 */
@@ -503,9 +450,9 @@ void setup(){
     Serial.begin(115200);
     Serial.setDebugOutput(true);
 
-    pinMode(loraChipSelect, OUTPUT);
+    pinMode(loraCSPin(), OUTPUT);
     pinMode(SDChipSelect, OUTPUT);
-    pinMode(DIOPin, INPUT);
+    pinMode(DIOPin(), INPUT);
 
     btStop(); //stop bluetooth as it may cause memory issues
 
@@ -517,7 +464,7 @@ void setup(){
         spiffsSetup();
     }    
     webServerSetup();
-    loraSetup();
+    loraSetup(); // from Layer1_LoRa.cpp
 
     uint8_t* myAddress = localAddress();
     Serial.printf("local address: ");

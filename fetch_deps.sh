@@ -44,5 +44,5 @@ cd ../
 
 git clone https://github.com/sudomesh/LoRaLayer2
 cd LoRaLayer2/
-git checkout d366e64402e192ed4dde46156269319d5dcadefe
+git checkout 24c17c2698e97bb4449de0065f70640ab8f54e2a
 cd ../../
