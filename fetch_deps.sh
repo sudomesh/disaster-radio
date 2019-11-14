@@ -6,10 +6,8 @@ BOARD=$1
 
 if [ -d makeEspArduino ]; then rm -rf makeEspArduino; fi
 if [ -d esp8266-arduino ]; then rm -rf esp8266-arduino; fi
-if [ -d arduino-esp32 ]; then rm -rf arduin-esp32o; fi
-if [ -d libs/ESPAsyncTCP ]; then rm -rf libs/ESPAsyncTCP; fi
-if [ -d libs/ESPAsyncWebServer ]; then rm -rf libs/ESPAsyncWebServer; fi
-if [ -d libs/arduino-LoRa ]; then rm -rf libs/arduino-LoRa; fi
+if [ -d arduino-esp32 ]; then rm -rf arduin-esp32; fi
+if [ -d libs ]; then rm -rf libs; fi
 
 # get makeEspArduino
 git clone https://github.com/plerup/makeEspArduino
