@@ -6,7 +6,7 @@ BOARD=$1
 
 if [ -d makeEspArduino ]; then rm -rf makeEspArduino; fi
 if [ -d esp8266-arduino ]; then rm -rf esp8266-arduino; fi
-if [ -d arduino-esp32 ]; then rm -rf arduin-esp32; fi
+if [ -d arduino-esp32 ]; then rm -rf arduino-esp32; fi
 if [ -d libs ]; then rm -rf libs; fi
 
 # get makeEspArduino
