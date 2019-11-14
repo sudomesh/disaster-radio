@@ -45,7 +45,15 @@ An example chat app can be found in the [web directory](https://github.com/sudom
 # Initial setup
 
 ```
-./fetch_deps.sh # download dependencies
+./fetch_deps.sh esp8266 # download dependencies if using WeMos D1 with disaster radio hat
+cp config.mk.esp8266 config.mk
+cp settings.mk.example settings.mk # create initial personal settings file
+sudo pip install esptool
+```
+OR
+```
+./fetch_deps.sh esp32 # if using ESP32 TTGO board
+cp config.mk.esp32 config.mk
 cp settings.mk.example settings.mk # create initial personal settings file
 sudo pip install esptool
 ```

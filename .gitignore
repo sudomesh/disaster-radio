@@ -2,6 +2,7 @@
 esp8266-arduino
 libs/**
 Makefile
+config.mk
 settings.mk
 web/settings.js
 web/static/build/*.js

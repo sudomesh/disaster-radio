@@ -1,7 +1,7 @@
 
 -include $(dir $(SKETCH))settings.mk
 
-SKETCH = ./firmware/firmware.cpp
+SKETCH = ./firmware/esp8266_wemos/firmware.cpp
 ESP_ROOT = ./esp8266-arduino
 FS_DIR = ./web/static
 LIBS = ./libs/ESPAsyncTCP \
