@@ -10,15 +10,19 @@ UPLOAD_SPEED = 460800
 
 FS_DIR = web/static/
 
-# for portable (wemos d1 mini) use these settings:
 # to list possible boards: make list_boards
 # to list possible flash defs for board: make list_flash_defs
-BOARD = d1_mini
-FLASH_DEF = 4M1M
-UPLOAD_RESET = nodemcu
+
+# for esp32 ttgo dev board use these settings
+CHIP=esp32
+BOARD=ttgo-lora32-v1
+
+# for portable (wemos d1 mini) use these settings:
+#BOARD = d1_mini
+#FLASH_DEF = 4M1M
+#UPLOAD_RESET = nodemcu
 
 # for solar node use these settings:
-
 #BOARD = generic
 #FLASH_DEF = 1M512
 #UPLOAD_RESET = none

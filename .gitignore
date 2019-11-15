@@ -1,5 +1,6 @@
 ~*
 esp8266-arduino
+arduino-esp32
 libs/**
 Makefile
 config.mk
