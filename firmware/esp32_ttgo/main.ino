@@ -67,13 +67,13 @@ void SPIenable(int opt){
         case 0: // select SD
             Serial.printf("enabling SD card");
             Serial.printf("\r\n");
-            digitalWrite(loraCSPin(), HIGH);
+            digitalWrite(Layer1.loraCSPin(), HIGH);
             digitalWrite(SDChipSelect, LOW); 
             break;
         case 1: // select LORA 
             Serial.printf("enabling LoRa radio");
             Serial.printf("\r\n");
-            digitalWrite(loraCSPin(), LOW);
+            digitalWrite(Layer1.loraCSPin(), LOW);
             digitalWrite(SDChipSelect, HIGH); // select SD card first, to initialize
             break;
     }
@@ -136,7 +136,7 @@ void printCharArray(char *buf, int len){
 }
 
 void checkInBuffer(){
-    struct Packet packet = popFromInBuffer();
+    struct Packet packet = LL2.popFromInBuffer();
     if (packet.totalLength > 0){
         struct wsMessage message;
         switch(packet.type){
@@ -181,7 +181,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             wsMessage message3 = buildWSMessage("FFc|WARNING: SD card not found, functionality may be limited", 60);
             sendToWS(message3, 60);
         }
-        if(!loraInitialized()){
+        if(!Layer1.loraInitialized()){
             wsMessage message4 = buildWSMessage("FFc|WARNING: LoRa radio not found, functionality may be limited", 63);
             sendToWS(message4, 63);
         }
@@ -250,8 +250,8 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
             //transmit message over LoRa
             uint8_t destination[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
-            struct Packet packet = buildPacket(1, mac, destination, messageCount(), 'c', data, msg_length); 
-            pushToOutBuffer(packet);
+            struct Packet packet = LL2.buildPacket(1, mac, destination, LL2.messageCount(), 'c', data, msg_length);
+            LL2.pushToOutBuffer(packet);
 
             //echoing message to ws
             if(echo_on){
@@ -285,7 +285,7 @@ void wifiSetup(){
     WiFi.mode(WIFI_AP);
     WiFi.macAddress(mac);
     sprintf(macaddr, "%02x%02x%02x%02x%02x%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac [5]);
-    setLocalAddress(macaddr);
+    Layer1.setLocalAddress(macaddr);
     strcat(ssid, macaddr);
     WiFi.setHostname(hostName);
     //WiFi.softAPConfig(local_IP, gateway, netmask);
@@ -449,9 +449,9 @@ void setup(){
     Serial.begin(115200);
     Serial.setDebugOutput(true);
 
-    pinMode(loraCSPin(), OUTPUT);
+    pinMode(Layer1.loraCSPin(), OUTPUT);
     pinMode(SDChipSelect, OUTPUT);
-    pinMode(DIOPin(), INPUT);
+    pinMode(Layer1.DIOPin(), INPUT);
 
     btStop(); //stop bluetooth as it may cause memory issues
 
@@ -463,24 +463,18 @@ void setup(){
         spiffsSetup();
     }    
     webServerSetup();
-    loraSetup(); // from Layer1_LoRa.cpp
+    Layer1.init(); // from Layer1_LoRa.cpp
 
-    uint8_t* myAddress = localAddress();
+    uint8_t* myAddress = Layer1.localAddress();
     Serial.printf("local address: ");
-    printAddress(myAddress);
+    LL2.printAddress(myAddress);
     Serial.printf("\n");
 
-    startTime = getTime();
+    startTime = Layer1.getTime();
     lastRoutingTime = startTime;
 }
 
 void loop(){
-        //Serial.printf("learning... %d\r", getTime() - startTime);
-        checkOutBuffer(); 
+        LL2.checkOutBuffer();
         checkInBuffer(); 
-        /*long timestamp = transmitRoutes(routingInterval, lastRoutingTime);
-        if(timestamp){
-            Serial.print("routes transmitted");
-            lastRoutingTime = timestamp;
-        }*/
 }
