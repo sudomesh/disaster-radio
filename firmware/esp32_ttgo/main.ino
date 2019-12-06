@@ -135,8 +135,8 @@ void printCharArray(char *buf, int len){
     Serial.printf("\r\n");
 }
 
-void checkInBuffer(){
-    struct Packet packet = LL2.popFromInBuffer();
+void checkChatBuffer(){
+    struct Packet packet = LL2.popFromChatBuffer();
     if (packet.totalLength > 0){
         struct wsMessage message;
         switch(packet.type){
@@ -151,10 +151,6 @@ void checkInBuffer(){
                 Serial.printf("\r\n");
                 memcpy(&message, packet.data, packet.totalLength-HEADER_LENGTH);
                 sendToWS(message, packet.totalLength-HEADER_LENGTH);
-                break;
-            case 'r':
-                Serial.printf("received routing message");
-                Serial.printf("\r\n");
                 break;
             default:
                 Serial.printf("Error: Unknown message type");
@@ -250,8 +246,8 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
             //transmit message over LoRa
             uint8_t destination[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
-            struct Packet packet = LL2.buildPacket(1, mac, destination, LL2.messageCount(), 'c', data, msg_length);
-            LL2.pushToOutBuffer(packet);
+            uint8_t msg_type = 'c';
+            LL2.sendToLayer2(destination, msg_type, data, msg_length);
 
             //echoing message to ws
             if(echo_on){
@@ -441,17 +437,11 @@ void webServerSetup(){
 /*
   START MAIN
 */
-long startTime;
-long lastRoutingTime; // time of last packet send
-int routingInterval = 10000 + random(5000);    // 5-15 seconds
-
 void setup(){
     Serial.begin(115200);
     Serial.setDebugOutput(true);
 
-    pinMode(Layer1.loraCSPin(), OUTPUT);
     pinMode(SDChipSelect, OUTPUT);
-    pinMode(Layer1.DIOPin(), INPUT);
 
     btStop(); //stop bluetooth as it may cause memory issues
 
@@ -463,18 +453,20 @@ void setup(){
         spiffsSetup();
     }    
     webServerSetup();
-    Layer1.init(); // from Layer1_LoRa.cpp
+    Layer1.init(); // initialize Layer1
 
     uint8_t* myAddress = Layer1.localAddress();
     Serial.printf("local address: ");
     LL2.printAddress(myAddress);
-    Serial.printf("\n");
+    Serial.printf("\r\n");
 
-    startTime = Layer1.getTime();
-    lastRoutingTime = startTime;
+    LL2.init(); // initialize Layer2
+    LL2.setInterval(10000); // set to zero to disable routing packets
+                            // note: that if your device has only one LoRa tranceiver,
+                            // you will not be able to receive message while transmitting
 }
 
 void loop(){
-        LL2.checkOutBuffer();
-        checkInBuffer(); 
+    LL2.daemon(); // check in with routing daemon for incoming/outgoing packets
+    checkChatBuffer(); // check if any chat messages have been received
 }
