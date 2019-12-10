@@ -15,6 +15,7 @@
 #include <AsyncSDServer.h>
 #include <Layer1.h>
 #include <LoRaLayer2.h>
+#include <console.h>
 
 #define HEADERSIZE 4 
 #define BUFFERSIZE 252
@@ -46,8 +47,6 @@ int beaconInterval = 30000;
 const int SDChipSelect = 2;
 
 //TODO: switch to volatile byte for interrupt
-
-byte destination = 0xFF;      // destination to send to default broadcast
 
 bool echo_on = false;
 
@@ -159,7 +158,6 @@ void checkChatBuffer(){
     }
     //else buffer is empty;
 }
-
 
 /*
   CALLBACK FUNCTIONS
@@ -440,6 +438,7 @@ void webServerSetup(){
 void setup(){
     Serial.begin(115200);
     Serial.setDebugOutput(true);
+    console.init(); 
 
     pinMode(SDChipSelect, OUTPUT);
 
@@ -469,4 +468,5 @@ void setup(){
 void loop(){
     LL2.daemon(); // check in with routing daemon for incoming/outgoing packets
     checkChatBuffer(); // check if any chat messages have been received
+    console.interface();
 }
