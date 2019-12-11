@@ -3,3 +3,5 @@ FT230X:
     
 ESP32
     https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
+    https://github.com/espressif/esptool/wiki/ESP32-Boot-Mode-Selection
+    https://github.com/espressif/esp-idf/tree/master/examples/storage/sd_card
