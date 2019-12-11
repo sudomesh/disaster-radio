@@ -1,8 +1,6 @@
 #include <Layer1.h>
 #include <LoRaLayer2.h>
 #include <console.h>
-extern "C" char _binary_data_txt_start;
-extern "C" char _binary_data_txt_end;
 
 consoleClass::consoleClass() :
 
@@ -12,15 +10,44 @@ consoleClass::consoleClass() :
     _inputLength()
     {}
 
+void consoleClass::lr(char cmd[MAX_ARGS_PER_LINE][MAX_ARG_LENGTH]){
+    if(strcmp(cmd[1], "addr") == 0){
+        Serial.printf("1: lora1:\r\n");
+        Serial.printf("    address: ");
+        LL2.printAddress(Layer1.localAddress());
+        Serial.printf("\r\n");
+    }
+    else if(strcmp(cmd[1], "route") == 0){
+        LL2.printRoutingTable();
+    }
+    else{
+        Serial.printf("Usage: lr [ OPTIONS ] OBJECT { COMMAND | help }\r\n");
+        Serial.printf("where  OBJECT := { addr | route }\r\n");
+    }
+}
+
 void consoleClass::parse(char input[MAX_INPUT_LENGTH], int length){
     
-    char cmd[10][MAX_INPUT_LENGTH]; 
+    char cmd[MAX_ARGS_PER_LINE][MAX_ARG_LENGTH];
     int init_size = strlen(input);
-    char delim[] = " ";
-    char *ptr = strtok(input, delim);
-    while(ptr != NULL){
-        Serial.printf("'%s'\r\n", ptr);
-	ptr = strtok(NULL, delim);
+    char *delim = " ";
+    char *token = strtok(input, delim);
+    int arg = 0;
+    while((arg < MAX_ARGS_PER_LINE) && (token != NULL)){
+        memcpy(&cmd[arg], token, MAX_ARG_LENGTH);
+	token = strtok(NULL, delim);
+        arg++;
+    }
+    /*
+    for(int i = 0 ; i < arg ; i++){
+        Serial.printf("%s\r\n", cmd[i]);
+    }
+    */
+    if(strcmp(cmd[0], "lr") == 0){
+        lr(cmd);
+    }
+    else if(strcmp(cmd[0], "tx") == 0){
+        Serial.printf("Usage: tx [ destination ] [ type ] message\r\n");
     }
     return;
 }
@@ -60,23 +87,19 @@ int consoleClass::interface(){
         if(Serial.available() > 0) {
             char incoming = Serial.read();
             Serial.printf("%c", incoming);
-            if(incoming == 0x7f){
+            if(incoming == 0x7f){ // backspace or delete
                 if(_inputLength > 0){
                     _input[_inputLength] = 0; 
                     _inputLength--;
                     Serial.printf("\b \b");
                 }
             }
-            else if(incoming == '\r'){
+            else if(incoming == '\r'){ // enter key
                 Serial.printf("\n");
-                Serial.printf("echo: ");
-                for(int i=0 ; i < _inputLength ; i++){
-                    Serial.printf("%c", _input[i]);
-                }
-                Serial.printf("\r\n");
                 parse(_input, _inputLength);
                 memset(_input, 0, MAX_INPUT_LENGTH);
                 _inputLength = 0;
+                Serial.printf("/# ");
             }else{
                 _input[_inputLength] = incoming; 
                 _inputLength++;
