@@ -1325,13 +1325,11 @@ Text Label 5500 8350 0    50   ~ 0
 LORA2_SCK
 Text Label 5500 8250 0    50   ~ 0
 LORA1_SCK
-Text Label 4450 8650 0    50   ~ 0
-LORA2_NSS
 Wire Wire Line
 	4350 8650 4450 8650
 Wire Wire Line
 	4350 8550 4450 8550
-Text Label 4450 8550 0    50   ~ 0
+Text Label 4450 8150 0    50   ~ 0
 LORA1_NSS
 Text Label 4450 8350 0    50   ~ 0
 VSPI_CLK
@@ -1381,14 +1379,14 @@ Wire Wire Line
 Wire Wire Line
 	1700 7550 1700 7400
 $Comp
-L symbols:SW_Push SW1
+L board_esp32-rescue:SW_Push-symbols SW1
 U 1 1 5DCB83D3
-P 750 7700
-F 0 "SW1" V 796 7556 50  0000 R CNN
-F 1 "SW_Push" V 705 7556 50  0000 R CNN
-F 2 "Button_Switch_SMD:SW_Push_1P1T-SH_NO_CK_KMR2xxG" H 750 7900 50  0001 C CNN
-F 3 "" H 750 7900 50  0001 C CNN
-	1    750  7700
+P 1100 7700
+F 0 "SW1" V 1146 7556 50  0000 R CNN
+F 1 "SW_Push" V 1055 7556 50  0000 R CNN
+F 2 "Button_Switch_SMD:SW_Push_1P1T-SH_NO_CK_KMR2xxG" H 1100 7900 50  0001 C CNN
+F 3 "" H 1100 7900 50  0001 C CNN
+	1    1100 7700
 	0    -1   -1   0   
 $EndComp
 $Comp
@@ -1545,9 +1543,9 @@ Wire Wire Line
 	8000 10150 8000 10050
 Wire Wire Line
 	7350 10100 7350 10000
-Text Label 4450 8850 0    50   ~ 0
-LORA1_RXEN
 Text Label 4450 9050 0    50   ~ 0
+LORA1_RXEN
+Text Label 4450 8850 0    50   ~ 0
 LORA1_TXEN
 Wire Wire Line
 	4350 9350 4450 9350
@@ -1559,9 +1557,9 @@ Wire Wire Line
 	4350 9050 4450 9050
 Text Label 8000 9400 0    50   ~ 0
 LORA1_DIO1
-Text Label 4450 8150 0    50   ~ 0
+Text Label 4450 8550 0    50   ~ 0
 LORA1_DIO2
-Text Label 4450 9350 0    50   ~ 0
+Text Label 4450 8650 0    50   ~ 0
 LORA1_BUSY
 Text Label 4450 9450 0    50   ~ 0
 LORA2_BUSY
@@ -1571,8 +1569,6 @@ Wire Wire Line
 	4450 8150 4350 8150
 Wire Wire Line
 	4450 8250 4350 8250
-Text Label 4450 8250 0    50   ~ 0
-LORA2_DIO2
 Text Label 4450 8950 0    50   ~ 0
 LORA2_RXEN
 Wire Wire Line
@@ -2261,4 +2257,104 @@ Wire Wire Line
 	12500 4950 12800 4950
 Text Notes 600  3750 0    50   ~ 0
 90 Ohm Diff Impedance
+$Comp
+L Mechanical:MountingHole_Pad H1
+U 1 1 5DF9D839
+P 11200 8450
+F 0 "H1" H 11300 8453 50  0000 L CNN
+F 1 "MountingHole_Pad" H 11300 8408 50  0001 L CNN
+F 2 "MountingHole:MountingHole_2.2mm_M2" H 11200 8450 50  0001 C CNN
+F 3 "~" H 11200 8450 50  0001 C CNN
+	1    11200 8450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	11200 8550 11200 8650
+$Comp
+L power:GND #PWR0140
+U 1 1 5DFA02C2
+P 11200 8650
+F 0 "#PWR0140" H 11200 8400 50  0001 C CNN
+F 1 "GND" H 11205 8477 50  0000 C CNN
+F 2 "" H 11200 8650 50  0001 C CNN
+F 3 "" H 11200 8650 50  0001 C CNN
+	1    11200 8650
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0144
+U 1 1 5DFA0824
+P 11500 8650
+F 0 "#PWR0144" H 11500 8400 50  0001 C CNN
+F 1 "GND" H 11505 8477 50  0000 C CNN
+F 2 "" H 11500 8650 50  0001 C CNN
+F 3 "" H 11500 8650 50  0001 C CNN
+	1    11500 8650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	11500 8550 11500 8650
+$Comp
+L Mechanical:MountingHole_Pad H2
+U 1 1 5DFA0832
+P 11500 8450
+F 0 "H2" H 11600 8453 50  0000 L CNN
+F 1 "MountingHole_Pad" H 11600 8408 50  0001 L CNN
+F 2 "MountingHole:MountingHole_2.2mm_M2" H 11500 8450 50  0001 C CNN
+F 3 "~" H 11500 8450 50  0001 C CNN
+	1    11500 8450
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0145
+U 1 1 5DFA0EBF
+P 11800 8650
+F 0 "#PWR0145" H 11800 8400 50  0001 C CNN
+F 1 "GND" H 11805 8477 50  0000 C CNN
+F 2 "" H 11800 8650 50  0001 C CNN
+F 3 "" H 11800 8650 50  0001 C CNN
+	1    11800 8650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	11800 8550 11800 8650
+$Comp
+L Mechanical:MountingHole_Pad H3
+U 1 1 5DFA0ECD
+P 11800 8450
+F 0 "H3" H 11900 8453 50  0000 L CNN
+F 1 "MountingHole_Pad" H 11900 8408 50  0001 L CNN
+F 2 "MountingHole:MountingHole_2.2mm_M2" H 11800 8450 50  0001 C CNN
+F 3 "~" H 11800 8450 50  0001 C CNN
+	1    11800 8450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	12100 8550 12100 8650
+$Comp
+L power:GND #PWR0146
+U 1 1 5DFA14BF
+P 12100 8650
+F 0 "#PWR0146" H 12100 8400 50  0001 C CNN
+F 1 "GND" H 12105 8477 50  0000 C CNN
+F 2 "" H 12100 8650 50  0001 C CNN
+F 3 "" H 12100 8650 50  0001 C CNN
+	1    12100 8650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:MountingHole_Pad H4
+U 1 1 5DFA14CC
+P 12100 8450
+F 0 "H4" H 12200 8453 50  0000 L CNN
+F 1 "MountingHole_Pad" H 12200 8408 50  0001 L CNN
+F 2 "MountingHole:MountingHole_2.2mm_M2" H 12100 8450 50  0001 C CNN
+F 3 "~" H 12100 8450 50  0001 C CNN
+	1    12100 8450
+	1    0    0    -1  
+$EndComp
+Text Label 4450 9350 0    50   ~ 0
+LORA2_NSS
+Text Label 4450 8250 0    50   ~ 0
+LORA2_DIO2
 $EndSCHEMATC
