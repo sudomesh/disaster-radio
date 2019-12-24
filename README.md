@@ -14,10 +14,10 @@
     - [Building firmware](#building-firmware)
     - [Flashing firmware](#flashing-firmware)
         - [For dev boards](#for-dev-boards)
-        - [For the full solar + li-ion board](#for-the-full-solar-+-li-ion-board)
+        - [For the full solar + li-ion board](#for-the-full-solar--li-ion-board)
 - [Building Web App](#building-web-app)
     - [Building and uploading SPIFFS image](#building-and-uploading-SPIFFS-image)
-- [Testing Firmware](#testing-the-firmware) 
+- [Testing Firmware](#testing-firmware) 
 - [Adding Libraries](#adding-libraries)
 - [License](#license)
 
@@ -27,7 +27,7 @@ The quickest way to get started with disaster.radio is to,
 * Unzip the `disaster-radio-0.X.X.zip` file
 * Follow the included instructions for flashing it to your device
 
-If you would rather test the latest, cutting-edge developments, you can compile the firmware yourself by cloning this repo and following the [initial setup](https://github.com/sudomesh/disaster-radio#initial-setup) instructions.
+If you would rather test the latest, cutting-edge developments, you can compile the firmware yourself by cloning this repo and following the [initial setup](#initial-setup) instructions.
 
 # Layout and Flow
 The general layout and flow of hardware, firmware, and software can be seen below:
@@ -38,7 +38,7 @@ The general layout and flow of hardware, firmware, and software can be seen belo
 NodeMCU/ESP8266 | ESP32 | LoRa Transceiver | SD Card |
 ----------------|-------|--------|---------|
 D1/GPIO5/OUT | GPIO23  |RESET | _NC_ 
-D2/GPIO4/INT | GPIO26 DIO0 | _NC_ 
+D2/GPIO4/INT | GPIO26 | DIO0 | _NC_ 
 D4/GPIO2/CS | GPIO2 | _NC_ | SS 
 D5/GPIO14/SCK | ??? | SCK | SCK 
 D6/GPIO12/MISO | ??? | MISO | MISO  
