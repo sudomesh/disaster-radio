@@ -64,7 +64,7 @@ cd ../
 
 git clone https://github.com/sudomesh/LoRaLayer2
 cd LoRaLayer2/
-git checkout c5819bc89ac12184c649f787b3911fb91562ae76
+git checkout 5b59547f400cdeccef7acacc9833f2f4502b8d46
 cd ../
 
 git clone https://github.com/paidforby/AsyncSDServer
