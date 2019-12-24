@@ -36,7 +36,7 @@ The general layout and flow of hardware, firmware, and software can be seen belo
 # Hardware Connections  
 
 NodeMCU/ESP8266 | ESP32 | LoRa Transceiver | SD Card |
-----------------|--------|---------|
+----------------|-------|--------|---------|
 D1/GPIO5/OUT | GPIO23  |RESET | _NC_ 
 D2/GPIO4/INT | GPIO26 DIO0 | _NC_ 
 D4/GPIO2/CS | GPIO2 | _NC_ | SS 
