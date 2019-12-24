@@ -1,11 +1,33 @@
 [disaster.radio](https://disaster.radio) is a work-in-progress long-range, low-bandwidth wireless disaster recovery mesh network powered by the sun.
 
-* `firmware/` is the ESP8266 firmware
-* `web/` is the web app served up by the ESP8266
-* `hardware/` is the kicad board layout and schematic
-* `enclosure/` are 3D models of the enclosure(s)
+* [firmware/](./firmware) contains the main firmware for ESP32 and ESP8266
+* [web/](./web) is the demo chat app served up by the disaster-radio
+* [hardware/](./hardware) is the kicad board layout and schematic
+* [enclosure/](./enclosure) are 3D models of the enclosure(s)
 
-The `web/` dir includes a simulator server that presents the same API as the ESP8266 to the client. This makes development of the web app possible without having the Disaster Radio hardware hooked up.
+## Table of contents
+- [Getting Started](#getting-started)
+- [Layout and Flow](#layout-and-flow)
+- [Hardware Connections](#hardware-connections)
+- [Websocket](#websocket)
+- [Initial Setup](#initial-setup)
+    - [Building firmware](#building-firmware)
+    - [Flashing firmware](#flashing-firmware)
+        - [For dev boards](#for-dev-boards)
+        - [For the full solar + li-ion board](#for-the-full-solar-+-li-ion-board)
+- [Building Web App](#building-web-app)
+    - [Building and uploading SPIFFS image](#building-and-uploading-SPIFFS-image)
+- [Testing Firmware](#testing-the-firmware) 
+- [Adding Libraries](#adding-libraries)
+- [License](#license)
+
+# Getting Started
+The quickest way to get started with disaster.radio is to,
+* Download the [latest release](https://github.com/sudomesh/disaster-radio/releases)
+* Unzip the `disaster-radio-0.X.X.zip` file
+* Follow the included instructions for flashing it to your device
+
+If you would rather test the latest, cutting-edge developments, you can compile the firmware yourself by cloning this repo and following the [initial setup](https://github.com/sudomesh/disaster-radio#initial-setup) instructions.
 
 # Layout and Flow
 The general layout and flow of hardware, firmware, and software can be seen below:
@@ -13,15 +35,15 @@ The general layout and flow of hardware, firmware, and software can be seen belo
 
 # Hardware Connections  
 
-NodeMCU/ESP8266 | LoRa Transceiver | SD Card |
+NodeMCU/ESP8266 | ESP32 | LoRa Transceiver | SD Card |
 ----------------|--------|---------|
-D1/GPIO5/OUT | RESET | _NC_ 
-D2/GPIO4/INT | DIO0 | _NC_ 
-D4/GPIO2/CS | _NC_ | SS 
-D5/GPIO14/SCK | SCK | SCK 
-D6/GPIO12/MISO | MISO | MISO  
-D7/GPIO13/MOSI | MOSI | MOSI  
-D8/GPIO15/CS | NSS | _NC_   
+D1/GPIO5/OUT | GPIO23  |RESET | _NC_ 
+D2/GPIO4/INT | GPIO26 DIO0 | _NC_ 
+D4/GPIO2/CS | GPIO2 | _NC_ | SS 
+D5/GPIO14/SCK | ??? | SCK | SCK 
+D6/GPIO12/MISO | ??? | MISO | MISO  
+D7/GPIO13/MOSI | ??? | MOSI | MOSI  
+D8/GPIO15/CS | GPIO18 |NSS | _NC_   
   
 DIO0 sends an interrupt from the LoRa chip upon Tx/Rx Ready on the radio. 
 Chip selects can be used to explicitly switch between the LoRa tranceiver and the SD card; however, the SD card should be enabled by default, as the LoRa interrupt appears to handle enabling the tranceiver (note: this still needs to be thoroughly tested, what happens if you receive an interrupt while loading from the SD?).
@@ -42,37 +64,42 @@ or
 
 An example chat app can be found in the [web directory](https://github.com/sudomesh/disaster-radio/tree/master/web).
 
-# Initial setup
+# Initial Setup
 
 ```
 ./fetch_deps.sh esp8266 # download dependencies if using WeMos D1 with disaster radio hat
-cp config.mk.esp8266 config.mk
 cp settings.mk.example settings.mk # create initial personal settings file
 sudo pip install esptool
 ```
 OR
 ```
 ./fetch_deps.sh esp32 # if using ESP32 TTGO board
-cp config.mk.esp32 config.mk
 cp settings.mk.example settings.mk # create initial personal settings file
 sudo pip install esptool
 ```
 
-Then edit `settings.mk` to suit your needs. If you are flashing a board based on the wemos d1 mini (with built-in usb) then you will probably not have to edit anything in `settings.mk` but make sure `UPLOAD_PORT` is set to the correct device which may vary depending on your operating system and which other devices you have connected.
-  
-# Building firmware
+If you would only like to update the libraries, instead reinstalling the entire arduino-esp toolchain, you can run,
+```
+./fetch_deps.sh esp32 libs
+``` 
 
+Edit `settings.mk` to suit your needs. If you are flashing a ESP32 LILY TTGO board then you will probably not have to edit anything in `settings.mk` but make sure `UPLOAD_PORT` is set to the correct device which may vary depending on your operating system and which other devices you have connected.
+  
+## Building firmware
+
+To test that the firmware is compiling correctly without flashing it to a device, run
 ```
 make
 ```
+This will compile all libraries and main firmware files. The resulting binary is stored as `/tmp/mkESP/main_ttgo-lora32-v1/main.bin`
 
-# Flashing firmware
+## Flashing firmware
 
-## For the wemos d1 mini dev board
+### For dev boards
 
 Connect your computer the board using a usb cable,
 
-In `settings.mk` make sure to uncomment the lines for the WeMos D1 Mini and comment the lines for the solar module. You'll have to do the same for the lines in `firmware/firmware.ino` defining `csPin`, `resetPin`, and `irqPin`.
+In `settings.mk` make sure to uncomment the lines for your device and comment the lines for the devices not being used.
 
 Then run:
 
@@ -80,7 +107,7 @@ Then run:
 make flash
 ```
 
-## For the full solar + li-ion board
+### For the full solar + li-ion board
 
 This board does not have usb so flashing is slightly more complicated. The pin header immediately to the left of the ESP-07 board has two labels: 
 
@@ -134,11 +161,13 @@ You can safely ignore this error.
 Remember to power the board off and moving the jumper back to the top position once you're done flashing. The simplest way to power off the board is to unplug the usb cable from your computer. If this gets annoying you can connect/solder a switch to flip between the two modes and another switch to toggle the power.
 
 
-# Building web app
+# Building Web App
+
+The `web/` dir includes a simulator server that presents the same API as the ESP8266 to the client. This makes development of the web app possible without having the Disaster Radio hardware hooked up.
 
 See [web/README.md](https://github.com/sudomesh/disaster-radio/tree/master/web)
 
-# Building and uploading SPIFFS image
+## Building and uploading SPIFFS image
 
 To build:
 
@@ -160,12 +189,13 @@ touch web/static/*
 
 If using an SD card model, copy the contents of `web/static/` to the root of a fat32 formatted SD card.
 
-# Testing the firmware and web app  
-See [firmware/README.md](https://github.com/sudomesh/disaster-radio/tree/master/firmware)
+# Testing Firmware  
+Once the firmware and SPIFFS image has been successfully flashed, you can test it by logging into the `disaster.radio <mac-address>` wireless network and navigating to http://192.168.4.1 in a browser to access the demo chat app.
+See [firmware/README.md](https://github.com/sudomesh/disaster-radio/tree/master/firmware) for more debugging information.
 
-# Adding libraries
+# Adding Libraries
 
-If you're including new libraries in the firmware then you wil need to add them to `LIBS =` in `config.mk`. 
+If you're including new libraries in the firmware then you wil need to add them to `LIBS =` in the correct `config.mk` file. 
 
 Make sure to also include the approprate commands for fetching the new libraries in `fetch_deps.sh`.
 
