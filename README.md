@@ -191,6 +191,40 @@ If using an SD card model, copy the contents of `web/static/` to the root of a f
 
 # Testing Firmware  
 Once the firmware and SPIFFS image has been successfully flashed, you can test it by logging into the `disaster.radio <mac-address>` wireless network and navigating to http://192.168.4.1 in a browser to access the demo chat app.
+
+You can also perform some tests by logging into the disaster.radio's console interface. If flashed correctly, you should be able to log into the device using a serial tool, such as screen or minicom with a baud rate of 115200. You will be greeted by a banner that looks like this,
+```
+     ___              __                            ___    
+ ___/ (_)__ ___ ____ / /____ ____      _______ ____/ (_)__ 
+/ _  / (_-</ _ `(_-</ __/ -_) __/ _   / __/ _ `/ _  / / _ \
+\_,_/_/___/\_,_/___/\__/\__/_/   (_) /_/  \_,_/\_,_/_/\___/
+v0.1.0
+LoRa tranceiver connected
+Local address of your node is d8a01d69bd4c
+
+```
+You can then run commands to confirm the device is operating correctly. To print the node's local address, use `lr -a`.
+```
+/# lr -a
+1: lora1:
+    address: d8a01d69bd4c
+```
+  
+To print the current routing table of the node, use `lr -r`.
+
+```
+/# lr -r
+
+Routing Table: total routes 1
+1 hops from d8a01d69d448 via d8a01d69d448 metric 204 
+```
+  
+To transmit a message over the lora transceiver, use `tx`.
+```
+/# tx -m heythere -d d8a01d69d448 -t c
+TXing: heythere to d8a01d69d448 as type 'c'
+```
+
 See [firmware/README.md](https://github.com/sudomesh/disaster-radio/tree/master/firmware) for more debugging information.
 
 # Adding Libraries

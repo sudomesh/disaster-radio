@@ -10,44 +10,110 @@ consoleClass::consoleClass() :
     _inputLength()
     {}
 
-void consoleClass::lr(char cmd[MAX_ARGS_PER_LINE][MAX_ARG_LENGTH]){
-    if(strcmp(cmd[1], "addr") == 0){
-        Serial.printf("1: lora1:\r\n");
-        Serial.printf("    address: ");
-        LL2.printAddress(Layer1.localAddress());
-        Serial.printf("\r\n");
+int consoleClass::lr(int argc, char *argv[]){
+    int index;
+    int opt;
+    optind = 1;
+    opterr = 0;
+    while ((opt = getopt(argc, argv, "ar")) != -1){
+        switch (opt){
+            case 'a':
+                Serial.printf("1: lora1:\r\n");
+                Serial.printf("    address: ");
+                LL2.printAddress(Layer1.localAddress());
+                Serial.printf("\r\n");
+                break;
+            case 'r':
+                LL2.printRoutingTable();
+                break;
+            case '?':
+                Serial.printf("Usage: lr [ OPTIONS ]\r\n");
+                Serial.printf("where  OPTIONS := { -a | -r }\r\n");
+                break;
+            default:
+                Serial.printf("Something is broken\r\n");
+                return 1;
+        }
     }
-    else if(strcmp(cmd[1], "route") == 0){
-        LL2.printRoutingTable();
+    for (index = optind; index < argc; index++){
+        Serial.printf("Non-option argument %s\n", argv[index]);
+        return 1;
     }
-    else{
-        Serial.printf("Usage: lr [ OPTIONS ] OBJECT { COMMAND | help }\r\n");
-        Serial.printf("where  OBJECT := { addr | route }\r\n");
+    return 0;
+}
+
+int consoleClass::tx(int argc, char *argv[]){
+    int index;
+    int opt;
+    optind = 1;
+    opterr = 0;
+    uint8_t message[240];
+    uint8_t length = 0;
+    uint8_t destination[ADDR_LENGTH] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+    uint8_t type = 'c';
+    uint8_t *hexOptArg;
+    while ((opt = getopt(argc, argv, "m:d:t:")) != -1){
+        switch (opt){
+            case 'm':
+                length = strlen(optarg);
+                memcpy(&message, optarg, length);
+                break;
+            case 'd':
+                hexOptArg = Layer1.charToHex(optarg);
+                memcpy(&destination, hexOptArg, ADDR_LENGTH);
+                break;
+            case 't':
+                type = optarg[0];
+                break;
+            case '?':
+                Serial.printf("Usage: tx [-m <message>] [-d <destination> ] [-t <type> ]\r\n");
+                Serial.printf("Where <message> is a string with no spaces!\r\n");
+                Serial.printf("      <destination> is the destination mac address formatted as a1b2c3d4e5f6\r\n");
+                Serial.printf("          if no destination is given, it will default to the broadcast address, ffffffffffff\r\n");
+                Serial.printf("      <type> is a single character signfiying message type, e.g. `c` or `m`\r\n");
+                Serial.printf("          if no type is given, will default to the chat type, 'c'\r\n");
+            default:
+                Serial.printf("Something is broken\r\n");
+                return 1;
+        }
     }
+    for (index = optind; index < argc; index++){
+        Serial.printf("Non-option argument %s\n", argv[index]);
+        return 1;
+    }
+    Serial.printf("TXing: ");
+    for(int i = 0 ; i < length ; i++){
+        Serial.printf("%c", message[i]);
+    }
+    Serial.printf(" to ");
+    for(int i = 0 ; i < ADDR_LENGTH ; i++){
+        Serial.printf("%02x", destination[i]);
+    }
+    Serial.printf(" as type ");
+    Serial.printf("'%c'", type);
+    Serial.printf("\r\n");
+    LL2.sendToLayer2(destination, type, message, length);
+    return 0;
 }
 
 void consoleClass::parse(char input[MAX_INPUT_LENGTH], int length){
-    
     char cmd[MAX_ARGS_PER_LINE][MAX_ARG_LENGTH];
-    int init_size = strlen(input);
+    char *argv[8]; //= (char*) malloc(8 * sizeof(char));
     char *delim = " ";
     char *token = strtok(input, delim);
-    int arg = 0;
-    while((arg < MAX_ARGS_PER_LINE) && (token != NULL)){
-        memcpy(&cmd[arg], token, MAX_ARG_LENGTH);
+    int argc = 0;
+    while((argc < MAX_ARGS_PER_LINE) && (token != NULL)){
+        memcpy(&cmd[argc], token, MAX_ARG_LENGTH);
 	token = strtok(NULL, delim);
-        arg++;
+        argv[argc] = &cmd[argc][0];
+        argc++;
     }
-    /*
-    for(int i = 0 ; i < arg ; i++){
-        Serial.printf("%s\r\n", cmd[i]);
-    }
-    */
+    argv[argc] = NULL;
     if(strcmp(cmd[0], "lr") == 0){
-        lr(cmd);
+        lr(argc, argv);
     }
     else if(strcmp(cmd[0], "tx") == 0){
-        Serial.printf("Usage: tx [ destination ] [ type ] message\r\n");
+        tx(argc, argv);
     }
     return;
 }
