@@ -67,31 +67,19 @@ An example chat app can be found in the [web directory](https://github.com/sudom
 # Initial Setup
 
 ```
-./fetch_deps.sh esp8266 # download dependencies if using WeMos D1 with disaster radio hat
-cp settings.mk.example settings.mk # create initial personal settings file
-sudo pip install esptool
-```
-OR
-```
-./fetch_deps.sh esp32 # if using ESP32 TTGO board
-cp settings.mk.example settings.mk # create initial personal settings file
-sudo pip install esptool
+pip install -U platformio
 ```
 
-If you would only like to update the libraries, instead reinstalling the entire arduino-esp toolchain, you can run,
-```
-./fetch_deps.sh esp32 libs
-``` 
+Edit `platformio.ini` to suit your needs. If you are flashing a ESP32 LILY TTGO board then you will probably not have to edit anything in `platformio.ini` but make sure `upload_port` is set to the correct device which may vary depending on your operating system and which other devices you have connected.
 
-Edit `settings.mk` to suit your needs. If you are flashing a ESP32 LILY TTGO board then you will probably not have to edit anything in `settings.mk` but make sure `UPLOAD_PORT` is set to the correct device which may vary depending on your operating system and which other devices you have connected.
-  
 ## Building firmware
 
 To test that the firmware is compiling correctly without flashing it to a device, run
 ```
-make
+pio run
 ```
-This will compile all libraries and main firmware files. The resulting binary is stored as `/tmp/mkESP/main_ttgo-lora32-v1/main.bin`
+
+This will compile all libraries and main firmware files. The resulting binary is stored as `.pio/build/ttgo-lora32-v1/firmware.bin`
 
 ## Flashing firmware
 
@@ -99,12 +87,12 @@ This will compile all libraries and main firmware files. The resulting binary is
 
 Connect your computer the board using a usb cable,
 
-In `settings.mk` make sure to uncomment the lines for your device and comment the lines for the devices not being used.
+In `platformio.ini` make sure `upload_port`, `upload_speed`, etc are correct for your device.
 
 Then run:
 
 ```
-make flash
+pio run -t upload -t uploadfs
 ```
 
 ### For the full solar + li-ion board
@@ -137,26 +125,21 @@ It is possible that the power supplied by the 3.3 V output of your serial adapte
 
 On the USB-to-serial adapter you should be able to find a pin or connection point that has the 5 V output from your computer. Connect this to Vout on the voltage regulator, then connect GND to GND (you can use the outer part of the USB plug if nothing else is available) and Vout will be the output that you connect to the 3V3 pin on the disaster.radio board. It's a good idea to put a ~100 uF capacitor between GND and Vout.
 
-In `settings.mk` make sure to comment the lines for the WeMos D1 Mini and uncomment the lines for the solar module. You'll have to do the same for the lines in `firmware/firmware.ino` defining `csPin`, `resetPin`, and `irqPin`.
+In `platformio.ini` make sure to comment the lines for the WeMos D1 Mini and uncomment the lines for the solar module. You'll have to do the same for the lines in `firmware/firmware.ino` defining `csPin`, `resetPin`, and `irqPin`.
 
-Now you can use `make flash` and `make flash_fs` normally, however note that you will have to manually reset the board after each flashing operation.
+Now you can use `pio run -t upload` and `pio run -t uploadfs` normally, however note that you will have to manually reset the board after each flashing operation.
 
-After running `make flash_fs` you may get an error that looks like this:
+After running `pio run -t uploadfs` you may get an error that looks like this:
 
 ```
 A fatal error occurred: Timed out waiting for packet header
-make: *** [flash_fs] Error 2
 ```
 
-If you run into a problem where the `make flash_fs` seems to complete but the files aren't readable by the firmware, try this:
+If you run into a problem where the `pio run -t uploadfs` seems to complete but the files aren't readable by the firmware, try this:
 
 ```
-make erase_flash
-make flash_fs
-make flash
+pio run -t erase -t uploadfs -t upload
 ```
-
-You can safely ignore this error.
 
 Remember to power the board off and moving the jumper back to the top position once you're done flashing. The simplest way to power off the board is to unplug the usb cable from your computer. If this gets annoying you can connect/solder a switch to flip between the two modes and another switch to toggle the power.
 
@@ -172,13 +155,13 @@ See [web/README.md](https://github.com/sudomesh/disaster-radio/tree/master/web)
 To build:
 
 ```
-make fs
+pio run -t buildfs
 ```
 
 To build and upload:
 
 ```
-make flash_fs
+pio run -t uploads
 ```
 
 If building doesn't work then try this first:
@@ -229,9 +212,7 @@ See [firmware/README.md](https://github.com/sudomesh/disaster-radio/tree/master/
 
 # Adding Libraries
 
-If you're including new libraries in the firmware then you wil need to add them to `LIBS =` in the correct `config.mk` file. 
-
-Make sure to also include the approprate commands for fetching the new libraries in `fetch_deps.sh`.
+If you're including new libraries in the firmware then you wil need to add them to `platformio.ini` under `lib_deps`.
 
 # License
 
