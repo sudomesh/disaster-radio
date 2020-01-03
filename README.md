@@ -64,7 +64,7 @@ or
 
 An example chat app can be found in the [web directory](https://github.com/sudomesh/disaster-radio/tree/master/web).
 
-# Initial Setup
+# Initial Setup with PlatformIO
 
 ```
 pip install -U platformio
@@ -85,7 +85,7 @@ This will compile all libraries and main firmware files. The resulting binary is
 
 ### For dev boards
 
-Connect your computer the board using a usb cable,
+Connect your computer to the board using a usb cable,
 
 In `platformio.ini` make sure `upload_port`, `upload_speed`, etc are correct for your device.
 
@@ -95,7 +95,53 @@ Then run:
 pio run -t upload -t uploadfs
 ```
 
+# Initial Setup with makeEspArduino 
+
+If you would prefer to use a makefile to build and flash the firmware, follow these instructions,
+
+./fetch_deps.sh esp8266 # download dependencies if using WeMos D1 with disaster radio hat
+cp settings.mk.example settings.mk # create initial personal settings file
+sudo pip install esptool
+```
+OR
+```
+./fetch_deps.sh esp32 # if using ESP32 TTGO board
+cp settings.mk.example settings.mk # create initial personal settings file
+sudo pip install esptool 
+```
+
+If you would only like to update the libraries, instead reinstalling the entire arduino-esp toolchain, you can run,
+```
+./fetch_deps.sh esp32 libs
+``` 
+
+Edit `settings.mk` to suit your needs. If you are flashing a ESP32 LILY TTGO board then you will probably not have to edit anything in `settings.mk` but make sure `UPLOAD_PORT` is set to the correct device which may vary depending on your operating system and which other devices you have connected.
+
+## Building firmware
+
+To test that the firmware is compiling correctly without flashing it to a device, run
+```
+make
+```
+This will compile all libraries and main firmware files. The resulting binary is stored as `/tmp/mkESP/main_ttgo-lora32-v1/main.bin`
+
+## Flashing firmware
+
+### For dev boards
+
+Connect your computer to the board using a usb cable,
+
+In `settings.mk` make sure to uncomment the lines for your device and comment the lines for the devices not being used.
+
+Then run:
+
+```
+make flash
+```
+
 ### For the full solar + li-ion board
+
+This section is depreacted until a new version of the full board is completed.
 
 This board does not have usb so flashing is slightly more complicated. The pin header immediately to the left of the ESP-07 board has two labels: 
 
@@ -157,12 +203,19 @@ To build:
 ```
 pio run -t buildfs
 ```
+OR
+```
+make fs
+```
 
 To build and upload:
 
 ```
 pio run -t uploads
 ```
+OR
+```
+make flash_fs
 
 If building doesn't work then try this first:
 
@@ -212,7 +265,11 @@ See [firmware/README.md](https://github.com/sudomesh/disaster-radio/tree/master/
 
 # Adding Libraries
 
-If you're including new libraries in the firmware then you wil need to add them to `platformio.ini` under `lib_deps`.
+If you're including new libraries in the firmware, for PlatformIO, you wil need to add them to `platformio.ini` under `lib_deps`.
+
+If you're including new libraries in the firmware, for makeEspArduino, you wil need to add them to `LIBS =` in the correct `config.mk` file. 
+
+Make sure to also include the approprate commands for fetching the new libraries in `fetch_deps.sh`.
 
 # License
 
