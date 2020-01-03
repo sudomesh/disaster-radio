@@ -12,3 +12,5 @@ web/static/build/*.gz
 web/node_modules
 makeEspArduino/
 
+.pio
+.vscode
