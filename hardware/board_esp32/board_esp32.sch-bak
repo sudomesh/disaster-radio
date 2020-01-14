@@ -380,17 +380,6 @@ F 3 "~" H 13900 1550 50  0001 C CNN
 	1    13900 1550
 	1    0    0    -1  
 $EndComp
-$Comp
-L Device:C_Small C10
-U 1 1 5DCE2BB3
-P 11500 1550
-F 0 "C10" H 11408 1596 50  0000 R CNN
-F 1 "10uF 25V" H 11408 1505 50  0000 R CNN
-F 2 "Capacitor_SMD:C_0805_2012Metric" H 11500 1550 50  0001 C CNN
-F 3 "~" H 11500 1550 50  0001 C CNN
-	1    11500 1550
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	13900 1450 13900 1350
 Wire Wire Line
@@ -1371,24 +1360,11 @@ Connection ~ 1200 8000
 Wire Wire Line
 	1700 7350 1700 7150
 Wire Wire Line
-	1200 8000 1200 7900
-Wire Wire Line
 	1700 7400 1700 7350
 Wire Wire Line
 	1100 8000 1200 8000
 Wire Wire Line
 	1700 7550 1700 7400
-$Comp
-L board_esp32-rescue:SW_Push-symbols SW1
-U 1 1 5DCB83D3
-P 1100 7700
-F 0 "SW1" V 1146 7556 50  0000 R CNN
-F 1 "SW_Push" V 1055 7556 50  0000 R CNN
-F 2 "Button_Switch_SMD:SW_Push_1P1T-SH_NO_CK_KMR2xxG" H 1100 7900 50  0001 C CNN
-F 3 "" H 1100 7900 50  0001 C CNN
-	1    1100 7700
-	0    -1   -1   0   
-$EndComp
 $Comp
 L Device:R_Small R3
 U 1 1 5DCBD0CE
@@ -1400,8 +1376,6 @@ F 3 "~" H 1700 7050 50  0001 C CNN
 	1    1700 7050
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	1200 7500 1200 7400
 $Comp
 L power:GND #PWR0128
 U 1 1 5DCBE750
@@ -1425,11 +1399,7 @@ F 3 "" H 1700 8200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	1100 7400 1100 7500
-Wire Wire Line
 	1200 8000 1200 8200
-Wire Wire Line
-	1100 7900 1100 8000
 Wire Wire Line
 	1700 7350 2000 7350
 $Comp
@@ -2357,4 +2327,53 @@ Text Label 4450 9350 0    50   ~ 0
 LORA2_NSS
 Text Label 4450 8250 0    50   ~ 0
 LORA2_DIO2
+Wire Wire Line
+	14300 6800 14450 6800
+Wire Wire Line
+	14450 6800 14450 7050
+$Comp
+L power:GND #PWR0147
+U 1 1 5E17CB00
+P 14450 7050
+F 0 "#PWR0147" H 14450 6800 50  0001 C CNN
+F 1 "GND" H 14455 6877 50  0000 C CNN
+F 2 "" H 14450 7050 50  0001 C CNN
+F 3 "" H 14450 7050 50  0001 C CNN
+	1    14450 7050
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C10
+U 1 1 5DCE2BB3
+P 11500 1550
+F 0 "C10" H 11408 1596 50  0000 R CNN
+F 1 "10uF 25V" H 11408 1505 50  0000 R CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric" H 11500 1550 50  0001 C CNN
+F 3 "~" H 11500 1550 50  0001 C CNN
+	1    11500 1550
+	1    0    0    -1  
+$EndComp
+Text Label 3550 1050 0    50   ~ 0
+BATT_IN
+Text Label 4600 1050 0    50   ~ 0
+BATT_PROT
+Wire Wire Line
+	1200 8000 1200 7900
+Wire Wire Line
+	1200 7500 1200 7400
+Wire Wire Line
+	1100 7400 1100 7500
+Wire Wire Line
+	1100 7900 1100 8000
+$Comp
+L symbols:SW_Push-Std SW1
+U 1 1 5E1D81ED
+P 1100 7700
+F 0 "SW1" V 1145 7557 50  0000 R CNN
+F 1 "SW_Push-Std" V 1055 7557 50  0000 R CNN
+F 2 "Button_Switch_SMD:SW_Push_1P1T-SH_NO_CK_KMR2xxG" H 1100 7900 50  0001 C CNN
+F 3 "" H 1100 7900 50  0001 C CNN
+	1    1100 7700
+	0    -1   -1   0   
+$EndComp
 $EndSCHEMATC
