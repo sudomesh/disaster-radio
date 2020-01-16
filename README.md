@@ -222,6 +222,7 @@ pio run -t uploads
 OR
 ```
 make flash_fs
+```
 
 If building doesn't work then try this first:
 
