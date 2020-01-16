@@ -134,16 +134,21 @@ void printCharArray(char *buf, int len){
     Serial.printf("\r\n");
 }
 
-void checkChatBuffer(){
-    struct Packet packet = LL2.popFromChatBuffer();
+void checkWSBuffer(){
+    struct Packet packet = LL2.popFromWSBuffer();
     if (packet.totalLength > 0){
         struct wsMessage message;
+        struct wsMessage r_message = { 0xF, 0xF, 'r', '|'};
         switch(packet.type){
             case 'c':
                 Serial.printf("received chat message");
                 Serial.printf("\r\n");
                 memcpy(&message, packet.data, packet.totalLength-HEADER_LENGTH);
                 sendToWS(message, packet.totalLength-HEADER_LENGTH);
+                break;
+            case 'r':
+                memcpy(&r_message.data, packet.data, packet.totalLength-HEADER_LENGTH);
+                sendToWS(r_message, packet.totalLength-HEADER_LENGTH+4);
                 break;
             case 'm':
                 Serial.printf("received map message");
@@ -467,6 +472,6 @@ void setup(){
 
 void loop(){
     LL2.daemon(); // check in with routing daemon for incoming/outgoing packets
-    checkChatBuffer(); // check if any chat messages have been received
+    checkWSBuffer(); // check if any chat messages have been received
     console.interface();
 }

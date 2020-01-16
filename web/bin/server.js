@@ -97,6 +97,17 @@ function sendMsg(ws, msg, curID) {
   return send(ws, msg, curID);
 }
 
+function sendRte(ws, msg, curID) {
+
+  if(!Buffer.isBuffer(msg)) {
+    msg = Buffer.from(msg, 'utf8');
+  }
+
+  msg = Buffer.concat([Buffer.from('r|', 'utf8'), msg]);
+
+  return send(ws, msg, curID);
+}
+
 function sendACK(ws, msg) {
   var msgID = msg.slice(0, 2);
 
@@ -112,6 +123,9 @@ wsServer.on('connection', function(ws, req) {
   var sendTimer = setInterval(function() {
     console.log("sending message with ID:", curID);
     curID = sendMsg(ws, "<cookie_cat> hello apocalypse!", curID);
+    console.log("sending routes with ID:", curID);
+    var testRoutes = [0xd8, 0xa0, 0x1d, 0x69, 0xbd, 0x4c, 0x01, 0xFF, 0xd8, 0xa0, 0x1d, 0x69, 0xfc, 0x48, 0x01, 0xFF];
+    curID = sendRte(ws, testRoutes, curID);
 
   }, 5000);
 
