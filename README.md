@@ -23,6 +23,7 @@
     - [Building and uploading SPIFFS image](#building-and-uploading-SPIFFS-image)
 - [Testing Firmware](#testing-firmware) 
 - [Adding Libraries](#adding-libraries)
+- [Creating Binary for Release](#creating-binary-for-release)
 - [License](#license)
 
 # Getting Started
@@ -31,7 +32,7 @@ The quickest way to get started with disaster.radio is to,
 * Unzip the `disaster-radio-0.X.X.zip` file
 * Follow the included instructions for flashing it to your device
 
-If you would rather test the latest, cutting-edge developments, you can compile the firmware yourself by cloning this repo and following the [initial setup](#initial-setup) instructions.
+If you would rather test the latest, cutting-edge developments, you can compile the firmware yourself by cloning this repo and following the [initial setup](#initial-setup-with-platformio) instructions.
 
 # Layout and Flow
 The general layout and flow of hardware, firmware, and software can be seen below:
@@ -103,6 +104,7 @@ pio run -t upload -t uploadfs
 
 If you would prefer to use a makefile to build and flash the firmware, follow these instructions,
 
+```
 ./fetch_deps.sh esp8266 # download dependencies if using WeMos D1 with disaster radio hat
 cp settings.mk.example settings.mk # create initial personal settings file
 sudo pip install esptool
@@ -274,6 +276,19 @@ If you're including new libraries in the firmware, for PlatformIO, you wil need 
 If you're including new libraries in the firmware, for makeEspArduino, you wil need to add them to `LIBS =` in the correct `config.mk` file. 
 
 Make sure to also include the approprate commands for fetching the new libraries in `fetch_deps.sh`.
+
+# Creating Binary for Release
+
+A full binary image can be created by reading the flash contents of a ESP32 that is flashed with the latest release of the firmware.
+To do this, run the following command,
+```
+esptool.py -p /dev/ttyUSB0 -b 921600 read_flash 0 0x400000 esp_flash.bin
+```
+
+This can then be flashed to a new device like so,
+```
+esptool.py -p /dev/ttyUSB0 --baud 460800 write_flash 0x00000 esp_flash.bin
+```
 
 # License
 
