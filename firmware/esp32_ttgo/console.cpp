@@ -127,7 +127,7 @@ int consoleClass::interface(){
                 Serial.printf(" ___/ (_)__ ___ ____ / /____ ____      _______ ____/ (_)__ \r\n");
                 Serial.printf("/ _  / (_-</ _ `(_-</ __/ -_) __/ _   / __/ _ `/ _  / / _ \\\r\n");
                 Serial.printf("\\_,_/_/___/\\_,_/___/\\__/\\__/_/   (_) /_/  \\_,_/\\_,_/_/\\___/\r\n");
-                Serial.printf("v0.1.0\r\n");
+                Serial.printf("v0.1.1\r\n");
                 if(Layer1.loraInitialized()){
                     Serial.printf("LoRa tranceiver connected");
                 }else{
