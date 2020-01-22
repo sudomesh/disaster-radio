@@ -52,7 +52,7 @@ AsyncServer tcp_server(23);
 AsyncWebServer http_server(80);
 AsyncWebSocket ws_server("/ws");
 
-DisasterRadio radio;
+DisasterRadio *radio = new DisasterRadio();
 DisasterHistory *history = NULL;
 
 int internal_clients = 0;
@@ -220,7 +220,7 @@ void setupHistory()
     history = new HistoryMemory();
   }
 
-  radio.connect(new HistoryRecord(history));
+  radio->connect(new HistoryRecord(history));
 }
 
 class WelcomeMessage : public DisasterMiddleware
@@ -245,7 +245,7 @@ void setupSerial()
 {
   Serial.println("* Initializing serial...");
 
-  radio.connect(new WelcomeMessage())
+  radio->connect(new WelcomeMessage())
       ->connect(new HistoryReplay(history))
       ->connect(new Console())
       ->connect(new StreamClient(&Serial));
@@ -256,7 +256,7 @@ void setupTelnet()
   Serial.println("* Initializing telnet server...");
 
   TCPClient::startServer(&tcp_server, [](TCPClient *tcp_client) {
-    radio.connect(new WelcomeMessage())
+    radio->connect(new WelcomeMessage())
         ->connect(new HistoryReplay(history))
         ->connect(new Console())
         ->connect(tcp_client);
@@ -270,7 +270,7 @@ void setupWebSocket()
   http_server.addHandler(&ws_server);
 
   WebSocketClient::startServer(&ws_server, [](WebSocketClient *ws_client) {
-    radio.connect(new WelcomeMessage())
+    radio->connect(new WelcomeMessage())
         ->connect(new HistoryReplay(history))
         ->connect(ws_client);
   });
@@ -289,7 +289,7 @@ void setupLoRa()
     if (lora_client->init())
     {
       Serial.printf(" --> LoRa address: %s\n", macaddr);
-      radio.connect(lora_client);
+      radio->connect(lora_client);
       loraInitialized = true;
       return;
     }
@@ -365,7 +365,7 @@ void setupDisplay()
     display.flipScreenVertically();
     display.clear();
 
-    radio.connect(new OLEDClient(&display, 0, STATUS_BAR_HEIGHT + 1));
+    radio->connect(new OLEDClient(&display, 0, STATUS_BAR_HEIGHT + 1));
 
     drawStatusBar();
   }
@@ -382,7 +382,7 @@ void setupGPS()
 #ifdef GPS_SERIAL
   Serial.println("* Initializing GPS...");
   Serial1.begin(GPS_SERIAL);
-  radio.connect(new GPSClient(&Serial1));
+  radio->connect(new GPSClient(&Serial1));
 #endif
 }
 
@@ -405,16 +405,16 @@ void setup()
   setupDisplay();
   setupGPS();
 
-  internal_clients = radio.clients.size();
+  internal_clients = radio->clients.size();
 
-  radio.setup();
+  radio->setup();
 }
 
 void loop()
 {
-  radio.loop();
+  radio->loop();
 
-  int new_clients = radio.clients.size() - internal_clients;
+  int new_clients = radio->clients.size() - internal_clients;
   int new_routes = LL2.getRouteEntry();
   if (clients != new_clients || routes != new_routes)
   {
