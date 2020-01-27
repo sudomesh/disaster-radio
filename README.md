@@ -38,26 +38,26 @@ If you would rather test the latest, cutting-edge developments, you can compile 
 The Disaster Radio firmware is made up of a single "server" and a number of "clients", as well as "middleware" that sits between the clients and server. These are a"server" and "client" in the logical, software sense, not a literal, networking sense.
  
 Here are the modules currently implemented with descriptions of their purpose:
-* DisasterServer:
-** DisasterRadio: the main "server" that takes messages from clients and sends them to other clients
+- DisasterServer:  
+    - DisasterRadio: the main "server" that takes messages from clients and sends them to other clients
 
-* DisasterClient:
-** LoRaClient: interfaces with LoRaLayer2
-** WebSocketClient: WebSocket connections from the web app
-** StreamClient: for Arduino Stream, currently used for serial console
-** TCPClient: for a telnet-like server
-** HistoryRecord: records messages to SD card (or bounded queue in memory)
-** OLEDClient: displays messages on the screen (mostly for debugging purposes, but eventually I'd like to use this for a mobile Disaster Radio terminal of some kind)
-** GPSClient: proof-of-concept, interfaces with a serial GPS module to beacon your current location periodically
+- DisasterClient:  
+    - LoRaClient: interfaces with LoRaLayer2  
+    - WebSocketClient: WebSocket connections from the web app  
+    - StreamClient: for Arduino Stream, currently used for serial console  
+    - TCPClient: for a telnet-like server  
+    - HistoryRecord: records messages to SD card (or bounded queue in memory)  
+    - OLEDClient: displays messages on the screen (mostly for debugging purposes, but eventually I'd like to use this for a mobile Disaster Radio terminal of some kind)   
+    - GPSClient: proof-of-concept, interfaces with a serial GPS module to beacon your current location periodically  
 
-* DisasterMiddleware:
-** WelcomeMessage: (very simple, in main.cpp) shows a welcome message to clients when they connect
-** HistoryReplay: shows history to clients when they connect
-** Console: implements a simple console with chat (similar to the web app) plus some /commands (I went with a more IRC-like syntax but you could easily implement a getopt version)
-
-* DisasterHistory:
-** HistorySD records history to SD card
-** HistoryMemory records history to a bounded queue in memory (default limit 10 messages)
+- DisasterMiddleware:  
+    - WelcomeMessage: (very simple, in main.cpp) shows a welcome message to clients when they connect
+    - HistoryReplay: shows history to clients when they connect
+    - Console: implements a simple console with chat (similar to the web app) plus some /commands (I went with a more IRC-like syntax but you could easily implement a getopt version)
+    
+- DisasterHistory:
+    - HistorySD records history to SD card
+    - HistoryMemory records history to a bounded queue in memory (default limit 10 messages)
 
 
 # Hardware Connections  
