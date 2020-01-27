@@ -9,9 +9,12 @@ LIBS = ./libs/AsyncTCP \
 	./libs/arduino-LoRa \
 	./libs/LoRaLayer2 \
 	./libs/AsyncSDServer \
+	./libs/TinyGPSPlus \
+        ./libs/esp8266-oled-ssd1306 \
 	$(ESP_LIBS)/WiFi \
 	$(ESP_LIBS)/SPI \
 	$(ESP_LIBS)/SD \
 	$(ESP_LIBS)/ESPmDNS \
 	$(ESP_LIBS)/FS \
-	$(ESP_LIBS)/SPIFFS
+	$(ESP_LIBS)/SPIFFS \
+	$(ESP_LIBS)/Wire

@@ -105,7 +105,7 @@ void printAddress(uint8_t address[ADDR_LENGTH]);
 
 //int parseRoutingPacket(struct Packet packet, struct Metadata metadata);
 
-struct Packet packet_received(char* data, size_t len);
+struct Packet packetreceived(char* data, size_t len);
 
 long transmitHello(long interval, long lastTime);
 

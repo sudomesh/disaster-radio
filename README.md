@@ -35,8 +35,30 @@ The quickest way to get started with disaster.radio is to,
 If you would rather test the latest, cutting-edge developments, you can compile the firmware yourself by cloning this repo and following the [initial setup](#initial-setup-with-platformio) instructions.
 
 # Layout and Flow
-The general layout and flow of hardware, firmware, and software can be seen below:
-![alt text](https://raw.githubusercontent.com/sudomesh/disaster-radio/master/diagram.png "disaster flow")
+The Disaster Radio firmware is made up of a single "server" and a number of "clients", as well as "middleware" that sits between the clients and server. These are a"server" and "client" in the logical, software sense, not a literal, networking sense.
+ 
+Here are the modules currently implemented with descriptions of their purpose:
+* DisasterServer:
+** DisasterRadio: the main "server" that takes messages from clients and sends them to other clients
+
+* DisasterClient:
+** LoRaClient: interfaces with LoRaLayer2
+** WebSocketClient: WebSocket connections from the web app
+** StreamClient: for Arduino Stream, currently used for serial console
+** TCPClient: for a telnet-like server
+** HistoryRecord: records messages to SD card (or bounded queue in memory)
+** OLEDClient: displays messages on the screen (mostly for debugging purposes, but eventually I'd like to use this for a mobile Disaster Radio terminal of some kind)
+** GPSClient: proof-of-concept, interfaces with a serial GPS module to beacon your current location periodically
+
+* DisasterMiddleware:
+** WelcomeMessage: (very simple, in main.cpp) shows a welcome message to clients when they connect
+** HistoryReplay: shows history to clients when they connect
+** Console: implements a simple console with chat (similar to the web app) plus some /commands (I went with a more IRC-like syntax but you could easily implement a getopt version)
+
+* DisasterHistory:
+** HistorySD records history to SD card
+** HistoryMemory records history to a bounded queue in memory (default limit 10 messages)
+
 
 # Hardware Connections  
 
@@ -99,7 +121,13 @@ Then run:
 ```
 pio run -t upload -t uploadfs
 ```
+ 
+By default, PlatformIO builds and flashes firmware for the LILY's ESP32 TTGO V2 dev board. If you would like to build for another supported board, select the corresponding build environment. For example to build and flash the firmware and file system for the ESP32 TTG0 V1 board, use the following, 
 
+```
+pio run -e ttgo-lora32-v1 -t upload -t uploadfs
+
+```
 # Initial Setup with makeEspArduino 
 
 If you would prefer to use a makefile to build and flash the firmware, follow these instructions,
@@ -121,7 +149,7 @@ If you would only like to update the libraries, instead reinstalling the entire 
 ./fetch_deps.sh esp32 libs
 ``` 
 
-Edit `settings.mk` to suit your needs. If you are flashing a ESP32 LILY TTGO board then you will probably not have to edit anything in `settings.mk` but make sure `UPLOAD_PORT` is set to the correct device which may vary depending on your operating system and which other devices you have connected.
+Edit `settings.mk` to suit your needs. If you are flashing a ESP32 LILY TTGO V2 board then you will probably not have to edit anything in `settings.mk` but make sure `UPLOAD_PORT` is set to the correct device which may vary depending on your operating system and which other devices you have connected. If you are flashing a different dev board, choose the `BOARD` and `BUILD_EXTRA_FLAGS` definitions that match your board.
 
 ## Building firmware
 
@@ -235,7 +263,9 @@ If using an SD card model, copy the contents of `web/static/` to the root of a f
 # Testing Firmware  
 Once the firmware and SPIFFS image has been successfully flashed, you can test it by logging into the `disaster.radio <mac-address>` wireless network and navigating to http://192.168.4.1 in a browser to access the demo chat app.
 
-You can also perform some tests by logging into the disaster.radio's console interface. If flashed correctly, you should be able to log into the device using a serial tool, such as screen or minicom with a baud rate of 115200. You will be greeted by a banner that looks like this,
+Note: v0.1.2 and later have switched to IRC-like commands, so try typing `/join <nickname>` into your Serial console.
+
+You can also perform some tests by logging into the disaster.radio's console interface. If flashed correctly, you should be able to log into the device using a serial tool, such as screen or minicom or `pio device monitor` with a baud rate of 115200. You will be greeted by a banner that looks like this,
 ```
      ___              __                            ___    
  ___/ (_)__ ___ ____ / /____ ____      _______ ____/ (_)__ 

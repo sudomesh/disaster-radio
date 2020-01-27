@@ -576,7 +576,7 @@ void parseChatPacket(struct Packet packet){
     }
 }
     
-struct Packet packet_received(char* data, size_t len) {
+struct Packet packetreceived(char* data, size_t len) {
 
     data[len] = '\0';
 

@@ -81,4 +81,15 @@ cd ../
 git clone https://github.com/paidforby/AsyncSDServer
 cd AsyncSDServer/
 git checkout 13375c6be978cb34180378ecf4042a3a4a1f5eab
+cd ../
+
+git clone https://github.com/mikalhart/TinyGPSPlus
+cd TinyGPSPlus/
+git checkout v1.0.2b
+cd ../
+
+git clone https://github.com/ThingPulse/esp8266-oled-ssd1306
+cd esp8266-oled-ssd1306/
+git checkout 4.1.0
 cd ../../
+
