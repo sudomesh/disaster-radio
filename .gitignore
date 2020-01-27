@@ -14,3 +14,4 @@ makeEspArduino/
 
 .pio
 .vscode
+secrets.h

@@ -162,7 +162,7 @@ void onReceive(int packetSize) {
         incomingLength++;
     }
 
-    struct Packet packet = packet_received(incoming, incomingLength);
+    struct Packet packet = packetreceived(incoming, incomingLength);
 
     //storeMessage(incoming, incomingLength);
     

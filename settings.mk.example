@@ -16,6 +16,10 @@ FS_DIR = web/static/
 # for esp32 ttgo dev board use these settings
 CHIP=esp32
 BOARD=ttgo-lora32-v1
+BUILD_EXTRA_FLAGS='-DTTGO_LORA_V2'
+#'-DTTGO_LORA_V1'
+#'-DTTGO_TBEAM'
+
 
 # for portable (wemos d1 mini) use these settings:
 #BOARD = d1_mini
