@@ -37,10 +37,7 @@
 
 #define MDNS_NAME_PREFIX "disaster"
 #define HOST_NAME "disaster.radio"
-#define WIFI_AP_SSID_PREFIX "dstr "
-
-// #define WIFI_SSID "WIFI_SSID"
-// #define WIFI_PASSWORD "WIFI_PASSWORD"
+#define WIFI_AP_SSID_PREFIX "disaster.radio "
 
 #define INDEX_FILE "index.htm"
 
@@ -314,10 +311,10 @@ void drawStatusBar()
   display.setColor(BLACK);
   display.fillRect(0, 0, OLED_WIDTH, STATUS_BAR_HEIGHT);
 
-  // draw SSID
+  // draw MAC
   display.setColor(WHITE);
   display.setTextAlignment(TEXT_ALIGN_LEFT);
-  display.drawString(0, 0, ssid);
+  display.drawString(0, 0, macaddr);
 
   String clientsString = String(clients) + "," + routes;
   String ipString = ip.toString();

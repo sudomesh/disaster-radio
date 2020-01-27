@@ -35,7 +35,7 @@ void Console::processLine(String message)
         String command = args[0].substring(1);
         if (command == "help")
         {
-            client->receive("Commands: /help /join /nick /raw /restart\n");
+            client->receive("Commands: /help /join /nick /raw /lora /restart\n");
         }
         else if (command == "raw")
         {
@@ -69,7 +69,6 @@ void Console::processLine(String message)
     else if (username.length() > 0)
     {
 
-        Serial.printf("4:[%d][%s]\n", message.length(), message.c_str());
         server->transmit(this, String("c|") + "<" + username + "> " + message);
         client->receive(String("<") + username + ">" + " " + message + "\n");
     }
@@ -81,7 +80,6 @@ void Console::processLine(String message)
 
 void Console::transmit(DisasterClient *client, String message)
 {
-    Serial.printf("2:[%d][%s]\n", message.length(), message.c_str());
     client->receive(message);
 
     buffer.concat(message);
@@ -93,7 +91,6 @@ void Console::transmit(DisasterClient *client, String message)
         String line = buffer.charAt(index - 1) == '\r'
                           ? buffer.substring(0, index - 1)
                           : buffer.substring(0, index);
-        Serial.printf("3:[%d][%s]\n", line.length(), line.c_str());
         buffer = buffer.substring(index + 1);
         processLine(line);
     }
