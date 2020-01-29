@@ -49,3 +49,19 @@
 #define GPS_SERIAL 9600, SERIAL_8N1, GPIO_NUM_12, GPIO_NUM_15
 
 #endif
+
+#ifdef HELTEC
+#define LORA_IRQ DIO0
+#define LORA_IO1 DIO1
+#define LORA_IO2 DIO2
+#define LORA_SCK SCK
+#define LORA_MISO MISO
+#define LORA_MOSI MOSI
+#define LORA_RST RST_LoRa
+#define LORA_CS SS
+#define OLED_SDA SDA_OLED
+#define OLED_SCL SCL_OLED
+#define OLED_RST RST_OLED
+#define OLED_WIDTH 128
+#define OLED_HEIGHT 64
+#endif
