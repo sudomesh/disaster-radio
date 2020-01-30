@@ -1,7 +1,7 @@
 
 -include $(dir $(SKETCH))settings.mk
 
-SKETCH = ./firmware/esp32_ttgo/main.ino
+SKETCH = ./firmware/esp32/main.ino
 ESP_ROOT = ./arduino-esp32
 FS_DIR = ./web/static
 LIBS = ./libs/AsyncTCP \
