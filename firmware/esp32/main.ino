@@ -25,6 +25,9 @@
 #include "client/TCPClient.h"
 #include "client/WebSocketClient.h"
 #include "client/GPSClient.h"
+#ifdef USE_BLE
+#include "client/BLEClient.h"
+#endif
 // middleware
 #include "middleware/Console.h"
 #include "middleware/HistoryReplay.h"
@@ -48,6 +51,10 @@ SPIClass sd_card(HSPI);
 AsyncServer tcp_server(23);
 AsyncWebServer http_server(80);
 AsyncWebSocket ws_server("/ws");
+
+#ifdef USE_BLE
+BleDrClient drBleClient;
+#endif
 
 DisasterRadio *radio = new DisasterRadio();
 DisasterHistory *history = NULL;
@@ -383,21 +390,52 @@ void setupGPS()
 #endif
 }
 
+void setupBLE(void)
+{
+#ifdef USE_BLE
+  Serial.println("* Initializing BLE...");
+
+  uint64_t uniqueId = ESP.getEfuseMac();
+
+  sprintf(macaddr, "%02x%02x%02x%02x%02x%02x",
+          (uint8_t)(uniqueId), (uint8_t)(uniqueId >> 8), (uint8_t)(uniqueId >> 16),
+          (uint8_t)(uniqueId >> 24), (uint8_t)(uniqueId >> 32), (uint8_t)(uniqueId >> 40));
+  /// \todo without callbacks. Welcome & History not working
+  drBleClient.init();
+  radio->connect(&drBleClient);
+
+  /// \todo Callback. Not working, as even BLE server is ready, there is no client yet
+  // BleDrClient::startServer([](BleDrClient *drBleClient) {
+  // 	radio->connect(new WelcomeMessage())
+  // 		->connect(new HistoryReplay(history))
+  // 		->connect(drBleClient);
+  // });
+#endif
+}
+
 void setup()
 {
   Serial.begin(115200);
   delay(200);
 
+#ifndef USE_BLE
   setupWiFi();
   setupMDNS();
+#endif
   setupSD();
   setupSPIFFS();
+#ifndef USE_BLE
   setupHTTPSever();
+#endif
 
   setupHistory();
   setupSerial();
+#ifndef USE_BLE
   setupTelnet();
   setupWebSocket();
+#else
+  setupBLE();
+#endif
   setupLoRa();
   setupDisplay();
   setupGPS();
