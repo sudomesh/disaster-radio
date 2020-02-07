@@ -232,6 +232,11 @@ class WelcomeMessage : public DisasterMiddleware
 public:
   void setup()
   {
+    if (client == NULL)
+    {
+      client = &drBleClient;
+      Serial.println("No client!!!!!!!!!!!!");
+    }
     client->receive(String("c|Welcome to DISASTER RADIO"));
     if (!sdInitialized)
     {
@@ -400,16 +405,13 @@ void setupBLE(void)
   sprintf(macaddr, "%02x%02x%02x%02x%02x%02x",
           (uint8_t)(uniqueId), (uint8_t)(uniqueId >> 8), (uint8_t)(uniqueId >> 16),
           (uint8_t)(uniqueId >> 24), (uint8_t)(uniqueId >> 32), (uint8_t)(uniqueId >> 40));
-  /// \todo without callbacks. Welcome & History not working
-  drBleClient.init();
-  radio->connect(&drBleClient);
 
   /// \todo Callback. Not working, as even BLE server is ready, there is no client yet
-  // BleDrClient::startServer([](BleDrClient *drBleClient) {
-  // 	radio->connect(new WelcomeMessage())
-  // 		->connect(new HistoryReplay(history))
-  // 		->connect(drBleClient);
-  // });
+  drBleClient.startServer([](BleDrClient *drBleClient) {
+  	radio->connect(new WelcomeMessage())
+  		->connect(new HistoryReplay(history))
+  		->connect(drBleClient);
+  });
 #endif
 }
 

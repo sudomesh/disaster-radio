@@ -12,6 +12,8 @@
 BLECharacteristic *pCharacteristicUartTX;
 /** Characteristic for BLE-UART RX */
 BLECharacteristic *pCharacteristicUartRX;
+/** Descriptor for the BLE-UART TX characteristic */
+BLEDescriptor *txDescriptor;
 /** BLE Advertiser */
 BLEAdvertising *pAdvertising;
 /** BLE Service for WiFi*/
@@ -24,6 +26,9 @@ BLEServer *pServer;
 /** Flag if device is connected */
 bool deviceConnected = false;
 
+/** Flag if we already registered on the server */
+bool connectedToServer = false;
+
 /** Unique device name */
 char apName[] = "DR-xxxxxxxxxxxx";
 
@@ -34,7 +39,6 @@ bool dataRcvd = false;
 
 extern BleDrClient drBleClient;
 void (*connectCallback)(BleDrClient *);
-void (*readyCallback)(BleDrClient *);
 
 void BleDrClient::receive(String message)
 {
@@ -105,14 +109,6 @@ class MyServerCallbacks : public BLEServerCallbacks
     Serial.println("BLE client connected");
     pServer->updatePeerMTU(pServer->getConnId(), 260);
     deviceConnected = true;
-    /// \todo callbacks are not working, History will crash
-    if (connectCallback)
-    {
-      /// \todo Search for characteristic callback after client enabled notifications
-      // Give some time until Android enabled notifications
-      delay(1000);
-      connectCallback(&drBleClient);
-    }
   };
 
   void onDisconnect(BLEServer *pServer)
@@ -144,47 +140,38 @@ class UartTxCbHandler : public BLECharacteristicCallbacks
   };
 };
 
+class DescriptorCallbacks : public BLEDescriptorCallbacks
+{
+  void onWrite(BLEDescriptor *pDescriptor)
+  {
+    uint8_t *descrValue;
+    descrValue = pDescriptor->getValue();
+    if (descrValue[0] & (1 << 0))
+    {
+      Serial.println("Notifications enabled");
+      if (connectCallback)
+      {
+        if (!connectedToServer)
+        {
+          connectCallback(&drBleClient);
+          connectedToServer = true;
+        }
+        else
+        {
+          if (history)
+          {
+            history->replay(&drBleClient);
+          }
+        }
+      }
+    }
+  };
+};
+
 bool oldStatus = false;
 
 void BleDrClient::loop(void)
 {
-  if (deviceConnected && (oldStatus != deviceConnected))
-  {
-    Serial.println("Connection established");
-    oldStatus = deviceConnected;
-
-    /// \todo get WelcomeMessage class and HistoryReplay class to work in callbacks !
-    if (readyCallback)
-    {
-      delay(1000);
-
-      readyCallback(&drBleClient);
-    }
-    else
-    {
-      /// \todo Search for characteristic callback after client enabled notifications
-      // Give some time until Android enabled notifications
-      delay(1000);
-
-      receive(String("c|Welcome to DISASTER RADIO"));
-      if (!sdInitialized)
-      {
-        receive(String("c|WARNING: SD card not found, functionality may be limited"));
-      }
-      if (!loraInitialized)
-      {
-        receive(String("c|WARNING: LoRa radio not found, functionality may be limited"));
-      }
-
-      radio->connect(new HistoryReplay(history));
-    }
-  }
-  if (!deviceConnected && (oldStatus != deviceConnected))
-  {
-    Serial.println("Disconnected");
-    oldStatus = deviceConnected;
-  }
-
   if (dataRcvd)
   {
     handleData(rxData, rxLen);
@@ -242,6 +229,14 @@ void BleDrClient::init()
       BLECharacteristic::PROPERTY_WRITE);
 
   pCharacteristicUartRX->setCallbacks(new UartTxCbHandler());
+
+  // Register callback for notification enabled
+  txDescriptor = pCharacteristicUartTX->getDescriptorByUUID("2902");
+  if (txDescriptor != NULL)
+  {
+    Serial.println("Got descriptor for TX as 2902");
+    txDescriptor->setCallbacks(new DescriptorCallbacks());
+  }
 
   // Start the service
   uartService->start();
