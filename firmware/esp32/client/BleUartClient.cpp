@@ -1,5 +1,5 @@
 #ifdef USE_BLE
-#include "BLEClient.h"
+#include "BleUartClient.h"
 
 /** Service UUID for Uart */
 #define UART_UUID "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
@@ -37,15 +37,15 @@ uint8_t rxData[512] = {0};
 size_t rxLen = 0;
 bool dataRcvd = false;
 
-extern BleDrClient drBleClient;
-void (*connectCallback)(BleDrClient *);
+extern BleUartClient ble_client;
+void (*connectCallback)(BleUartClient *);
 
-void BleDrClient::receive(String message)
+void BleUartClient::receive(String message)
 {
   if (deviceConnected)
   {
     // /// \todo for debug only
-    // Serial.printf("BLE: sending %s\n", message.c_str());
+    // Serial.printf("BLE: sending %s with len %d\n", message.c_str(), message.length());
     // /// \todo end of for debug only
 
     // TODO: msg id? defaulting to 0 for now
@@ -72,13 +72,13 @@ void BleDrClient::receive(String message)
   }
 }
 
-void BleDrClient::handleData(void *data, size_t len)
+void BleUartClient::handleData(void *data, size_t len)
 {
   uint16_t msg_id;
   char msg[len - 2 + 1] = {'\0'};
 
   // /// \todo for debug only
-  // char debug[len - 2 + 1] = {'\0'};
+  // char debug[len] = {'\0'};
   // memcpy(debug, data, len);
   // Serial.println("BLE: Received raw data");
   // for (int idx = 0; idx < len; idx++)
@@ -93,7 +93,7 @@ void BleDrClient::handleData(void *data, size_t len)
   memcpy(msg, data + 2, rxLen - 2);
 
   // /// \todo for debug only
-  // Serial.printf("BLE: received %s from %04X\n", msg, msg_id);
+  // Serial.printf("BLE: received %s len %d\n", msg, len - 2 + 1);
   // /// \todo end of for debug only
 
   server->transmit(this, String(msg));
@@ -134,7 +134,7 @@ class UartTxCbHandler : public BLECharacteristicCallbacks
     {
       strncpy((char *)rxData, rxValue.c_str(), 512);
 
-      Serial.printf("UART callback received %s\n", (char *)rxData);
+      Serial.printf("UART write callback received %s\n", (char *)rxData);
       dataRcvd = true;
     }
   };
@@ -153,14 +153,14 @@ class DescriptorCallbacks : public BLEDescriptorCallbacks
       {
         if (!connectedToServer)
         {
-          connectCallback(&drBleClient);
+          connectCallback(&ble_client);
           connectedToServer = true;
         }
         else
         {
           if (history)
           {
-            history->replay(&drBleClient);
+            history->replay(&ble_client);
           }
         }
       }
@@ -170,7 +170,7 @@ class DescriptorCallbacks : public BLEDescriptorCallbacks
 
 bool oldStatus = false;
 
-void BleDrClient::loop(void)
+void BleUartClient::loop(void)
 {
   if (dataRcvd)
   {
@@ -179,21 +179,21 @@ void BleDrClient::loop(void)
   }
 }
 
-void BleDrClient::startServer(void (*callback)(BleDrClient *))
+void BleUartClient::startServer(void (*callback)(BleUartClient *))
 {
   connectCallback = callback;
 
   init();
 }
 
-void BleDrClient::init()
+void BleUartClient::init()
 {
   uint64_t uniqueId = ESP.getEfuseMac();
   // Using ESP32 MAC (48 bytes only, so upper 2 bytes will be 0)
   sprintf(apName, "DR-%02X%02X%02X%02X%02X%02X",
-      (uint8_t)(uniqueId), (uint8_t)(uniqueId >> 8),
-      (uint8_t)(uniqueId >> 16), (uint8_t)(uniqueId >> 24),
-      (uint8_t)(uniqueId >> 32), (uint8_t)(uniqueId >> 40));
+          (uint8_t)(uniqueId), (uint8_t)(uniqueId >> 8),
+          (uint8_t)(uniqueId >> 16), (uint8_t)(uniqueId >> 24),
+          (uint8_t)(uniqueId >> 32), (uint8_t)(uniqueId >> 40));
   Serial.printf("Device name: %s\n", apName);
 
   // Initialize BLE and set output power
@@ -216,12 +216,13 @@ void BleDrClient::init()
 
   // Create a BLE Characteristic
   pCharacteristicUartTX = uartService->createCharacteristic(
-    TX_UUID,
-    BLECharacteristic::PROPERTY_NOTIFY |
-      BLECharacteristic::PROPERTY_READ);
+      TX_UUID,
+      BLECharacteristic::PROPERTY_NOTIFY |
+          BLECharacteristic::PROPERTY_READ);
 
   pCharacteristicUartTX->addDescriptor(new BLE2902());
 
+  // Register callback for notification enabled
   pCharacteristicUartTX->setNotifyProperty(true);
 
   pCharacteristicUartRX = uartService->createCharacteristic(
@@ -230,7 +231,6 @@ void BleDrClient::init()
 
   pCharacteristicUartRX->setCallbacks(new UartTxCbHandler());
 
-  // Register callback for notification enabled
   txDescriptor = pCharacteristicUartTX->getDescriptorByUUID("2902");
   if (txDescriptor != NULL)
   {

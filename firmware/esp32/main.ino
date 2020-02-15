@@ -26,7 +26,7 @@
 #include "client/WebSocketClient.h"
 #include "client/GPSClient.h"
 #ifdef USE_BLE
-#include "client/BLEClient.h"
+#include "client/BleUartClient.h"
 #endif
 // middleware
 #include "middleware/Console.h"
@@ -53,7 +53,7 @@ AsyncWebServer http_server(80);
 AsyncWebSocket ws_server("/ws");
 
 #ifdef USE_BLE
-BleDrClient drBleClient;
+BleUartClient ble_client;
 #endif
 
 DisasterRadio *radio = new DisasterRadio();
@@ -234,7 +234,7 @@ public:
   {
     if (client == NULL)
     {
-      client = &drBleClient;
+      client = &ble_client;
       Serial.println("No client!!!!!!!!!!!!");
     }
     client->receive(String("c|Welcome to DISASTER RADIO"));
@@ -407,10 +407,10 @@ void setupBLE(void)
           (uint8_t)(uniqueId >> 24), (uint8_t)(uniqueId >> 32), (uint8_t)(uniqueId >> 40));
 
   /// \todo Callback. Not working, as even BLE server is ready, there is no client yet
-  drBleClient.startServer([](BleDrClient *drBleClient) {
+  ble_client.startServer([](BleUartClient *ble_client) {
   	radio->connect(new WelcomeMessage())
   		->connect(new HistoryReplay(history))
-  		->connect(drBleClient);
+  		->connect(ble_client);
   });
 #endif
 }

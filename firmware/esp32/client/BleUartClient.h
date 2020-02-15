@@ -22,9 +22,9 @@ extern bool spiffsInitialized;
 extern bool displayInitialized;
 extern bool loraInitialized;
 
-class BleDrClient : public DisasterClient
+class BleUartClient : public DisasterClient
 {
-  BleDrClient *client;
+  BleUartClient *client;
 
 public:
   String buffer = "";
@@ -33,9 +33,8 @@ public:
 
   void handleData(void *data, size_t len);
   void loop();
-  void init();
-  /// \todo Callback. Not working, as even BLE server is ready, there is no client yet
-  void startServer(void (*callback)(BleDrClient *));
+  static void init();
+  static void startServer(void (*callback)(BleUartClient *));
 };
 
 #endif
