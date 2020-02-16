@@ -27,7 +27,7 @@
 - [License](#license)
 
 # Getting Started
-The quickest way to get started with disaster.radio is to,
+The quickest way to get started with disaster.radio is to, buy a [preinstalled device](https://www.aliexpress.com/item/4000396836096.html) or
 * Download the [latest release](https://github.com/sudomesh/disaster-radio/releases)
 * Unzip the `disaster-radio-0.X.X.zip` file
 * Follow the included instructions for flashing it to your device
