@@ -25,6 +25,9 @@
 #include "client/TCPClient.h"
 #include "client/WebSocketClient.h"
 #include "client/GPSClient.h"
+#ifdef USE_BLE
+#include "client/BleUartClient.h"
+#endif
 // middleware
 #include "middleware/Console.h"
 #include "middleware/HistoryReplay.h"
@@ -48,6 +51,10 @@ SPIClass sd_card(HSPI);
 AsyncServer tcp_server(23);
 AsyncWebServer http_server(80);
 AsyncWebSocket ws_server("/ws");
+
+#ifdef USE_BLE
+BleUartClient ble_client;
+#endif
 
 DisasterRadio *radio = new DisasterRadio();
 DisasterHistory *history = NULL;
@@ -225,6 +232,13 @@ class WelcomeMessage : public DisasterMiddleware
 public:
   void setup()
   {
+    #ifdef USE_BLE
+    if (client == NULL)
+    {
+      client = &ble_client;
+      Serial.println("No client!!!!!!!!!!!!");
+    }
+    #endif
     client->receive(String("c|Welcome to DISASTER RADIO"));
     if (!sdInitialized)
     {
@@ -383,6 +397,26 @@ void setupGPS()
 #endif
 }
 
+void setupBLE(void)
+{
+#ifdef USE_BLE
+  Serial.println("* Initializing BLE...");
+
+  uint64_t uniqueId = ESP.getEfuseMac();
+
+  sprintf(macaddr, "%02x%02x%02x%02x%02x%02x",
+          (uint8_t)(uniqueId), (uint8_t)(uniqueId >> 8), (uint8_t)(uniqueId >> 16),
+          (uint8_t)(uniqueId >> 24), (uint8_t)(uniqueId >> 32), (uint8_t)(uniqueId >> 40));
+
+  /// \todo Callback. Not working, as even BLE server is ready, there is no client yet
+  ble_client.startServer([](BleUartClient *ble_client) {
+  	radio->connect(new WelcomeMessage())
+  		->connect(new HistoryReplay(history))
+  		->connect(ble_client);
+  });
+#endif
+}
+
 void setup()
 {
   Serial.begin(115200);
@@ -391,16 +425,24 @@ void setup()
   setCpuFrequencyMhz(CLOCK_SPEED); //Set CPU clock in config.h
   getCpuFrequencyMhz(); //Get CPU clock
 
+#ifndef USE_BLE
   setupWiFi();
   setupMDNS();
+#endif
   setupSD();
   setupSPIFFS();
+#ifndef USE_BLE
   setupHTTPSever();
+#endif
 
   setupHistory();
   setupSerial();
+#ifndef USE_BLE
   setupTelnet();
   setupWebSocket();
+#else
+  setupBLE();
+#endif
   setupLoRa();
   setupDisplay();
   setupGPS();
