@@ -387,6 +387,9 @@ void setup()
 {
   Serial.begin(115200);
   delay(200);
+  
+  setCpuFrequencyMhz(80); //Set CPU clock to 80MHz fo example
+  getCpuFrequencyMhz(); //Get CPU clock
 
   setupWiFi();
   setupMDNS();
