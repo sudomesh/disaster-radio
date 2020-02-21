@@ -232,11 +232,13 @@ class WelcomeMessage : public DisasterMiddleware
 public:
   void setup()
   {
+    #ifdef USE_BLE
     if (client == NULL)
     {
       client = &ble_client;
       Serial.println("No client!!!!!!!!!!!!");
     }
+    #endif
     client->receive(String("c|Welcome to DISASTER RADIO"));
     if (!sdInitialized)
     {
