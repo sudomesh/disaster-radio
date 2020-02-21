@@ -1,8 +1,12 @@
+#ifndef CONFIG_H
+#define CONFIG_H
 
 // secrets in a separate file so we don't accidentally commit credentials
 #if __has_include("secrets.h")
 #include "secrets.h"
 #endif
+
+#define CLOCK_SPEED 240
 
 #ifdef TTGO_LORA_V1
 #define LORA_SCK 5
@@ -64,4 +68,6 @@
 #define OLED_RST RST_OLED
 #define OLED_WIDTH 128
 #define OLED_HEIGHT 64
+#endif
+
 #endif
