@@ -387,6 +387,9 @@ void setup()
 {
   Serial.begin(115200);
   delay(200);
+  
+  setCpuFrequencyMhz(CLOCK_SPEED); //Set CPU clock in config.h
+  getCpuFrequencyMhz(); //Get CPU clock
 
   setupWiFi();
   setupMDNS();
