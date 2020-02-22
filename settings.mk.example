@@ -18,6 +18,7 @@ CHIP=esp32
 BOARD=ttgo-lora32-v1
 #BOARD=heltec_wifi_lora_32_V2
 BUILD_EXTRA_FLAGS='-DTTGO_LORA_V2'
+#'-DUSE_BLE'
 #'-DTTGO_LORA_V1'
 #'-DTTGO_TBEAM'
 #'-DHELTEC'

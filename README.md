@@ -4,6 +4,8 @@
 * [web/](./web) is the demo chat app served up by the disaster-radio
 * [hardware/](./hardware) is the kicad board layout and schematic
 * [enclosure/](./enclosure) are 3D models of the enclosure(s)
+* [android app](https://github.com/beegee-tokyo/disaster-radio-android) source code for [DisasterRadio BLE Chatbox](https://play.google.com/store/apps/details?id=tk.giesecke.disaster_radio&hl=en_US) Android Application
+* [mapping web app](https://github.com/sudomesh/disaster-radio-map) source code for mapping web-based appilcation
 
 ## Table of contents
 - [Getting Started](#getting-started)
@@ -27,7 +29,7 @@
 - [License](#license)
 
 # Getting Started
-The quickest way to get started with disaster.radio is to, buy a <a href="https://www.aliexpress.com/item/4000396836096.html" target="_blank">preinstalled device</a> or
+The quickest way to get started with disaster.radio is to buy a <a href="https://www.aliexpress.com/item/4000396836096.html" target="_blank">preinstalled device</a> or
 * Download the [latest release](https://github.com/sudomesh/disaster-radio/releases)
 * Unzip the `disaster-radio-0.X.X.zip` file
 * Follow the included instructions for flashing it to your device
@@ -62,6 +64,8 @@ Here are the modules currently implemented with descriptions of their purpose:
 
 # Hardware Connections  
 
+For supported development boards see the [Devices & Hardware](https://github.com/sudomesh/disaster-radio/wiki/Devices--&-Hardware) wiki page.
+
 NodeMCU/ESP8266 | ESP32 | LoRa Transceiver | SD Card |
 ----------------|-------|--------|---------|
 D1/GPIO5/OUT | GPIO23  |RESET | _NC_ 
@@ -82,12 +86,10 @@ The disaster.radio firmware opens up a websocket using [the ESPAsyncWebServer li
 where,
 * `<msgID>` is a two-byte binary unsigned integer representing an abitrary sequence number, this is sent back to the websocket client with an `!` appended to act as an acknowledgment and could be used for error-checking,  
 * `<msgType>` is a single binary utf8 encoded character representing the application for which the message is intended, such 'c' for chat, 'm' for maps, or 'e' for events  
-* `<msg>` is a binary utf8 encoded string of characters limited to 252 bytes, this can be treated as the body of the message and may be used to handle client-side concerns, such as intended recipient or requested map tile.    
+* `<msg>` is a binary utf8 encoded string of characters limited to 236 bytes, this can be treated as the body of the message and may be used to handle client-side concerns, such as intended recipient or requested map tile.    
 
 An example messge may appear as follows,
 `0100c|<noffle>@juul did you feel that earthquake!`
-or
-`0400m|<juul>{request:{tile:[[2.115, -59.28],[2.345,-59.05]]}`
 
 An example chat app can be found in the [web directory](https://github.com/sudomesh/disaster-radio/tree/master/web).
 
@@ -263,9 +265,9 @@ If using an SD card model, copy the contents of `web/static/` to the root of a f
 # Testing Firmware  
 Once the firmware and SPIFFS image has been successfully flashed, you can test it by logging into the `disaster.radio <mac-address>` wireless network and navigating to http://192.168.4.1 in a browser to access the demo chat app.
 
-Note: v0.1.2 and later have switched to IRC-like commands, so try typing `/join <nickname>` into your Serial console.
+Note: v0.2.0 and later have switched to IRC-like commands, so try typing `/join <nickname>` into your Serial console.
 
-You can also perform some tests by logging into the disaster.radio's console interface. If flashed correctly, you should be able to log into the device using a serial tool, such as screen or minicom or `pio device monitor` with a baud rate of 115200. You will be greeted by a banner that looks like this,
+On v0.1.1 and earlier, you can also perform some tests by logging into the disaster.radio's console interface. If flashed correctly, you should be able to log into the device using a serial tool, such as screen or minicom or `pio device monitor` with a baud rate of 115200. You will be greeted by a banner that looks like this,
 ```
      ___              __                            ___    
  ___/ (_)__ ___ ____ / /____ ____      _______ ____/ (_)__ 
