@@ -17,7 +17,7 @@ public:
         : sd{s} {};
 
     bool init();
-    void record(String message);
+    void record(struct Datagram datagram, size_t len);
     void replay(DisasterClient *client);
 };
 

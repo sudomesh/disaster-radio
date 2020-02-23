@@ -29,7 +29,7 @@ class BleUartClient : public DisasterClient
 public:
   String buffer = "";
 
-  void receive(String message);
+  void receive(struct Datagram datagram, size_t len);
 
   void handleData(void *data, size_t len);
   void loop();

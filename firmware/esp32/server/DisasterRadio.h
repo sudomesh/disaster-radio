@@ -26,7 +26,7 @@ public:
     void setup();
     void loop();
 
-    void transmit(DisasterClient *client, String message);
+    void transmit(DisasterClient *client, struct Datagram datagram, size_t len);
 };
 
 #endif

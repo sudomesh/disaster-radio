@@ -1,9 +1,9 @@
 #include "HistoryRecord.h"
 
-void HistoryRecord::receive(String message)
+void HistoryRecord::receive(struct Datagram datagram, size_t len)
 {
     if (history)
     {
-        history->record(message);
+        history->record(datagram, len);
     }
 }

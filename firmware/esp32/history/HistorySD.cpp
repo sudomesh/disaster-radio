@@ -19,8 +19,9 @@ bool HistorySD::init()
     }
 }
 
-void HistorySD::record(String message)
+void HistorySD::record(struct Datagram datagram, size_t len)
 {
+    /*
     File log = SD.open(log_path, FILE_APPEND);
     if (log)
     {
@@ -28,6 +29,7 @@ void HistorySD::record(String message)
         log.write('\n');
         log.close();
     }
+*/
 }
 
 #define MAX_HISTORY 10
@@ -35,6 +37,7 @@ void HistorySD::record(String message)
 
 void HistorySD::replay(DisasterClient *client)
 {
+    /*
     File log = SD.open(log_path, FILE_READ);
     if (log)
     {
@@ -48,4 +51,5 @@ void HistorySD::replay(DisasterClient *client)
         }
         log.close();
     }
+    */
 }

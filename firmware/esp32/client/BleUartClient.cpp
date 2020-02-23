@@ -40,7 +40,7 @@ bool dataRcvd = false;
 extern BleUartClient ble_client;
 void (*connectCallback)(BleUartClient *);
 
-void BleUartClient::receive(String message)
+void BleUartClient::receive(struct Datagram datagram, size_t len)
 {
   if (deviceConnected)
   {
@@ -51,9 +51,10 @@ void BleUartClient::receive(String message)
     // TODO: msg id? defaulting to 0 for now
     uint16_t msg_id = 0x2020;
 
-    unsigned char buf[2 + message.length() + 2] = {'\0'};
+    unsigned char buf[2 + len-DATAGRAM_HEADER + 2] = {'\0'};
     memcpy(buf, &msg_id, 2);
-    message.getBytes(buf + 2, message.length() + 1);
+    //message.getBytes(buf + 2, message.length() + 1);
+    memcpy(buf+2, &datagram.message, len-DATAGRAM_HEADER);
 
     // /// \todo for debug only
     // Serial.println("BLE: Sending raw data");
@@ -64,7 +65,7 @@ void BleUartClient::receive(String message)
     // Serial.println("");
     // /// \todo end of for debug only
 
-    pCharacteristicUartTX->setValue(buf, 2 + message.length() + 2);
+    pCharacteristicUartTX->setValue(buf, 2 + len-DATAGRAM_HEADER + 2);
     pCharacteristicUartTX->notify();
 
     // Give BLE time to get the data out
@@ -74,8 +75,8 @@ void BleUartClient::receive(String message)
 
 void BleUartClient::handleData(void *data, size_t len)
 {
-  uint16_t msg_id;
-  char msg[len - 2 + 1] = {'\0'};
+  //uint16_t msg_id;
+  //char msg[len - 2 + 1] = {'\0'};
 
   // /// \todo for debug only
   // char debug[len] = {'\0'};
@@ -89,14 +90,19 @@ void BleUartClient::handleData(void *data, size_t len)
   // /// \todo end of for debug only
 
   // parse out message and message id
-  memcpy(&msg_id, data, 2);
-  memcpy(msg, data + 2, rxLen - 2);
+  //memcpy(&msg_id, data, 2);
+  //memcpy(msg, data + 2, rxLen - 2);
+
+  struct Datagram datagram = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+  datagram.type = 'c';
+  memcpy(&datagram.message, data, len);
+  len = len+DATAGRAM_HEADER;
 
   // /// \todo for debug only
   // Serial.printf("BLE: received %s len %d\n", msg, len - 2 + 1);
   // /// \todo end of for debug only
 
-  server->transmit(this, String(msg));
+  server->transmit(this, datagram, len);
 }
 
 /**

@@ -12,7 +12,17 @@ void GPSClient::loop()
     {
         if (gps.location.isValid() && gps.location.age() < beacon_period)
         {
-            server->transmit(this, String("c|<" + username + "> ") + gps.location.lat() + ", " + gps.location.lng());
+            String message = String("c|<" + username + "> ") + gps.location.lat() + ", " + gps.location.lng();
+
+            size_t len = message.length();
+            uint8_t* data; 
+            message.getBytes(data, len);
+            struct Datagram datagram = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+            datagram.type = 'c';
+            memcpy(datagram.message, data, len);
+            len = len+DATAGRAM_HEADER;
+
+            server->transmit(this, datagram, len);
             beacon_last = millis();
         }
     }

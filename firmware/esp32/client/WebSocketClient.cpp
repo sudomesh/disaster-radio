@@ -2,14 +2,10 @@
 
 #include <unordered_map>
 
-void WebSocketClient::receive(String message)
+void WebSocketClient::receive(struct Datagram datagram, size_t len)
 {
-    // TODO: msg id? defaulting to 0 for now
-    uint16_t msg_id = 0;
-
-    unsigned char buf[2 + message.length() + 2] = {'\0'};
-    memcpy(buf, &msg_id, 2);
-    message.getBytes(buf + 2, message.length() + 1);
+    unsigned char buf[len-7]; //= {'\0'};
+    memcpy(buf, &datagram.message, sizeof(buf));
 
     client->binary(buf, sizeof(buf));
 }
@@ -26,20 +22,19 @@ void WebSocketClient::handleError(uint16_t code, const char *message)
 
 void WebSocketClient::handleData(void *data, size_t len)
 {
-    uint16_t msg_id;
-    char msg[len - 2 + 1] = {'\0'};
+    // assume this is a broadcast message for now 
+    struct Datagram datagram = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+    datagram.type = 'c';
+    memcpy(&datagram.message, data, len);
+    len = len+DATAGRAM_HEADER;
 
-    // parse out message and message id
-    memcpy(&msg_id, data, 2);
-    memcpy(msg, data + 2, len - 2);
-
-    // ACK
+    //TODO  work on ACK
     char msg_id_buf[3];
     memcpy(&msg_id_buf, data, 2);
     msg_id_buf[2] = '!';
     client->binary(msg_id_buf, 3);
 
-    server->transmit(this, String(msg));
+    server->transmit(this, datagram, len);
 }
 
 std::unordered_map<uint32_t, WebSocketClient *> client_map;

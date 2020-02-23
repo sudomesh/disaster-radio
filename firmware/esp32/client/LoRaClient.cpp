@@ -10,31 +10,25 @@ bool LoRaClient::init()
 void LoRaClient::loop()
 {
     LL2.daemon();
-    struct Packet packet = LL2.popFromWSBuffer();
-    size_t len = packet.totalLength - HEADER_LENGTH;
-    if (packet.totalLength > HEADER_LENGTH && len > 0)
+    struct Packet packet = LL2.popFromL3OutBuffer();
+    if (packet.totalLength > HEADER_LENGTH)
     {
-        uint16_t msg_id;
-        char msg[len - 2 + 1] = {'\0'};
-
-        // parse out message and message id
-        memcpy(&msg_id, packet.data, 2);
-        memcpy(msg, packet.data + 2, len - 2);
-
-        server->transmit(this, String(msg));
+        struct Datagram datagram;
+        size_t len = packet.totalLength - HEADER_LENGTH;
+        // parse out datagram
+        memcpy(&datagram, packet.data, len);
+        //memcpy(datagram.message, packet.data + DATAGRAM_HEADER, len - DATAGRAM_HEADER);
+        server->transmit(this, datagram, len);
     }
 }
 
-void LoRaClient::receive(String message)
+void LoRaClient::receive(struct Datagram datagram, size_t len)
 {
-    // TODO: msg id? defaulting to 0 for now
-    uint16_t msg_id = 0;
+    unsigned char buf[len]; // = {'\0'};
+    memcpy(buf, &datagram, sizeof(buf));
 
-    unsigned char buf[2 + message.length() + 1] = {'\0'};
-    memcpy(buf, &msg_id, 2);
-    message.getBytes(buf + 2, message.length() + 1);
+    //memcpy(buf, &datagram, DATAGRAM_HEADER);
+    //memcpy(datagram.message, packet.data + DATAGRAM_HEADER, len - DATAGRAM_HEADER);
 
-    uint8_t destination[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-    uint8_t msg_type = 'c';
-    LL2.sendToLayer2(destination, msg_type, buf, sizeof(buf));
+    LL2.sendToLayer2(buf, sizeof(buf));
 }

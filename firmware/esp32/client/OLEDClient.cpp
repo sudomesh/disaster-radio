@@ -25,8 +25,13 @@ void OLEDClient::loop()
   }
 }
 
-void OLEDClient::receive(String message)
+void OLEDClient::receive(struct Datagram datagram, size_t len)
 {
+  
+  String message;
+  for(size_t i=0; i < len-DATAGRAM_HEADER; i++) {
+    message += (char) datagram.message[i];
+  }
   if (message.substring(0, 2) == "c|")
   {
     uint16_t maxLines = (height - top) / LINE_HEIGHT;

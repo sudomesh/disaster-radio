@@ -14,7 +14,7 @@ public:
     WebSocketClient(AsyncWebSocketClient *c)
         : client{c} {};
 
-    void receive(String message);
+    void receive(struct Datagram datagram, size_t len);
 
     // bool interactive() { return true; };
 

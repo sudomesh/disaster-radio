@@ -14,11 +14,12 @@ void Console::setup()
     {
         history->replay(this);
     }
-    client->receive(String(START_MESSAGE) + "\n");
+    //client->receive(String(START_MESSAGE) + "\n");
 }
 
-void Console::processLine(String message)
+void Console::processLine(char *message, size_t len)
 {
+    /*
     if (message.charAt(0) == '/')
     {
         std::vector<String> args;
@@ -76,10 +77,12 @@ void Console::processLine(String message)
     {
         client->receive(String(START_MESSAGE) + "\n");
     }
+    */
 }
 
-void Console::transmit(DisasterClient *client, String message)
+void Console::transmit(DisasterClient *client, struct Datagram datagram, size_t len)
 {
+    /*
     client->receive(message);
 
     buffer.concat(message);
@@ -94,12 +97,15 @@ void Console::transmit(DisasterClient *client, String message)
         buffer = buffer.substring(index + 1);
         processLine(line);
     }
+    */
 };
 
-void Console::receive(String message)
+void Console::receive(struct Datagram datagram, size_t len)
 {
+    /*
     if (message.substring(0, 2) == "c|")
     {
         client->receive(message.substring(2) + "\n");
     }
+    */
 };

@@ -16,7 +16,7 @@ public:
   void setup();
   void loop();
 
-  void receive(String message);
+  void receive(struct Datagram datagram, size_t len);
 };
 
 #endif

@@ -1,20 +1,24 @@
 
 #include "TCPClient.h"
 
-void TCPClient::receive(String message)
+void TCPClient::receive(struct Datagram datagram, size_t len)
 {
+    String message;
+    for(size_t i=0; i < len-DATAGRAM_HEADER; i++) {
+        message += (char) datagram.message[i];
+    }
     client->add(message.c_str(), message.length());
     client->send();
 }
 
 void TCPClient::handleData(void *data, size_t len)
 {
-    char buf[len + 1];
-    memcpy(buf, data, len);
-    buf[len] = 0;
-    String str = String(buf);
-    Serial.printf("1:[%d][%s]\n", str.length(), str.c_str());
-    server->transmit(this, str);
+    struct Datagram datagram = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+    datagram.type = 'c';
+    memcpy(datagram.message, data, len);
+    len = len+DATAGRAM_HEADER;
+
+    server->transmit(this, datagram, len);
 }
 
 void TCPClient::handleDisconnect()

@@ -17,7 +17,7 @@ public:
   HistoryMemory(int l = DEFAULT_LIMIT)
       : limit(l){};
 
-  void record(String message);
+  void record(struct Datagram datagram, size_t len);
   void replay(DisasterClient *client);
 };
 

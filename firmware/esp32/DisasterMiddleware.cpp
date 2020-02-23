@@ -47,18 +47,18 @@ void DisasterMiddleware::loop()
     }
 };
 
-void DisasterMiddleware::receive(String message)
+void DisasterMiddleware::receive(struct Datagram datagram, size_t len)
 {
     if (client)
     {
-        client->receive(message);
+        client->receive(datagram, len);
     }
 };
 
-void DisasterMiddleware::transmit(DisasterClient *c, String message)
+void DisasterMiddleware::transmit(DisasterClient *c, struct Datagram datagram, size_t len)
 {
     if (server)
     {
-        server->transmit(this, message);
+        server->transmit(this, datagram, len);
     }
 };
