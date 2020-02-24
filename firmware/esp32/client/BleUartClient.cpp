@@ -1,6 +1,9 @@
 #ifdef USE_BLE
 #include "BleUartClient.h"
 
+/** Comment out to stop debug output */
+// #define DEBUG_OUT
+
 /** Service UUID for Uart */
 #define UART_UUID "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
 /** Characteristic UUID for receiver */
@@ -44,28 +47,31 @@ void BleUartClient::receive(struct Datagram datagram, size_t len)
 {
   if (deviceConnected)
   {
-    // /// \todo for debug only
-    // Serial.printf("BLE: sending %s with len %d\n", message.c_str(), message.length());
-    // /// \todo end of for debug only
+#ifdef DEBUG_OUT
+    Serial.printf("BLE:receive %s length %d\n", (char *)datagram.message, len - DATAGRAM_HEADER);
+    Serial.println("BLE::receive raw data");
+    for (int idx = 0; idx < len - DATAGRAM_HEADER; idx++)
+    {
+      Serial.printf("%02X ", datagram.message[idx]);
+    }
+    Serial.println("");
+#endif
 
-    // TODO: msg id? defaulting to 0 for now
-    uint16_t msg_id = 0x2020;
+    unsigned char buf[len - DATAGRAM_HEADER] = {'\0'};
+    memcpy(buf, &datagram.message, len-DATAGRAM_HEADER);
 
-    unsigned char buf[2 + len-DATAGRAM_HEADER + 2] = {'\0'};
-    memcpy(buf, &msg_id, 2);
-    //message.getBytes(buf + 2, message.length() + 1);
-    memcpy(buf+2, &datagram.message, len-DATAGRAM_HEADER);
+#ifdef DEBUG_OUT
+    Serial.printf("BLE: Sending raw data with len %d\n", sizeof(buf));
+    for (int idx = 0; idx < sizeof(buf); idx++)
+    {
+      Serial.printf("%02X ", buf[idx]);
+    }
+    Serial.println("");
 
-    // /// \todo for debug only
-    // Serial.println("BLE: Sending raw data");
-    // for (int idx = 0; idx < sizeof(buf); idx++)
-    // {
-    // 	Serial.printf("%02X ", buf[idx]);
-    // }
-    // Serial.println("");
-    // /// \todo end of for debug only
+    Serial.printf("BLE::receive %s len %d type %c\n", buf, sizeof(buf), datagram.type);
+#endif
 
-    pCharacteristicUartTX->setValue(buf, 2 + len-DATAGRAM_HEADER + 2);
+    pCharacteristicUartTX->setValue(buf, sizeof(buf));
     pCharacteristicUartTX->notify();
 
     // Give BLE time to get the data out
@@ -75,34 +81,27 @@ void BleUartClient::receive(struct Datagram datagram, size_t len)
 
 void BleUartClient::handleData(void *data, size_t len)
 {
-  //uint16_t msg_id;
-  //char msg[len - 2 + 1] = {'\0'};
+#ifdef DEBUG_OUT
+  char debug[len] = {'\0'};
+  memcpy(debug, data, len);
+  Serial.println("BLE: Received raw data");
+  for (int idx = 0; idx < len; idx++)
+  {
+  	Serial.printf("%02X ", debug[idx]);
+  }
+  Serial.println("");
+#endif
 
-  // /// \todo for debug only
-  // char debug[len] = {'\0'};
-  // memcpy(debug, data, len);
-  // Serial.println("BLE: Received raw data");
-  // for (int idx = 0; idx < len; idx++)
-  // {
-  // 	Serial.printf("%02X ", debug[idx]);
-  // }
-  // Serial.println("");
-  // /// \todo end of for debug only
-
-  // parse out message and message id
-  //memcpy(&msg_id, data, 2);
-  //memcpy(msg, data + 2, rxLen - 2);
-
+  char *msg = (char *)data;
   struct Datagram datagram = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-  datagram.type = 'c';
+  datagram.type = msg[2];
   memcpy(&datagram.message, data, len);
-  len = len+DATAGRAM_HEADER;
 
-  // /// \todo for debug only
-  // Serial.printf("BLE: received %s len %d\n", msg, len - 2 + 1);
-  // /// \todo end of for debug only
+#ifdef DEBUG_OUT
+  Serial.printf("BLE::handleData %s len %d type %c\n", msg, len, datagram.type);
+#endif
 
-  server->transmit(this, datagram, len);
+  server->transmit(this, datagram, len + DATAGRAM_HEADER);
 }
 
 /**
@@ -112,14 +111,18 @@ class MyServerCallbacks : public BLEServerCallbacks
 {
   void onConnect(BLEServer *pServer)
   {
+#ifdef DEBUG_OUT
     Serial.println("BLE client connected");
+#endif
     pServer->updatePeerMTU(pServer->getConnId(), 260);
     deviceConnected = true;
   };
 
   void onDisconnect(BLEServer *pServer)
   {
+#ifdef DEBUG_OUT
     Serial.println("BLE client disconnected");
+#endif
     deviceConnected = false;
     pAdvertising->start();
   }
@@ -140,7 +143,15 @@ class UartTxCbHandler : public BLECharacteristicCallbacks
     {
       strncpy((char *)rxData, rxValue.c_str(), 512);
 
-      Serial.printf("UART write callback received %s\n", (char *)rxData);
+#ifdef DEBUG_OUT
+      Serial.printf("BLE:onWrite write callback received %s length %d\n", (char *)rxData, rxLen);
+      Serial.println("BLE:onWrite raw data");
+      for (int idx = 0; idx < rxLen; idx++)
+      {
+        Serial.printf("%02X ", rxData[idx]);
+      }
+      Serial.println("");
+#endif
       dataRcvd = true;
     }
   };
@@ -154,7 +165,9 @@ class DescriptorCallbacks : public BLEDescriptorCallbacks
     descrValue = pDescriptor->getValue();
     if (descrValue[0] & (1 << 0))
     {
+#ifdef DEBUG_OUT
       Serial.println("Notifications enabled");
+#endif
       if (connectCallback)
       {
         if (!connectedToServer)
@@ -164,10 +177,10 @@ class DescriptorCallbacks : public BLEDescriptorCallbacks
         }
         else
         {
-          if (history)
-          {
-            history->replay(&ble_client);
-          }
+        //   if (history)
+        //   {
+        //     history->replay(&ble_client);
+        //   }
         }
       }
     }
@@ -200,7 +213,9 @@ void BleUartClient::init()
           (uint8_t)(uniqueId), (uint8_t)(uniqueId >> 8),
           (uint8_t)(uniqueId >> 16), (uint8_t)(uniqueId >> 24),
           (uint8_t)(uniqueId >> 32), (uint8_t)(uniqueId >> 40));
+#ifdef DEBUG_OUT
   Serial.printf("Device name: %s\n", apName);
+#endif
 
   // Initialize BLE and set output power
   BLEDevice::init(apName);
@@ -209,7 +224,9 @@ void BleUartClient::init()
 
   BLEAddress thisAddress = BLEDevice::getAddress();
 
+#ifdef DEBUG_OUT
   Serial.printf("BLE address: %s\n", thisAddress.toString().c_str());
+#endif
 
   // Create BLE Server
   pServer = BLEDevice::createServer();
@@ -240,7 +257,6 @@ void BleUartClient::init()
   txDescriptor = pCharacteristicUartTX->getDescriptorByUUID("2902");
   if (txDescriptor != NULL)
   {
-    Serial.println("Got descriptor for TX as 2902");
     txDescriptor->setCallbacks(new DescriptorCallbacks());
   }
 

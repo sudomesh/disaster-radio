@@ -29,7 +29,7 @@
 #include "client/BleUartClient.h"
 #endif
 // middleware
-//#include "middleware/Console.h"
+#include "middleware/Console.h"
 //#include "middleware/HistoryReplay.h"
 // history
 //#include "history/HistorySD.h"
@@ -243,23 +243,20 @@ class WelcomeMessage : public DisasterMiddleware
 public:
   void setup()
   {
-    size_t len = 30;
-    uint8_t data[len] = "00c|Welcome to DISASTER RADIO"; 
-    struct Datagram datagram1 = buildDatagram(LL2.broadcastAddr(), 'c', data, len);
-    client->receive(datagram1, len+7);
+    uint8_t data[] = "00c|Welcome to DISASTER RADIO";
+    struct Datagram datagram1 = buildDatagram(LL2.broadcastAddr(), 'c', data, sizeof(data));
+    client->receive(datagram1, sizeof(data) + 7);
     if (!sdInitialized)
     {
-      size_t len = 64;
-      uint8_t data[len] = "00c|WARNING: SD card not found, functionality may be limited"; 
-      struct Datagram datagram2 = buildDatagram(LL2.broadcastAddr(), 'c', data, len);
-      client->receive(datagram2, len+7);
+      uint8_t data[] = "00c|WARNING: SD card not found, functionality may be limited";
+      struct Datagram datagram2 = buildDatagram(LL2.broadcastAddr(), 'c', data, sizeof(data));
+      client->receive(datagram2, sizeof(data) + 7);
     }
     if (!loraInitialized)
     {
-      size_t len = 67;
-      uint8_t data[len] = "00c|WARNING: LoRa radio not found, functionality may be limited"; 
-      struct Datagram datagram3 = buildDatagram(LL2.broadcastAddr(), 'c', data, len);
-      client->receive(datagram3, len+7);
+      uint8_t data[] = "00c|WARNING: LoRa radio not found, functionality may be limited";
+      struct Datagram datagram3 = buildDatagram(LL2.broadcastAddr(), 'c', data, sizeof(data));
+      client->receive(datagram3, sizeof(data) + 7);
     }
     client->setup();
   }
@@ -269,8 +266,8 @@ void setupSerial()
 {
   Serial.println("* Initializing serial...");
 
-  //radio->connect(new Console())
-  //radio->connect(new StreamClient(&Serial));
+  radio->connect(new Console())
+      ->connect(new StreamClient(&Serial));
       //->connect(new WelcomeMessage())
       //->connect(new HistoryReplay(history))
 }

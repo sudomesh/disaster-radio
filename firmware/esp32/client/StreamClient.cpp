@@ -14,7 +14,7 @@ void StreamClient::loop()
     {
         String message = stream->readString();
         size_t len = message.length();
-        uint8_t* data; 
+    uint8_t data[len];
         message.getBytes(data, len);
         struct Datagram datagram = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
         datagram.type = 'c';
@@ -27,9 +27,5 @@ void StreamClient::loop()
 
 void StreamClient::receive(struct Datagram datagram, size_t len)
 {
-    String message;
-    for(size_t i=0; i < len-DATAGRAM_HEADER; i++) {
-        message += (char) datagram.message[i];
-    }
-    stream->print(message);
+  stream->write(datagram.message, len - DATAGRAM_HEADER);
 };
