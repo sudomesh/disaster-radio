@@ -45,7 +45,8 @@ void Console::processLine(char *message, size_t len)
         }
 
     p = args[0];
-    if (strcmp(&args[0][1], "help") == 0)
+
+    if (strncmp(&args[0][1], "help", 4) == 0)
         {
       msgLen = sprintf((char *)response.message, "Commands: /help /join /nick /raw /lora /restart\n");
       client->receive(response, msgLen + DATAGRAM_HEADER);
@@ -53,7 +54,7 @@ void Console::processLine(char *message, size_t len)
       Serial.printf("Console::processLine help result %s\n", (char *)response.message);
 #endif
     }
-    else if (strcmp(&args[0][1], "raw") == 0)
+    else if (strncmp(&args[0][1], "raw", 3) == 0)
     {
 #ifdef DEBUG_OUT
       Serial.printf("Console::processLine switching to RAW\n");
@@ -62,7 +63,7 @@ void Console::processLine(char *message, size_t len)
             server->disconnect(this);
             server->connect(client);
         }
-    else if ((strcmp(&args[0][1], "join") == 0) || (strcmp(&args[0][1], "nick") == 0) && (args.size() > 1))
+    else if (((strncmp(&args[0][1], "join",4) == 0) || (strncmp(&args[0][1], "nick",4) == 0)) && (args.size() > 1))
         {
       if (username.length() > 0)
       {
@@ -84,7 +85,7 @@ void Console::processLine(char *message, size_t len)
       Serial.printf("Console::processLine new username is %s\n", username.c_str());
 #endif
     }
-    else if ((strcmp(&args[0][1], "restart") == 0))
+    else if ((strncmp(&args[0][1], "restart", 7) == 0))
     {
 #ifdef DEBUG_OUT
       Serial.printf("Console::processLine restarting\n");
@@ -92,7 +93,7 @@ void Console::processLine(char *message, size_t len)
 #endif
             ESP.restart();
         }
-    else if ((strcmp(&args[0][1], "lora") == 0))
+    else if ((strncmp(&args[0][1], "lora", 4) == 0))
         {
             // TODO: print to client instead of serial
             Serial.printf("Address: ");
