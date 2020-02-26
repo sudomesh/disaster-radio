@@ -83,7 +83,7 @@
     (aux_axis_origin 0 0)
     (visible_elements FFF9FF7F)
     (pcbplotparams
-      (layerselection 0x010fc_ffffffff)
+      (layerselection 0x010c0_ffffffff)
       (usegerberextensions false)
       (usegerberattributes false)
       (usegerberadvancedattributes false)
