@@ -1,6 +1,5 @@
 #include "HistoryMemory.h"
 #include "LoRalayer2.h"
-#include <printMem.h>
 
 void HistoryMemory::record(struct Datagram datagram, size_t len)
 {
@@ -15,7 +14,6 @@ void HistoryMemory::record(struct Datagram datagram, size_t len)
   String newEntry = String(tempBuf);
 
   //   Serial.printf("HistoryMemory::record New History entry >%s<\n", newEntry.c_str());
-  //   printMem();
 
   buffer.push_back(newEntry);
   while (buffer.size() > limit)
@@ -38,7 +36,6 @@ void HistoryMemory::replay(DisasterClient *client)
   for (String message : buffer)
   {
     // Serial.printf("HistoryMemory::replay Replay >%s<\n", message.c_str());
-    // printMem();
     Datagram newHistory = {0};
     memcpy(newHistory.destination, LL2.broadcastAddr(), ADDR_LENGTH);
     newHistory.type = 'c';
