@@ -1,4 +1,3 @@
-#ifdef USE_BLE
 #ifndef BLECLIENT_H
 #define BLECLIENT_H
 
@@ -36,4 +35,3 @@ public:
 };
 
 #endif
-#endif // #ifdef USE_BLE

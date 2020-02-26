@@ -14,18 +14,19 @@ void StreamClient::loop()
     {
         String message = stream->readString();
         size_t len = message.length();
-    uint8_t data[len];
+        uint8_t data[len];
         message.getBytes(data, len);
         struct Datagram datagram = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+        memset(datagram.message, 0, 233);
         datagram.type = 'c';
         memcpy(datagram.message, data, len);
-        len = len+DATAGRAM_HEADER;
-        
+        len = len + DATAGRAM_HEADER;
+
         server->transmit(this, datagram, len);
     }
 };
 
 void StreamClient::receive(struct Datagram datagram, size_t len)
 {
-  stream->write(datagram.message, len - DATAGRAM_HEADER);
+    stream->write(datagram.message, len - DATAGRAM_HEADER);
 };

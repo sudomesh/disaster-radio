@@ -1,5 +1,5 @@
-#ifdef USE_BLE
 #include "BleUartClient.h"
+#include "settings/settings.h"
 
 /** Comment out to stop debug output */
 // #define DEBUG_OUT
@@ -30,7 +30,7 @@ BLEServer *pServer;
 bool deviceConnected = false;
 
 /** Flag if we already registered on the server */
-bool connectedToServer = false;
+bool notifEnabled = false;
 
 /** Unique device name */
 char apName[] = "DR-xxxxxxxxxxxx";
@@ -93,7 +93,42 @@ void BleUartClient::handleData(void *data, size_t len)
 #endif
 
   char *msg = (char *)data;
+
+  if (msg[2] == 'u')
+  {
+    if (msg[4] == '~')
+    {
+      // delete username
+      username = "";
+      saveUsername(username);
+#ifdef DEBUG_OUT
+      Serial.printf("Deleted username over BLE\n");
+#endif
+      return;
+    }
+    else
+    {
+      // username set over BLE
+      username = String(&msg[4]);
+      Serial.printf("Username set over BLE: %s\n", username.c_str());
+      saveUsername(username);
+      return;
+    }
+  }
+
+  if (msg[2] == 'i')
+  {
+    // Switch to WiFi interface
+#ifdef DEBUG_OUT
+    Serial.printf("User wants to switch to WiFi");
+#endif
+    saveUI(false);
+    delay(500);
+    ESP.restart();
+  }
+
   struct Datagram datagram = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+  memset(datagram.message, 0, 233);
   datagram.type = msg[2];
   memcpy(&datagram.message, data, len);
 
@@ -124,6 +159,7 @@ class MyServerCallbacks : public BLEServerCallbacks
     Serial.println("BLE client disconnected");
 #endif
     deviceConnected = false;
+    notifEnabled = false;
     pAdvertising->start();
   }
 };
@@ -170,19 +206,26 @@ class DescriptorCallbacks : public BLEDescriptorCallbacks
 #endif
       if (connectCallback)
       {
-        if (!connectedToServer)
+        if (!notifEnabled)
         {
           connectCallback(&ble_client);
-          connectedToServer = true;
+          notifEnabled = true;
         }
         else
         {
-        //   if (history)
-        //   {
-        //     history->replay(&ble_client);
-        //   }
+          if (history)
+          {
+            history->replay(&ble_client);
+          }
         }
       }
+    }
+    else
+    {
+#ifdef DEBUG_OUT
+      Serial.println("Notifications disabled");
+#endif
+      notifEnabled = false;
     }
   };
 };
@@ -195,6 +238,25 @@ void BleUartClient::loop(void)
   {
     handleData(rxData, rxLen);
     dataRcvd = false;
+  }
+  if (notifEnabled && !oldStatus)
+  {
+    oldStatus = true;
+    if (!username.isEmpty())
+    {
+      Datagram nameDatagram;
+      nameDatagram.type = 'u';
+      int msgLen = sprintf((char *)nameDatagram.message, "00u|%s", username.c_str());
+      receive(nameDatagram, msgLen + DATAGRAM_HEADER);
+    }
+    if (history)
+    {
+      history->replay(&ble_client);
+    }
+  }
+  if (!notifEnabled && oldStatus)
+  {
+    oldStatus = false;
   }
 }
 
@@ -222,9 +284,8 @@ void BleUartClient::init()
   BLEDevice::setMTU(260);
   BLEDevice::setPower(ESP_PWR_LVL_P7);
 
-  BLEAddress thisAddress = BLEDevice::getAddress();
-
 #ifdef DEBUG_OUT
+  BLEAddress thisAddress = BLEDevice::getAddress();
   Serial.printf("BLE address: %s\n", thisAddress.toString().c_str());
 #endif
 
@@ -268,4 +329,3 @@ void BleUartClient::init()
   pAdvertising->addServiceUUID(UART_UUID);
   pAdvertising->start();
 }
-#endif // #ifdef USE_BLE
