@@ -1,5 +1,5 @@
 #include "HistoryMemory.h"
-#include "LoRalayer2.h"
+#include "LoRaLayer2.h"
 
 void HistoryMemory::record(struct Datagram datagram, size_t len)
 {
