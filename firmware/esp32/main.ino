@@ -19,24 +19,23 @@
 #include "server/DisasterRadio.h"
 // client
 #include "client/OLEDClient.h"
-#//include "client/HistoryRecord.h"
+#include "client/HistoryRecord.h"
 #include "client/LoRaClient.h"
 #include "client/StreamClient.h"
 #include "client/TCPClient.h"
 #include "client/WebSocketClient.h"
 #include "client/GPSClient.h"
-#ifdef USE_BLE
 #include "client/BleUartClient.h"
-#endif
-// middleware
-//#include "middleware/Console.h"
-//#include "middleware/HistoryReplay.h"
-// history
-//#include "history/HistorySD.h"
-//#include "history/HistoryMemory.h"
 
-//#include "DisasterHistory.h"
-//#include "DisasterMiddleware.h"
+// middleware
+#include "middleware/Console.h"
+#include "middleware/HistoryReplay.h"
+// history
+#include "history/HistorySD.h"
+#include "history/HistoryMemory.h"
+
+#include "DisasterHistory.h"
+#include "DisasterMiddleware.h"
 
 #define MDNS_NAME_PREFIX "disaster"
 #define HOST_NAME "disaster.radio"
@@ -52,12 +51,12 @@ AsyncServer tcp_server(23);
 AsyncWebServer http_server(80);
 AsyncWebSocket ws_server("/ws");
 
-#ifdef USE_BLE
 BleUartClient ble_client;
-#endif
+
+#include "settings/settings.h"
 
 DisasterRadio *radio = new DisasterRadio();
-//DisasterHistory *history = NULL;
+DisasterHistory *history = NULL;
 
 int internal_clients = 0;
 int clients = 0;
@@ -205,7 +204,6 @@ void setupHTTPSever()
   MDNS.addService("http", "tcp", 80);
 }
 
-/*
 void setupHistory()
 {
   Serial.println("* Initializing history...");
@@ -227,7 +225,6 @@ void setupHistory()
 
   radio->connect(new HistoryRecord(history));
 }
-*/
 
 struct Datagram buildDatagram(uint8_t destination[ADDR_LENGTH], uint8_t type, uint8_t* data, size_t len){
     struct Datagram datagram;
@@ -237,29 +234,36 @@ struct Datagram buildDatagram(uint8_t destination[ADDR_LENGTH], uint8_t type, ui
     return datagram;
 }
 
-
 class WelcomeMessage : public DisasterMiddleware
 {
 public:
   void setup()
   {
-    size_t len = 30;
-    uint8_t data[len] = "00c|Welcome to DISASTER RADIO"; 
-    struct Datagram datagram1 = buildDatagram(LL2.broadcastAddr(), 'c', data, len);
-    client->receive(datagram1, len+7);
+    char data[128] = {0};
+    int msgLen = 0;
+    Serial.printf("WelcomeMessage username: >%s<\n", username.c_str());
+    if (username.isEmpty())
+    {
+      msgLen = sprintf(data, "00c|Welcome to DISASTER RADIO ");
+    }
+    else
+    {
+      msgLen = snprintf(data, 127, "00c|Welcome to DISASTER RADIO >%s<", username.c_str());
+    }
+
+    struct Datagram datagram1 = buildDatagram(LL2.broadcastAddr(), 'c', (uint8_t *)data, msgLen);
+    client->receive(datagram1, msgLen + DATAGRAM_HEADER);
     if (!sdInitialized)
     {
-      size_t len = 64;
-      uint8_t data[len] = "00c|WARNING: SD card not found, functionality may be limited"; 
-      struct Datagram datagram2 = buildDatagram(LL2.broadcastAddr(), 'c', data, len);
-      client->receive(datagram2, len+7);
+      msgLen = sprintf(data, "00c|WARNING: SD card not found, functionality may be limited");
+      struct Datagram datagram2 = buildDatagram(LL2.broadcastAddr(), 'c', (uint8_t *)data, msgLen);
+      client->receive(datagram2, msgLen + DATAGRAM_HEADER);
     }
     if (!loraInitialized)
     {
-      size_t len = 67;
-      uint8_t data[len] = "00c|WARNING: LoRa radio not found, functionality may be limited"; 
-      struct Datagram datagram3 = buildDatagram(LL2.broadcastAddr(), 'c', data, len);
-      client->receive(datagram3, len+7);
+      msgLen = sprintf(data, "00c|WARNING: LoRa radio not found, functionality may be limited");
+      struct Datagram datagram3 = buildDatagram(LL2.broadcastAddr(), 'c', (uint8_t *)data, msgLen);
+      client->receive(datagram3, msgLen + DATAGRAM_HEADER);
     }
     client->setup();
   }
@@ -269,10 +273,10 @@ void setupSerial()
 {
   Serial.println("* Initializing serial...");
 
-  //radio->connect(new Console())
-  //radio->connect(new StreamClient(&Serial));
-      //->connect(new WelcomeMessage())
-      //->connect(new HistoryReplay(history))
+  radio->connect(new WelcomeMessage())
+      ->connect(new HistoryReplay(history))
+      ->connect(new Console())
+      ->connect(new StreamClient(&Serial));
 }
 
 /*
@@ -297,8 +301,8 @@ void setupWebSocket()
 
   WebSocketClient::startServer(&ws_server, [](WebSocketClient *ws_client) {
     radio->connect(new WelcomeMessage())
+        ->connect(new HistoryReplay(history))
         ->connect(ws_client);
-        //->connect(new HistoryReplay(history))
   });
 }
 
@@ -414,7 +418,6 @@ void setupGPS()
 
 void setupBLE(void)
 {
-#ifdef USE_BLE
   Serial.println("* Initializing BLE...");
 
   uint64_t uniqueId = ESP.getEfuseMac();
@@ -423,13 +426,11 @@ void setupBLE(void)
           (uint8_t)(uniqueId), (uint8_t)(uniqueId >> 8), (uint8_t)(uniqueId >> 16),
           (uint8_t)(uniqueId >> 24), (uint8_t)(uniqueId >> 32), (uint8_t)(uniqueId >> 40));
 
-  /// \todo Callback. Not working, as even BLE server is ready, there is no client yet
   ble_client.startServer([](BleUartClient *ble_client) {
   	radio->connect(new WelcomeMessage())
-  		//->connect(new HistoryReplay(history))
+        ->connect(new HistoryReplay(history))
   		->connect(ble_client);
   });
-#endif
 }
 
 void setup()
@@ -437,27 +438,35 @@ void setup()
   Serial.begin(115200);
   delay(200);
 
+  // Get saved settings
+  getSettings();
+
   setCpuFrequencyMhz(CLOCK_SPEED); //Set CPU clock in config.h
   getCpuFrequencyMhz(); //Get CPU clock
 
-#ifndef USE_BLE
+  if (!useBLE)
+  {
   setupWiFi();
   setupMDNS();
-#endif
+  }
   setupSD();
   setupSPIFFS();
-#ifndef USE_BLE
+  if (!useBLE)
+  {
   setupHTTPSever();
-#endif
+  }
 
-  //setupHistory();
+  setupHistory();
   setupSerial();
-#ifndef USE_BLE
+  if (!useBLE)
+  {
   //setupTelnet();
   setupWebSocket();
-#else
+  }
+  else
+  {
   setupBLE();
-#endif
+  }
   setupLoRa();
   setupDisplay();
   setupGPS();

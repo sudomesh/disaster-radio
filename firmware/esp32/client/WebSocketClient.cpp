@@ -1,4 +1,5 @@
 #include "WebSocketClient.h"
+#include "settings/settings.h"
 
 #include <unordered_map>
 
@@ -24,6 +25,7 @@ void WebSocketClient::handleData(void *data, size_t len)
 {
     // assume this is a broadcast message for now 
     struct Datagram datagram = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+    memset(datagram.message, 0, 233);
     datagram.type = 'c';
     memcpy(&datagram.message, data, len);
     len = len+DATAGRAM_HEADER;
@@ -33,6 +35,63 @@ void WebSocketClient::handleData(void *data, size_t len)
     memcpy(&msg_id_buf, data, 2);
     msg_id_buf[2] = '!';
     client->binary(msg_id_buf, 3);
+
+  if (datagram.message[4] == '~')
+  {
+    /// \todo Change WS interface to have name directly
+    /// \todo Change WS interface to use name from startup
+    // Pull out the name from the message
+    int idx = 0;
+    int startIdx = 0;
+    int endIdx = 0;
+    while (datagram.message[idx] != 0x20)
+    {
+      startIdx++;
+      idx++;
+    }
+    idx++;
+    endIdx = idx;
+    while (datagram.message[idx] != 0x20)
+    {
+      endIdx++;
+      idx++;
+    }
+    startIdx++;
+    endIdx--;
+
+    char tempName[endIdx - startIdx + 2] = {0};
+    memcpy(tempName, (char *)&datagram.message[startIdx], endIdx - startIdx + 1);
+    username = String(tempName);
+
+    saveUsername(username);
+  }
+
+  /// \todo WS command extensions, this should be changed when WS interface is rewritten!
+  // Get first two characters after the <NAME> which are used as commands
+  int startIdx = 0;
+  while (datagram.message[startIdx] != 0x20)
+  {
+    startIdx++;
+  }
+
+  /// \todo Change WS interface to make this with a button
+  // Check if user wants to switch UI with command '!!'
+  if ((datagram.message[startIdx + 1] == '!') && (datagram.message[startIdx + 2] == '!'))
+  {
+    // User wants to switch to BLE interface
+    username = "";
+    saveUsername(username);
+  }
+
+  /// \todo Change WS interface to make this with a button
+  // Check if user wants to switch UI with command '!~'
+  if ((datagram.message[startIdx + 1] == '!') && (datagram.message[startIdx + 2] == '~'))
+  {
+    // User wants to switch to BLE interface
+    saveUI(true);
+    delay(500);
+    ESP.restart();
+  }
 
     server->transmit(this, datagram, len);
 }

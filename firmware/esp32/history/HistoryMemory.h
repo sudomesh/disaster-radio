@@ -8,8 +8,14 @@
 
 #define DEFAULT_LIMIT 10
 
+struct HistoryEntry {
+	Datagram data;
+	size_t len;
+};
+
 class HistoryMemory : public DisasterHistory
 {
+	// std::list<HistoryEntry> buffer;
   std::list<String> buffer;
   unsigned int limit = DEFAULT_LIMIT;
 

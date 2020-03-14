@@ -1,4 +1,3 @@
-#ifdef USE_BLE
 #ifndef BLECLIENT_H
 #define BLECLIENT_H
 
@@ -27,8 +26,6 @@ class BleUartClient : public DisasterClient
   BleUartClient *client;
 
 public:
-  String buffer = "";
-
   void receive(struct Datagram datagram, size_t len);
 
   void handleData(void *data, size_t len);
@@ -38,4 +35,3 @@ public:
 };
 
 #endif
-#endif // #ifdef USE_BLE
