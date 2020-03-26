@@ -27,9 +27,12 @@ void OLEDClient::loop()
 
 void OLEDClient::receive(struct Datagram datagram, size_t len)
 {
-  String message = String((char *) datagram.message);
-  if (message.substring(2, 4) == "c|")
+  String message = "";
+  if (datagram.type == 'c')
   {
+    for( int i = 0 ; i < len-DATAGRAM_HEADER ; i ++){
+      message = message + (char)datagram.message[i];
+    }
     uint16_t maxLines = (height - top) / LINE_HEIGHT;
     buffer.push_back(message.substring(4));
     while (buffer.size() > maxLines)

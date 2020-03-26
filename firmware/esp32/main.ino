@@ -43,7 +43,9 @@
 
 #define INDEX_FILE "index.htm"
 
+#ifdef OLED_SDA
 SSD1306Wire display(0x3c, OLED_SDA, OLED_SCL);
+#endif
 
 SPIClass sd_card(HSPI);
 
@@ -333,6 +335,7 @@ void setupLoRa()
 
 void drawStatusBar()
 {
+  #ifdef OLED_SDA
   if (!displayInitialized)
   {
     return;
@@ -375,6 +378,7 @@ void drawStatusBar()
   // draw divider line
   display.drawLine(0, 12, 128, 12);
   display.display();
+  #endif
 }
 
 void setupDisplay()
