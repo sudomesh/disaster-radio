@@ -7,11 +7,12 @@
 #include "DisasterClient.h"
 
 #define DATAGRAM_HEADER 7
+#define DATAGRAM_MESSAGE 233
 
 struct Datagram {
     uint8_t destination[6];
     uint8_t type; // 1 byte (typically a char) corresponding to intended client/service 
-    uint8_t message[233]; // content of message, possibly binary data, not necessarily null-terminated
+    uint8_t message[DATAGRAM_MESSAGE]; // content of message, possibly binary data, not necessarily null-terminated
 };
 
 class DisasterClient;

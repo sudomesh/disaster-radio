@@ -25,14 +25,13 @@ void Console::setup()
   {
     history->replay(this);
   }
-  inputLength = 0;
   sessionConnected = 0;
 }
 
 void Console::processLine(char *message, size_t len)
 {
   struct Datagram response;
-  memset(response.message, 0, 233);
+  memset(response.message, 0, DATAGRAM_MESSAGE);
   int msgLen;
 
 #ifdef DEBUG_OUT
@@ -176,8 +175,8 @@ void Console::printPrompt()
 {
   if (username.length() > 0)
   {
-    char message[MAX_INPUT_LENGTH];
-    sprintf(message, "<%s> ", username);
+    char message[DATAGRAM_MESSAGE];
+    sprintf(message, "<%s> ", username.c_str());
     print(message);
   }
   else
@@ -197,41 +196,16 @@ void Console::transmit(DisasterClient *client, struct Datagram datagram, size_t 
   Serial.println("\n" + String((char *)datagram.message));
 #endif
 
+  // TODO: set sessionConnected back to zero on disconnection?
   if(sessionConnected == 0){
     printBanner();
     printPrompt();
     sessionConnected = 1;
   }
-  // TODO: set sessionConnected back to zero on disconnection?
   else if(sessionConnected == 1){
-    // Console should always receive datagram message of one char
-    // Split in case it is multi line
-    // \todo handle CR-LF combination
-    Serial.printf("%c", datagram.message[0]);
-
-    char p = (char)datagram.message[0];
-    if(p == '\b'){ // backspace
-      input[inputLength] = NULL;
-      inputLength--;
-      Serial.printf(" \b");
-    }
-    else if(p == 0x7f ){ // delete
-      if(inputLength > 0){
-        input[inputLength] = NULL;
-        inputLength--;
-        Serial.printf("\b \b");
-      }
-    }
-    else if(p == '\r'){ // enter key
-      print("\n");
-      processLine(input, inputLength);
-      memset(input, 0, MAX_INPUT_LENGTH);
-      inputLength = 0;
-      printPrompt();
-    }else{
-      input[inputLength] = p;
-      inputLength++;
-    }
+    // Console receives one line at a time
+    processLine((char *) datagram.message, len - DATAGRAM_HEADER);
+    printPrompt();
   }
 }
 

@@ -5,8 +5,6 @@
 #include "../DisasterClient.h"
 #include "../DisasterHistory.h"
 
-#define MAX_INPUT_LENGTH 128
-
 class Console : public DisasterMiddleware
 {
     String username = "";
@@ -29,8 +27,6 @@ private:
     void printBanner();
     void printPrompt();
 
-    char input[MAX_INPUT_LENGTH];
-    int inputLength;
     int sessionConnected;
 };
 

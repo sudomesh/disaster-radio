@@ -17,6 +17,11 @@ public:
   void loop();
 
   void receive(struct Datagram datagram, size_t len);
+
+private:
+  char input[DATAGRAM_MESSAGE];
+  int inputLength;
+
 };
 
 #endif

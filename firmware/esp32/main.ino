@@ -281,7 +281,6 @@ void setupSerial()
       ->connect(new StreamClient(&Serial));
 }
 
-/*
 void setupTelnet()
 {
   Serial.println("* Initializing telnet server...");
@@ -293,7 +292,6 @@ void setupTelnet()
         ->connect(tcp_client);
   });
 }
-*/
 
 void setupWebSocket()
 {
@@ -464,7 +462,7 @@ void setup()
   setupSerial();
   if (!useBLE)
   {
-  //setupTelnet();
+  setupTelnet();
   setupWebSocket();
   }
   else
