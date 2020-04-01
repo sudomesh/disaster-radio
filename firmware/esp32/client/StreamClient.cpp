@@ -15,7 +15,7 @@ void StreamClient::loop()
         String message = stream->readString();
         size_t len = message.length();
         uint8_t data[len];
-        message.getBytes(data, len);
+        memcpy(&data, message.c_str(), len);
         struct Datagram datagram = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
         memset(datagram.message, 0, 233);
         datagram.type = 'c';

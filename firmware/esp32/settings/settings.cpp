@@ -47,7 +47,7 @@ void saveUsername(String newUserName)
   else
   {
     preferences.putString("un", newUserName);
-    Serial.printf("Saved username '%s'\n", preferences.getString("un", "ERROR SAVING").c_str());
+    //Serial.printf("Saved username '%s'\n", preferences.getString("un", "ERROR SAVING").c_str());
   }
   preferences.end();
 }
