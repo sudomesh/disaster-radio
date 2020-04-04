@@ -15,7 +15,7 @@
   "dependencies": {
     "ecstatic": "^2.2.2",
     "gulp-cssimport": "^6.0.0",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.3",
     "routes": "^2.1.0",
     "ws": "^3.3.1"
   },
