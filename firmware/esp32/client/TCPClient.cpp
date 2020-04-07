@@ -4,11 +4,7 @@
 
 void TCPClient::receive(struct Datagram datagram, size_t len)
 {
-    String message;
-    for(size_t i=0; i < len-DATAGRAM_HEADER; i++) {
-        message += (char) datagram.message[i];
-    }
-    client->add(message.c_str(), message.length());
+    client->add((char *)datagram.message, len - DATAGRAM_HEADER);
     client->send();
 }
 
@@ -19,16 +15,7 @@ void TCPClient::handleData(void *data, size_t len)
   datagram.type = 'c';
   memset(datagram.message, 0, DATAGRAM_MESSAGE);
   memcpy(datagram.message, data, len);
-
-  Serial.printf("telnet data: ");
-  for( int i = 0 ; i < len ; i++)
-  {
-    Serial.printf("%c", datagram.message[i]);
-  }
-  Serial.printf("\r\n");
-
   len = len+DATAGRAM_HEADER;
-
   server->transmit(this, datagram, len);
 }
 
