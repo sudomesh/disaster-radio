@@ -67,7 +67,7 @@ int routes = 0;
 #define WIFI_POLL_DELAY 500
 #define WIFI_POLL_TRIES 10
 
-char macaddr[12 + 1] = {'\0'};
+char nodeAddress[ADDR_LENGTH*2 + 1] = {'\0'};
 char ssid[100] = {'\0'};
 IPAddress ip;
 
@@ -85,7 +85,7 @@ void setupWiFi()
   WiFi.macAddress(mac);
 
   // format WiFi MAC address to string
-  sprintf(macaddr, "%02x%02x%02x%02x%02x%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+  sprintf(nodeAddress, "%02x%02x%02x%02x", mac[2], mac[3], mac[4], mac[5]);
 
 #ifdef WIFI_SSID
   Serial.printf(" --> Connecting to WiFi \"%s\"\n", WIFI_SSID);
@@ -111,7 +111,7 @@ void setupWiFi()
   if (WiFi.status() != WL_CONNECTED)
   {
     // format full SSID with MAC address suffix
-    snprintf(ssid, sizeof(ssid), "%s%s", WIFI_AP_SSID_PREFIX, macaddr);
+    snprintf(ssid, sizeof(ssid), "%s%s", WIFI_AP_SSID_PREFIX, nodeAddress);
 
     // start the AP
     WiFi.mode(WIFI_AP);
@@ -313,13 +313,13 @@ void setupLoRa()
 
   Layer1.setPins(LORA_CS, LORA_RST, LORA_IRQ);
   Layer1.setLoRaFrequency(LORA_FREQ);
-  LL2.setLocalAddress(macaddr);
+  LL2.setLocalAddress(nodeAddress);
   if (Layer1.init())
   {
     LoRaClient *lora_client = new LoRaClient();
     if (lora_client->init())
     {
-      Serial.printf(" --> LoRa address: %s\n", macaddr);
+      Serial.printf(" --> LoRa address: %s\n", nodeAddress);
       radio->connect(lora_client);
       loraInitialized = true;
       return;
@@ -349,7 +349,7 @@ void drawStatusBar()
   // draw MAC
   display.setColor(WHITE);
   display.setTextAlignment(TEXT_ALIGN_LEFT);
-  display.drawString(0, 0, macaddr);
+  display.drawString(0, 0, nodeAddress);
 
   String clientsString = String(clients) + "," + routes;
   String ipString = ip.toString();
@@ -425,9 +425,7 @@ void setupBLE(void)
 
   uint64_t uniqueId = ESP.getEfuseMac();
 
-  sprintf(macaddr, "%02x%02x%02x%02x%02x%02x",
-          (uint8_t)(uniqueId), (uint8_t)(uniqueId >> 8), (uint8_t)(uniqueId >> 16),
-          (uint8_t)(uniqueId >> 24), (uint8_t)(uniqueId >> 32), (uint8_t)(uniqueId >> 40));
+  sprintf(nodeAddress, "%02x%02x%02x%02x", (uint8_t)(uniqueId >> 16), (uint8_t)(uniqueId >> 24), (uint8_t)(uniqueId >> 32), (uint8_t)(uniqueId >> 40));
 
   ble_client.startServer([](BleUartClient *ble_client) {
   	radio->connect(new WelcomeMessage())

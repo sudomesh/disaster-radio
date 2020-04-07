@@ -14,7 +14,7 @@ void LoRaClient::loop()
     if (packet.totalLength > HEADER_LENGTH)
     {
         struct Datagram datagram;
-		memset(datagram.message, 0, 233);
+		memset(datagram.message, 0, DATAGRAM_MESSAGE);
         size_t len = packet.totalLength - HEADER_LENGTH;
         // parse out datagram
         memcpy(&datagram, packet.data, len);
