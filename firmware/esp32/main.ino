@@ -312,6 +312,7 @@ void setupLoRa()
   Serial.println("* Initializing LoRa...");
 
   Layer1.setPins(LORA_CS, LORA_RST, LORA_IRQ);
+  Layer1.setLoRaFrequency(LORA_FREQ);
   LL2.setLocalAddress(macaddr);
   if (Layer1.init())
   {
