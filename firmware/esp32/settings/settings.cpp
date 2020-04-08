@@ -63,3 +63,17 @@ void saveUI(bool useBLE)
   preferences.putBool("ble", useBLE);
   preferences.end();
 }
+
+/*
+void saveLRFQ(int lrfq)
+{
+  if (!preferences.begin("dr", false))
+  {
+    Serial.println("Error opening preferences");
+    return;
+  }
+
+  preferences.putInt("lrfq", lrfq);
+  preferences.end();
+}
+*/

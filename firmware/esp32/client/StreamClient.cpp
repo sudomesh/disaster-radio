@@ -26,7 +26,7 @@ void StreamClient::loop()
       if(p == '\b') // backspace
       {
         if(inputLength > 0){
-          input[inputLength] = NULL;
+          input[inputLength] = '\0';
           inputLength--;
           stream->write(" \b");
         }
@@ -34,7 +34,7 @@ void StreamClient::loop()
       else if(p == 0x7f ) // delete
       {
         if(inputLength > 0){
-          input[inputLength] = NULL;
+          input[inputLength] = '\0';
           inputLength--;
           stream->write("\b \b");
         }
