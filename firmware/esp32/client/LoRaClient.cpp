@@ -10,7 +10,7 @@ bool LoRaClient::init()
 void LoRaClient::loop()
 {
     LL2.daemon();
-    struct Packet packet = LL2.popFromL3OutBuffer();
+    struct Packet packet = LL2.readData();
     if (packet.totalLength > HEADER_LENGTH)
     {
         struct Datagram datagram;
@@ -18,18 +18,13 @@ void LoRaClient::loop()
         size_t len = packet.totalLength - HEADER_LENGTH;
         // parse out datagram
         memcpy(&datagram, packet.data, len);
-        //memcpy(datagram.message, packet.data + DATAGRAM_HEADER, len - DATAGRAM_HEADER);
         server->transmit(this, datagram, len);
     }
 }
 
 void LoRaClient::receive(struct Datagram datagram, size_t len)
 {
-    unsigned char buf[len]; // = {'\0'};
-    memcpy(buf, &datagram, sizeof(buf));
-
-    //memcpy(buf, &datagram, DATAGRAM_HEADER);
-    //memcpy(datagram.message, packet.data + DATAGRAM_HEADER, len - DATAGRAM_HEADER);
-
-    LL2.sendToLayer2(buf, sizeof(buf));
+    uint8_t buf[len] = {'\0'};
+    memcpy(buf, &datagram, len);
+    LL2.writeData(buf, sizeof(buf));
 }
