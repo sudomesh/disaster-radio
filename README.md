@@ -69,7 +69,7 @@ For supported development boards see the [Devices & Hardware](https://github.com
 The pinouts for supported boards can be found in [firmware/esp32/config.h](https://github.com/sudomesh/disaster-radio/blob/master/firmware/esp32/config.h).  
 
 DIO0 sends an interrupt from the LoRa transceiver upon Tx/Rx Ready on the radio.   
-Chip selects can be used to explicitly switch between the LoRa tranceiver and the SD card; however, the SD card should be enabled by default, as the LoRa interrupt appears to handle enabling the tranceiver (note: this still needs to be thoroughly tested, what happens if you receive an interrupt while loading from the SD?).  
+Chip selects can be used to explicitly switch between the LoRa tranceiver and the SD card; however, the SD card should be enabled by default, as the LoRa interrupt appears to handle enabling the transceiver (note: this still needs to be thoroughly tested, what happens if you receive an interrupt while loading from the SD?).  
 
 # Initial Setup with PlatformIO
 
@@ -187,9 +187,29 @@ make flash_fs
 If using an SD card, copy the contents of `web/static/` to the root of a fat32 formatted SD card, then insert the SD card.
 
 # Testing Firmware  
-Once the firmware and SPIFFS image has been successfully flashed, you can test it by logging into the `disaster.radio <mac-address>` wireless network and navigating to http://192.168.4.1 in a browser to access the demo chat app.
+Once the firmware and SPIFFS image has been successfully flashed, you can test it by logging into the `disaster.radio <node-address>` wireless network and navigating to http://192.168.4.1 in a browser to access the demo chat app.  
 
-Note: v0.2.0 and later have switched to IRC-like commands, so try typing `/join <nickname>` into your Serial console.
+You can also try connecting to the device via serial or telnet with commands like,  
+```
+pio device monitor
+```
+or
+```
+telnet 192.168.4.1
+```
+
+After pressing enter once, you should be greeted with a banner and presented with a prompt to enter a nick or send an anonymous message,
+```
+     ___              __                            ___    
+ ___/ (_)__ ___ ____ / /____ ____      _______ ____/ (_)__ 
+/ _  / (_-</ _ `(_-</ __/ -_) __/ _   / __/ _ `/ _  / / _ \
+\_,_/_/___/\_,_/___/\__/\__/_/   (_) /_/  \_,_/\_,_/_/\___/
+v1.0.0-rc.1
+LoRa transceiver connected
+Local address of your node is 1d69bd4c
+Type '/join NICKNAME' to join the chat, or '/help' for more commands.
+< > 
+```
 
 See [firmware/README.md](https://github.com/sudomesh/disaster-radio/tree/master/firmware) for more debugging information.
 
