@@ -6,7 +6,7 @@
 class DisasterHistory
 {
 public:
-    virtual void record(String message) = 0;
+    virtual void record(struct Datagram datagram, size_t len) = 0;
     virtual void replay(DisasterClient *client) = 0;
 };
 

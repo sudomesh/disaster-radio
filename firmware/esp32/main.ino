@@ -25,9 +25,8 @@
 #include "client/TCPClient.h"
 #include "client/WebSocketClient.h"
 #include "client/GPSClient.h"
-#ifdef USE_BLE
 #include "client/BleUartClient.h"
-#endif
+
 // middleware
 #include "middleware/Console.h"
 #include "middleware/HistoryReplay.h"
@@ -44,7 +43,9 @@
 
 #define INDEX_FILE "index.htm"
 
+#ifdef OLED_SDA
 SSD1306Wire display(0x3c, OLED_SDA, OLED_SCL);
+#endif
 
 SPIClass sd_card(HSPI);
 
@@ -52,9 +53,9 @@ AsyncServer tcp_server(23);
 AsyncWebServer http_server(80);
 AsyncWebSocket ws_server("/ws");
 
-#ifdef USE_BLE
 BleUartClient ble_client;
-#endif
+
+#include "settings/settings.h"
 
 DisasterRadio *radio = new DisasterRadio();
 DisasterHistory *history = NULL;
@@ -66,7 +67,7 @@ int routes = 0;
 #define WIFI_POLL_DELAY 500
 #define WIFI_POLL_TRIES 10
 
-char macaddr[12 + 1] = {'\0'};
+char nodeAddress[ADDR_LENGTH*2 + 1] = {'\0'};
 char ssid[100] = {'\0'};
 IPAddress ip;
 
@@ -84,7 +85,7 @@ void setupWiFi()
   WiFi.macAddress(mac);
 
   // format WiFi MAC address to string
-  sprintf(macaddr, "%02x%02x%02x%02x%02x%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+  sprintf(nodeAddress, "%02x%02x%02x%02x", mac[2], mac[3], mac[4], mac[5]);
 
 #ifdef WIFI_SSID
   Serial.printf(" --> Connecting to WiFi \"%s\"\n", WIFI_SSID);
@@ -110,7 +111,7 @@ void setupWiFi()
   if (WiFi.status() != WL_CONNECTED)
   {
     // format full SSID with MAC address suffix
-    snprintf(ssid, sizeof(ssid), "%s%s", WIFI_AP_SSID_PREFIX, macaddr);
+    snprintf(ssid, sizeof(ssid), "%s%s", WIFI_AP_SSID_PREFIX, nodeAddress);
 
     // start the AP
     WiFi.mode(WIFI_AP);
@@ -227,26 +228,44 @@ void setupHistory()
   radio->connect(new HistoryRecord(history));
 }
 
+struct Datagram buildDatagram(uint8_t destination[ADDR_LENGTH], uint8_t type, uint8_t* data, size_t len){
+    struct Datagram datagram;
+    memcpy(datagram.destination, destination, ADDR_LENGTH);
+    datagram.type = 'c';
+    memcpy(datagram.message, data, len);
+    return datagram;
+}
+
 class WelcomeMessage : public DisasterMiddleware
 {
 public:
   void setup()
   {
-    #ifdef USE_BLE
-    if (client == NULL)
+    char data[128] = {0};
+    int msgLen = 0;
+    Serial.printf("WelcomeMessage username: >%s<\n", username.c_str());
+    if (username.isEmpty())
     {
-      client = &ble_client;
-      Serial.println("No client!!!!!!!!!!!!");
+      msgLen = sprintf(data, "00c|Welcome to DISASTER RADIO ");
     }
-    #endif
-    client->receive(String("c|Welcome to DISASTER RADIO"));
+    else
+    {
+      msgLen = snprintf(data, 127, "00c|Welcome to DISASTER RADIO >%s<", username.c_str());
+    }
+
+    struct Datagram datagram1 = buildDatagram(LL2.broadcastAddr(), 'c', (uint8_t *)data, msgLen);
+    client->receive(datagram1, msgLen + DATAGRAM_HEADER);
     if (!sdInitialized)
     {
-      client->receive(String("c|WARNING: SD card not found, functionality may be limited"));
+      msgLen = sprintf(data, "00c|WARNING: SD card not found, functionality may be limited");
+      struct Datagram datagram2 = buildDatagram(LL2.broadcastAddr(), 'c', (uint8_t *)data, msgLen);
+      client->receive(datagram2, msgLen + DATAGRAM_HEADER);
     }
     if (!loraInitialized)
     {
-      client->receive(String("c|WARNING: LoRa radio not found, functionality may be limited"));
+      msgLen = sprintf(data, "00c|WARNING: LoRa radio not found, functionality may be limited");
+      struct Datagram datagram3 = buildDatagram(LL2.broadcastAddr(), 'c', (uint8_t *)data, msgLen);
+      client->receive(datagram3, msgLen + DATAGRAM_HEADER);
     }
     client->setup();
   }
@@ -293,13 +312,14 @@ void setupLoRa()
   Serial.println("* Initializing LoRa...");
 
   Layer1.setPins(LORA_CS, LORA_RST, LORA_IRQ);
-  Layer1.setLocalAddress(macaddr);
+  Layer1.setLoRaFrequency(LORA_FREQ);
+  LL2.setLocalAddress(nodeAddress);
   if (Layer1.init())
   {
     LoRaClient *lora_client = new LoRaClient();
     if (lora_client->init())
     {
-      Serial.printf(" --> LoRa address: %s\n", macaddr);
+      Serial.printf(" --> LoRa address: %s\n", nodeAddress);
       radio->connect(lora_client);
       loraInitialized = true;
       return;
@@ -314,6 +334,7 @@ void setupLoRa()
 
 void drawStatusBar()
 {
+  #ifdef OLED_SDA
   if (!displayInitialized)
   {
     return;
@@ -328,7 +349,7 @@ void drawStatusBar()
   // draw MAC
   display.setColor(WHITE);
   display.setTextAlignment(TEXT_ALIGN_LEFT);
-  display.drawString(0, 0, macaddr);
+  display.drawString(0, 0, nodeAddress);
 
   String clientsString = String(clients) + "," + routes;
   String ipString = ip.toString();
@@ -356,6 +377,7 @@ void drawStatusBar()
   // draw divider line
   display.drawLine(0, 12, 128, 12);
   display.display();
+  #endif
 }
 
 void setupDisplay()
@@ -399,50 +421,53 @@ void setupGPS()
 
 void setupBLE(void)
 {
-#ifdef USE_BLE
   Serial.println("* Initializing BLE...");
 
   uint64_t uniqueId = ESP.getEfuseMac();
 
-  sprintf(macaddr, "%02x%02x%02x%02x%02x%02x",
-          (uint8_t)(uniqueId), (uint8_t)(uniqueId >> 8), (uint8_t)(uniqueId >> 16),
-          (uint8_t)(uniqueId >> 24), (uint8_t)(uniqueId >> 32), (uint8_t)(uniqueId >> 40));
+  sprintf(nodeAddress, "%02x%02x%02x%02x", (uint8_t)(uniqueId >> 16), (uint8_t)(uniqueId >> 24), (uint8_t)(uniqueId >> 32), (uint8_t)(uniqueId >> 40));
 
-  /// \todo Callback. Not working, as even BLE server is ready, there is no client yet
   ble_client.startServer([](BleUartClient *ble_client) {
   	radio->connect(new WelcomeMessage())
-  		->connect(new HistoryReplay(history))
+        ->connect(new HistoryReplay(history))
   		->connect(ble_client);
   });
-#endif
 }
 
 void setup()
 {
   Serial.begin(115200);
   delay(200);
-  
+
+  // Get saved settings
+  getSettings();
+
   setCpuFrequencyMhz(CLOCK_SPEED); //Set CPU clock in config.h
   getCpuFrequencyMhz(); //Get CPU clock
 
-#ifndef USE_BLE
+  if (!useBLE)
+  {
   setupWiFi();
   setupMDNS();
-#endif
+  }
   setupSD();
   setupSPIFFS();
-#ifndef USE_BLE
+  if (!useBLE)
+  {
   setupHTTPSever();
-#endif
+  }
 
   setupHistory();
   setupSerial();
-#ifndef USE_BLE
+  if (!useBLE)
+  {
   setupTelnet();
   setupWebSocket();
-#else
+  }
+  else
+  {
   setupBLE();
-#endif
+  }
   setupLoRa();
   setupDisplay();
   setupGPS();

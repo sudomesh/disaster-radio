@@ -1,105 +1,256 @@
 #include "Console.h"
 
+/** Comment out to stop debug output */
+// #define DEBUG_OUT
+
 #include <Layer1.h>
 #include <LoRaLayer2.h>
+#include "settings/settings.h"
+#include "utils/utils.h"
 
 #include <vector>
 
-#define START_MESSAGE "Type '/join NICKNAME' to join the chat, or '/help' for more commands."
+void Console::print(const char* message)
+{
+  struct Datagram response;
+  memcpy(response.destination, LL2.loopbackAddr(), ADDR_LENGTH);
+  response.type = 'i';
+  int msgLen = sprintf((char *)response.message, message);
+  client->receive(response, msgLen + DATAGRAM_HEADER);
+}
 
 void Console::setup()
 {
-    DisasterMiddleware::setup();
-    if (history)
-    {
-        history->replay(this);
-    }
-    client->receive(String(START_MESSAGE) + "\n");
+  DisasterMiddleware::setup();
+  if (history)
+  {
+    history->replay(this);
+  }
+  sessionConnected = 0;
 }
 
-void Console::processLine(String message)
+void Console::processLine(char *message, size_t len)
 {
-    if (message.charAt(0) == '/')
+  struct Datagram response;
+  memset(response.message, 0, DATAGRAM_MESSAGE);
+  int msgLen;
+
+  #ifdef DEBUG_OUT
+  Serial.printf("Console::processLine help result %s\r\n", message);
+  #endif
+  // message might not be NULL ended
+  char msgBuff[len + 2] = {0};
+  memcpy(msgBuff, message, len);
+
+  if (msgBuff[0] == '/')
+  {
+    std::vector<char *> args;
+
+    char *p;
+
+    p = strtok(msgBuff, " ");
+    while (p)
     {
-        std::vector<String> args;
-
-        int start = 0, end;
-        while (start < message.length())
-        {
-            int index = message.indexOf(' ', start);
-            end = index == -1 ? message.length() : index;
-            args.push_back(message.substring(start, end));
-            start = end + 1;
-        }
-
-        String command = args[0].substring(1);
-        if (command == "help")
-        {
-            client->receive("Commands: /help /join /nick /raw /lora /restart\n");
-        }
-        else if (command == "raw")
-        {
-            disconnect(client);
-            server->disconnect(this);
-            server->connect(client);
-        }
-        else if ((command == "join" || command == "nick") && args.size() > 1)
-        {
-            String msg = username.length() > 0 ? String("~ ") + username + " is now known as " + args[1] : String("~ ") + args[1] + " joined the channel";
-            username = args[1];
-            server->transmit(this, String("c|") + msg);
-            client->receive(msg);
-        }
-        else if (command == "restart")
-        {
-            ESP.restart();
-        }
-        else if (command == "lora")
-        {
-            // TODO: print to client instead of serial
-            Serial.printf("Address: ");
-            LL2.printAddress(Layer1.localAddress());
-            LL2.printRoutingTable();
-        }
-        else
-        {
-            client->receive(String("Unknown command '") + command + "'\n");
-        }
+      args.push_back(p);
+      p = strtok(NULL, " ");
     }
-    else if (username.length() > 0)
-    {
 
-        server->transmit(this, String("c|") + "<" + username + "> " + message);
-        client->receive(String("<") + username + ">" + " " + message + "\n");
+    p = args[0];
+
+    if (strncmp(&args[0][1], "help", 4) == 0)
+    {
+      print("Commands: /help /join /nick /raw /lora /set /restart\r\n");
+      #ifdef DEBUG_OUT
+      Serial.printf("Console::processLine help result %s\r\n", (char *)response.message);
+      #endif
+    }
+    else if (strncmp(&args[0][1], "raw", 3) == 0)
+    {
+      #ifdef DEBUG_OUT
+      Serial.printf("Console::processLine switching to RAW\r\n");
+      #endif
+      disconnect(client);
+      server->disconnect(this);
+      server->connect(client);
+    }
+    else if ((strncmp(&args[0][1], "set", 3) == 0) && (args.size() > 1))
+    {
+      #ifdef DEBUG_OUT
+      Serial.printf("Switching UI to %s\n", useBLE ? "WiFi" : "BLE");
+      #endif
+      if (strncmp(&args[1][0], "ui", 2) == 0){
+        saveUI(!useBLE);
+        delay(500);
+        ESP.restart();
+      }
+    }
+    else if ((strncmp(&args[0][1], "set", 3) == 0) && (args.size() == 1)){
+      print("No setting provided, type '/set SETTING'\r\n");
+      print("SETTINGs include,\r\n");
+      print("'ui' - toggles between WiFi and BLE user interface\r\n");
+    }
+
+    else if (((strncmp(&args[0][1], "join", 4) == 0) || (strncmp(&args[0][1], "nick", 4) == 0)) && (args.size() > 1))
+    {
+      strtok(args[1], "\r"); // remove CR-LF from username
+
+      if (username.length() > 0)
+      {
+        msgLen = sprintf((char *)response.message, "00c|~ %s is now known as %s\r\n", username.c_str(), args[1]);
+      }
+      else
+      {
+        msgLen = sprintf((char *)response.message, "00c|~ %s joined the channel\r\n", args[1]);
+      }
+
+      memcpy(response.destination, LL2.broadcastAddr(), ADDR_LENGTH);
+      response.type = 'c';
+      server->transmit(this, response, msgLen + DATAGRAM_HEADER);
+
+      memcpy(response.message, &response.message[4], msgLen - 4);
+      response.message[msgLen - 4] = '\n';
+      client->receive(response, msgLen - 4 + DATAGRAM_HEADER);
+
+      username = String(args[1]);
+      saveUsername(username);
+
+      #ifdef DEBUG_OUT
+      Serial.printf("Console::processLine join/nick result %s\r\n", (char *)response.message);
+      Serial.printf("Console::processLine new username is %s\r\n", username.c_str());
+      #endif
+    }
+    else if (((strncmp(&args[0][1], "join", 4) == 0) || (strncmp(&args[0][1], "nick", 4) == 0)) && (args.size() == 1)){
+      print("No NICKNAME provided, type '/join NICKNAME' to join the chat\r\n");
+    }
+    else if ((strncmp(&args[0][1], "restart", 7) == 0))
+    {
+      #ifdef DEBUG_OUT
+      Serial.printf("Console::processLine restarting\r\n");
+      delay(500);
+      #endif
+      ESP.restart();
+    }
+    else if ((strncmp(&args[0][1], "lora", 4) == 0))
+    {
+      print("Local address: ");
+      char str[ADDR_LENGTH*2 + 1] = {'\0'};
+      hexcpy(str, LL2.localAddress(), ADDR_LENGTH);
+      print(str);
+      print("\r\n");
+      char str2[256] = {'\0'}; //TODO: need to check size of routing table to allocate correct amount of memory
+      LL2.getRoutingTable(str2);
+      print(str2);
     }
     else
     {
-        client->receive(String(START_MESSAGE) + "\n");
+      msgLen = sprintf((char *)response.message, "Unknown command '%s'\r\n", msgBuff);
+      client->receive(response, msgLen + DATAGRAM_HEADER);
     }
+  }
+  else if (username.length() > 0)
+  {
+    msgLen = sprintf((char *)response.message, "00c|<%s>%s", username.c_str(), msgBuff);
+    memcpy(response.destination, LL2.broadcastAddr(), ADDR_LENGTH);
+    response.type = 'c';
+    server->transmit(this, response, msgLen + DATAGRAM_HEADER);
+    memcpy(response.message, &response.message[4], msgLen - 4);
+    response.message[msgLen - 4] = '\n';
+    #ifdef DEBUG_OUT
+    Serial.printf("Console message =>%s<\r\n", &response.message[4]);
+    #endif
+  }
+  else
+  {
+    msgLen = sprintf((char *)response.message, "00c|%s", msgBuff);
+    memcpy(response.destination, LL2.broadcastAddr(), ADDR_LENGTH);
+    response.type = 'c';
+    server->transmit(this, response, msgLen + DATAGRAM_HEADER);
+    memcpy(response.message, &response.message[4], msgLen - 4);
+    response.message[msgLen - 4] = '\n';
+    #ifdef DEBUG_OUT
+    Serial.printf("Console message =>%s<\r\n", &response.message[4]);
+    #endif
+  }
 }
 
-void Console::transmit(DisasterClient *client, String message)
+void Console::printBanner()
 {
-    client->receive(message);
+  print("     ___              __                            ___    \r\n");
+  print(" ___/ (_)__ ___ ____ / /____ ____      _______ ____/ (_)__ \r\n");
+  print("/ _  / (_-</ _ `(_-</ __/ -_) __/ _   / __/ _ `/ _  / / _ \\\r\n");
+  print("\\_,_/_/___/\\_,_/___/\\__/\\__/_/   (_) /_/  \\_,_/\\_,_/_/\\___/\r\n");
+  print("v1.0.0-rc.1\r\n");
 
-    buffer.concat(message);
+  if(Layer1.loraInitialized()){
+    print("LoRa transceiver connected\r\n");
+  }else{
+    print("WARNING: LoRa transceiver not found!\r\n");
+  }
+  print("Local address of your node is ");
+  char str[ADDR_LENGTH*2 + 1] = {'\0'};
+  hexcpy(str, LL2.localAddress(), ADDR_LENGTH);
+  print(str);
+  print("\r\n");
+  print("Type '/join NICKNAME' to join the chat, or '/help' for more commands.\r\n");
+}
 
-    int index;
-    while ((index = buffer.indexOf('\n')) >= 0)
-    {
-        // split the string on \n or \r\n
-        String line = buffer.charAt(index - 1) == '\r'
-                          ? buffer.substring(0, index - 1)
-                          : buffer.substring(0, index);
-        buffer = buffer.substring(index + 1);
-        processLine(line);
-    }
-};
-
-void Console::receive(String message)
+void Console::printPrompt()
 {
-    if (message.substring(0, 2) == "c|")
+  if (username.length() > 0)
+  {
+    print("<");
+    print(username.c_str());
+    print("> ");
+  }
+  else
+  {
+    print("< > ");
+  }
+}
+
+void Console::transmit(DisasterClient *client, struct Datagram datagram, size_t len)
+{
+  #ifdef DEBUG_OUT
+  Serial.printf("CONSOLE::transmit raw data with len %d type %c\n", len, datagram.type);
+  for (int idx = 0; idx < len - DATAGRAM_HEADER; idx++)
+  {
+    Serial.printf("%02X ", datagram.message[idx]);
+  }
+  Serial.println("\n" + String((char *)datagram.message));
+  #endif
+
+  // TODO: set sessionConnected back to zero on disconnection?
+  if(sessionConnected == 0){
+    printBanner();
+    printPrompt();
+    sessionConnected = 1;
+  }
+  else if(sessionConnected == 1){
+    // Console receives one line at a time
+    processLine((char *) datagram.message, len - DATAGRAM_HEADER);
+    printPrompt();
+  }
+}
+
+void Console::receive(struct Datagram datagram, size_t len)
+{
+  int msgSize = len - DATAGRAM_HEADER;
+
+  if ((datagram.message[2] == 'c') && (datagram.message[3] == '|'))
+  {
+    #ifdef DEBUG_OUT
+    Serial.printf("CONSOLE::receive raw data with len %d type %c\n", msgSize, datagram.type);
+    for (int idx = 0; idx < msgSize; idx++)
     {
-        client->receive(message.substring(2) + "\n");
+      Serial.printf("%02X ", datagram.message[idx]);
     }
-};
+    Serial.println("");
+    #endif
+
+    memcpy(datagram.message, &datagram.message[4], msgSize - 4);
+    msgSize -= 4;
+    datagram.message[msgSize] = '\n';
+    msgSize += 1;
+    client->receive(datagram, msgSize + DATAGRAM_HEADER);
+  }
+}

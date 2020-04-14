@@ -15,7 +15,7 @@ public:
 
     virtual void setup(){};
     virtual void loop(){};
-    virtual void receive(String message){};
+    virtual void receive(struct Datagram datagram, size_t len){};
 };
 
 #endif

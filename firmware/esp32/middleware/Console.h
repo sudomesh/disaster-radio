@@ -15,13 +15,19 @@ public:
     Console(DisasterHistory *h = NULL)
         : DisasterMiddleware(), history(h){};
 
+    void print(const char* message);
+
     void setup();
 
-    void transmit(DisasterClient *client, String message);
-    void receive(String message);
+    void transmit(DisasterClient *client, struct Datagram datagram, size_t len);
+    void receive(struct Datagram datagram, size_t len);
 
 private:
-    void processLine(String message);
+    void processLine(char *message, size_t len);
+    void printBanner();
+    void printPrompt();
+
+    int sessionConnected;
 };
 
 #endif

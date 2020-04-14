@@ -1,15 +1,12 @@
 #include "WebSocketClient.h"
+#include "settings/settings.h"
 
 #include <unordered_map>
 
-void WebSocketClient::receive(String message)
+void WebSocketClient::receive(struct Datagram datagram, size_t len)
 {
-    // TODO: msg id? defaulting to 0 for now
-    uint16_t msg_id = 0;
-
-    unsigned char buf[2 + message.length() + 2] = {'\0'};
-    memcpy(buf, &msg_id, 2);
-    message.getBytes(buf + 2, message.length() + 1);
+    unsigned char buf[len-DATAGRAM_HEADER]; //= {'\0'};
+    memcpy(buf, &datagram.message, sizeof(buf));
 
     client->binary(buf, sizeof(buf));
 }
@@ -26,20 +23,77 @@ void WebSocketClient::handleError(uint16_t code, const char *message)
 
 void WebSocketClient::handleData(void *data, size_t len)
 {
-    uint16_t msg_id;
-    char msg[len - 2 + 1] = {'\0'};
+    // assume this is a broadcast message for now 
+    struct Datagram datagram = {0xff, 0xff, 0xff, 0xff};
+    memset(datagram.message, 0, 233);
+    datagram.type = 'c';
+    memcpy(&datagram.message, data, len);
+    len = len+DATAGRAM_HEADER;
 
-    // parse out message and message id
-    memcpy(&msg_id, data, 2);
-    memcpy(msg, data + 2, len - 2);
-
-    // ACK
+    //TODO  work on ACK
     char msg_id_buf[3];
     memcpy(&msg_id_buf, data, 2);
     msg_id_buf[2] = '!';
     client->binary(msg_id_buf, 3);
 
-    server->transmit(this, String(msg));
+  if (datagram.message[4] == '~')
+  {
+    /// \todo Change WS interface to have name directly
+    /// \todo Change WS interface to use name from startup
+    // Pull out the name from the message
+    int idx = 0;
+    int startIdx = 0;
+    int endIdx = 0;
+    while (datagram.message[idx] != 0x20)
+    {
+      startIdx++;
+      idx++;
+    }
+    idx++;
+    endIdx = idx;
+    while (datagram.message[idx] != 0x20)
+    {
+      endIdx++;
+      idx++;
+    }
+    startIdx++;
+    endIdx--;
+
+    char tempName[endIdx - startIdx + 2] = {0};
+    memcpy(tempName, (char *)&datagram.message[startIdx], endIdx - startIdx + 1);
+    username = String(tempName);
+
+    saveUsername(username);
+  }
+
+  /// \todo WS command extensions, this should be changed when WS interface is rewritten!
+  // Get first two characters after the <NAME> which are used as commands
+  int startIdx = 0;
+  while (datagram.message[startIdx] != 0x20)
+  {
+    startIdx++;
+  }
+
+  /// \todo Change WS interface to make this with a button
+  // Check if user wants to switch UI with command '!!'
+  if ((datagram.message[startIdx + 1] == '!') && (datagram.message[startIdx + 2] == '!'))
+  {
+    // User wants to switch to BLE interface
+    username = "";
+    saveUsername(username);
+  }
+
+  /// \todo Change WS interface to make this with a button
+  // Check if user wants to switch UI with command '!~'
+  if ((datagram.message[startIdx + 1] == '!') && (datagram.message[startIdx + 2] == '~'))
+  {
+    // User wants to switch to BLE interface
+    saveUI(true);
+    delay(500);
+    ESP.restart();
+  }
+
+    server->transmit(this, datagram, len);
 }
 
 std::unordered_map<uint32_t, WebSocketClient *> client_map;

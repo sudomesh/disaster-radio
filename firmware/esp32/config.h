@@ -7,6 +7,7 @@
 #endif
 
 #define CLOCK_SPEED 240
+#define LORA_FREQ 915E6
 
 #ifdef TTGO_LORA_V1
 #define LORA_SCK 5

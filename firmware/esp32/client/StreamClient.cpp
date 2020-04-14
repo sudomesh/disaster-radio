@@ -1,22 +1,66 @@
 
 #include "StreamClient.h"
+#include <LoRaLayer2.h>
 
 #define STREAM_ECHO
 
 void StreamClient::setup()
 {
-    stream->setTimeout(0);
+  stream->setTimeout(0);
+  inputLength = 0;
 }
 
 void StreamClient::loop()
 {
-    if (stream->available() > 0)
+  if (stream->available() > 0)
     {
-        server->transmit(this, stream->readString());
+      String message = stream->readString();
+      size_t len = message.length();
+      uint8_t data[len];
+      memcpy(&data, message.c_str(), len);
+
+      char p = (char)data[0];
+
+      stream->write(p);
+
+      if(p == '\b') // backspace
+      {
+        if(inputLength > 0){
+          input[inputLength] = '\0';
+          inputLength--;
+          stream->write(" \b");
+        }
+      }
+      else if(p == 0x7f ) // delete
+      {
+        if(inputLength > 0){
+          input[inputLength] = '\0';
+          inputLength--;
+          stream->write("\b \b");
+        }
+      }
+      else if(p == '\r') // enter key
+      {
+        stream->write("\n");
+
+        struct Datagram datagram;
+        memcpy(datagram.destination, LL2.broadcastAddr(), ADDR_LENGTH);
+        datagram.type = 'c';
+        memcpy(datagram.message, input, inputLength);
+        server->transmit(this, datagram, inputLength + DATAGRAM_HEADER);
+
+        memset(input, 0, DATAGRAM_MESSAGE);
+        inputLength = 0;
+      }
+      else
+      {
+        input[inputLength] = p;
+        inputLength++;
+      }
     }
 };
 
-void StreamClient::receive(String message)
+void StreamClient::receive(struct Datagram datagram, size_t len)
 {
-    stream->print(message);
+  stream->write(datagram.message, len - DATAGRAM_HEADER);
 };

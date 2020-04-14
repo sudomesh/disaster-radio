@@ -22,13 +22,13 @@ void DisasterRadio::disconnect(DisasterClient *client)
     delete client;
 }
 
-void DisasterRadio::transmit(DisasterClient *client, String message)
+void DisasterRadio::transmit(DisasterClient *client, struct Datagram datagram, size_t len)
 {
     for (DisasterClient *other_client : clients)
     {
         if (client != other_client)
         {
-            other_client->receive(message);
+            other_client->receive(datagram, len);
         }
     }
 }

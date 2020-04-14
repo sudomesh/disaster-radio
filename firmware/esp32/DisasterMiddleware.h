@@ -18,8 +18,8 @@ public:
     virtual void setup();
     virtual void loop();
 
-    virtual void receive(String message);
-    virtual void transmit(DisasterClient *client, String message);
+    virtual void receive(struct Datagram datagram, size_t len);
+    virtual void transmit(DisasterClient *client, struct Datagram datagram, size_t len);
 };
 
 #endif

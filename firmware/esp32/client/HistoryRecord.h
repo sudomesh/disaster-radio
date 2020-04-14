@@ -12,7 +12,7 @@ public:
     HistoryRecord(DisasterHistory *h)
         : history(h){};
 
-    void receive(String message);
+    void receive(struct Datagram datagram, size_t len);
 };
 
 #endif
