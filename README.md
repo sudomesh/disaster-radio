@@ -1,4 +1,6 @@
-[disaster.radio](https://disaster.radio) is a work-in-progress long-range, low-bandwidth wireless disaster recovery mesh network powered by the sun.
+[disaster.radio](https://disaster.radio) is a work-in-progress long-range, low-bandwidth wireless disaster recovery mesh network powered by the sun.  
+
+[![Build Status](https://travis-ci.org/sudomesh/disaster-radio.svg?branch=master)](https://travis-ci.org/sudomesh/disaster-radio)  
 
 * [firmware/](./firmware) contains the main firmware for ESP32 and ESP8266
 * [web/](./web) is the demo chat app served up by the disaster-radio
