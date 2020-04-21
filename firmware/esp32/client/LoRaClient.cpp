@@ -17,14 +17,12 @@ void LoRaClient::loop()
 		memset(datagram.message, 0, DATAGRAM_MESSAGE);
         size_t len = packet.totalLength - HEADER_LENGTH;
         // parse out datagram
-        memcpy(&datagram, packet.data, len);
-        server->transmit(this, datagram, len);
+        //memcpy(&datagram, &packet.datagram, len);
+        server->transmit(this, packet.datagram, len);
     }
 }
 
 void LoRaClient::receive(struct Datagram datagram, size_t len)
 {
-    uint8_t buf[len] = {'\0'};
-    memcpy(buf, &datagram, len);
-    LL2.writeData(buf, sizeof(buf));
+    LL2.writeData(datagram, len);
 }
