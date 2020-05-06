@@ -1,0 +1,11 @@
+@board esp32_board HW changes
+
+board_esp32 changes
+flip around sd-card slot ***
+increase usb and micro-sd bad length for hand soldering ***
+find more common switch ***
+maybe add atmega chip for optional development ???
+fix lora (small) footprint ***
+make E22-900M30S only connect to 3V3 or Vbatt NOT both! **
+remove copper form underneath esp32 antenna ***
+fix usb plus and minus reverse *** 
