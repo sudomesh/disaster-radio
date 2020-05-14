@@ -311,6 +311,9 @@ void setupLoRa()
 #ifdef LORA_CS
   Serial.println("* Initializing LoRa...");
 
+  #ifdef LOPY4
+  SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
+  #endif
   Layer1.setPins(LORA_CS, LORA_RST, LORA_IRQ);
   Layer1.setLoRaFrequency(LORA_FREQ);
   LL2.setLocalAddress(nodeAddress);

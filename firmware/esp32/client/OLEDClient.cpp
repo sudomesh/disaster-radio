@@ -1,6 +1,7 @@
 
 #include "OLEDClient.h"
 
+#ifdef OLED_SDA
 #define LINE_HEIGHT 10
 
 void OLEDClient::loop()
@@ -42,3 +43,4 @@ void OLEDClient::receive(struct Datagram datagram, size_t len)
     needs_display = true;
   }
 }
+#endif

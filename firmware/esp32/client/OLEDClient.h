@@ -6,6 +6,7 @@
 #include "../DisasterServer.h"
 #include "../config.h"
 
+#ifdef OLED_SDA
 #include "SSD1306Wire.h"
 #include <list>
 
@@ -29,4 +30,5 @@ public:
   void receive(struct Datagram datagram, size_t len);
 };
 
+#endif
 #endif

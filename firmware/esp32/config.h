@@ -87,4 +87,10 @@
 #define OLED_HEIGHT 128
 #endif
 
+#ifdef LOPY4
+// all necessary pins are defined in the arduino-esp32 variants
+// https://github.com/espressif/arduino-esp32/blob/master/variants/lopy4/pins_arduino.h
+// any additional board specifc settings should be added here
+#endif
+
 #endif
