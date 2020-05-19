@@ -16,8 +16,6 @@ void LoRaClient::loop()
         struct Datagram datagram;
 		memset(datagram.message, 0, DATAGRAM_MESSAGE);
         size_t len = packet.totalLength - HEADER_LENGTH;
-        // parse out datagram
-        //memcpy(&datagram, &packet.datagram, len);
         server->transmit(this, packet.datagram, len);
     }
 }
