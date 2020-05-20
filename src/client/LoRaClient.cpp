@@ -13,10 +13,7 @@ void LoRaClient::loop()
     struct Packet packet = LL2.readData();
     if (packet.totalLength > HEADER_LENGTH)
     {
-        struct Datagram datagram;
-		memset(datagram.message, 0, DATAGRAM_MESSAGE);
-        size_t len = packet.totalLength - HEADER_LENGTH;
-        server->transmit(this, packet.datagram, len);
+        server->transmit(this, packet.datagram, packet.totalLength - HEADER_LENGTH);
     }
 }
 

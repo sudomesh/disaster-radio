@@ -1,7 +1,9 @@
 #ifndef DISASTERSERVER_H
 #define DISASTERSERVER_H
 
+#ifndef SIM
 #include <Arduino.h>
+#endif
 #include <cstddef>
 #include <LoRaLayer2.h>
 
