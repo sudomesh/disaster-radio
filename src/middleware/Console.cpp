@@ -179,7 +179,7 @@ void Console::printBanner()
   print(" ___/ (_)__ ___ ____ / /____ ____      _______ ____/ (_)__ \r\n");
   print("/ _  / (_-</ _ `(_-</ __/ -_) __/ _   / __/ _ `/ _  / / _ \\\r\n");
   print("\\_,_/_/___/\\_,_/___/\\__/\\__/_/   (_) /_/  \\_,_/\\_,_/_/\\___/\r\n");
-  print("v1.0.0-rc.1\r\n");
+  print("v1.0.0-rc.2\r\n");
 
   if(Layer1.loraInitialized()){
     print("LoRa transceiver connected\r\n");

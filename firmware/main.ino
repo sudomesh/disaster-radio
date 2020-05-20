@@ -401,7 +401,7 @@ void setupDisplay()
     display.flipScreenVertically();
     display.clear();
 
-    radio->connect(new OLEDClient(&display, 0, STATUS_BAR_HEIGHT + 1));
+    radio->connect(new OLEDClient(&display, 0, STATUS_BAR_HEIGHT + 1, OLED_WIDTH, OLED_HEIGHT));
 
     drawStatusBar();
   }

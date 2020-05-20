@@ -4,7 +4,7 @@
 
 #include "../DisasterClient.h"
 #include "../DisasterServer.h"
-#include "../config.h"
+//#include "../config.h"
 
 #ifdef OLED_SDA
 #include "SSD1306Wire.h"
@@ -17,14 +17,14 @@ class OLEDClient : public DisasterClient
 
   int left;
   int top;
-  int width = OLED_WIDTH;
-  int height = OLED_HEIGHT;
+  int width;
+  int height;
 
   bool needs_display = false;
 
 public:
-  OLEDClient(SSD1306Wire *d, int l = 0, int t = 0)
-      : display{d}, left{l}, top{t} {};
+  OLEDClient(SSD1306Wire *d, int l = 0, int t = 0, int w = 128, int h = 64)
+      : display{d}, left{l}, top{t}, width{w}, height{h} {};
 
   void loop();
   void receive(struct Datagram datagram, size_t len);
