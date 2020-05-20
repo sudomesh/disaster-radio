@@ -13,4 +13,5 @@ install:
     - platformio update
 
 script:
+    - cd firmware
     - platformio run -e ttgo-lora32-v1 -e ttgo-lora32-v2 -e ttgo-lora32-tbeam -e heltec-v2 -e sparkfun-lora
