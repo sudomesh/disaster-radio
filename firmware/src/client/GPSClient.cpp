@@ -1,6 +1,6 @@
 #include "GPSClient.h"
 
-extern char *macaddr;
+extern char *nodeAddress; //TODO: should not use extern
 
 void GPSClient::loop()
 {
@@ -25,7 +25,7 @@ void GPSClient::loop()
 			}
 			else
 			{
-				len = snprintf((char *)datagram.message, 233, "m|<%s>{\"pos\":[%.3f,%.3f]}", macaddr, gps.location.lat(), gps.location.lng());
+				len = snprintf((char *)datagram.message, 233, "m|<%s>{\"pos\":[%.3f,%.3f]}", nodeAddress, gps.location.lat(), gps.location.lng());
 			}
             len = len+DATAGRAM_HEADER;
 
