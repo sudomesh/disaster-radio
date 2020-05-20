@@ -2,7 +2,8 @@
 
 [![Build Status](https://travis-ci.org/sudomesh/disaster-radio.svg?branch=master)](https://travis-ci.org/sudomesh/disaster-radio)  
 
-* [firmware/](./firmware) contains the main firmware for ESP32 and ESP8266
+* [firmware/](./firmware) contains the main example code for ESP32 dev boards
+* [src/](./src) contains the disaster radio library code used by the firmware and simulator
 * [web/](./web) is the demo chat app served up by the disaster-radio
 * [hardware/](./hardware) is the kicad board layout and schematic
 * [enclosure/](./enclosure) are 3D models of the enclosure(s)
@@ -13,12 +14,7 @@
 - [Getting Started](#getting-started)
 - [Layout and Flow](#layout-and-flow)
 - [Hardware Connections](#hardware-connections)
-- [Websocket](#websocket)
 - [Initial Setup with PlatformIO](#initial-setup-with-platformio)
-    - [Building firmware](#building-firmware)
-    - [Flashing firmware](#flashing-firmware)
-        - [For dev boards](#for-dev-boards)
-- [Initial Setup with makeEspArduino](#initial-setup-with-makeesparduino)
     - [Building firmware](#building-firmware)
     - [Flashing firmware](#flashing-firmware)
         - [For dev boards](#for-dev-boards)
@@ -110,50 +106,12 @@ By default, PlatformIO builds and flashes firmware for the LILY's ESP32 TTGO V2 
 pio run -e ttgo-lora32-v1 -t upload -t uploadfs
 
 ```
-# Initial Setup with makeEspArduino 
 
-If you would prefer to use a makefile to build and flash the firmware, follow these instructions,
+## Developing firmware
 
-```
-./fetch_deps.sh esp8266 # download dependencies if using WeMos D1 with disaster radio hat
-cp settings.mk.example settings.mk # create initial personal settings file
-sudo pip install esptool
-```
-OR
-```
-./fetch_deps.sh esp32 # if using ESP32 TTGO board
-cp settings.mk.example settings.mk # create initial personal settings file
-sudo pip install esptool 
-```
-
-If you would only like to update the libraries, instead reinstalling the entire arduino-esp toolchain, you can run,
-```
-./fetch_deps.sh esp32 libs
-``` 
-
-Edit `settings.mk` to suit your needs. If you are flashing a ESP32 LILY TTGO V2 board then you will probably not have to edit anything in `settings.mk` but make sure `UPLOAD_PORT` is set to the correct device which may vary depending on your operating system and which other devices you have connected. If you are flashing a different dev board, choose the `BOARD` and `BUILD_EXTRA_FLAGS` definitions that match your board.
-
-## Building firmware
-
-To test that the firmware is compiling correctly without flashing it to a device, run
-```
-make
-```
-This will compile all libraries and main firmware files. The resulting binary is stored as `/tmp/mkESP/main_ttgo-lora32-v1/main.bin`
-
-## Flashing firmware
-
-### For dev boards
-
-Connect your computer to the board using a usb cable,
-
-In `settings.mk` make sure to uncomment the lines for your device and comment the lines for the devices not being used.
-
-Then run:
-
-```
-make flash
-```
+Some useful hints for developing this firmware using platformio are included here,
+* It may be a good idea to delete the libdeps folder prior to rebuilding, as old, out-dated libraries could case conflits. To do this, `rm -rf .pio/libdeps`.
+* If you would like to make changes to a specific library, such as LoRaLayer2, you can clone the library into the `firmware/lib` folder that is created after running `pio run` and then comment it out or remove it from the `lib_deps` list in the `platformio.ini` file.
 
 # Building Web App
 
@@ -171,19 +129,11 @@ To only build:
 ```
 pio run -t buildfs
 ```
-OR
-```
-make fs
-```
 
 To build and upload:
 
 ```
 pio run -t uploadfs
-```
-OR
-```
-make flash_fs
 ```
 
 If using an SD card, copy the contents of `web/static/` to the root of a fat32 formatted SD card, then insert the SD card.
@@ -206,7 +156,7 @@ After pressing enter once, you should be greeted with a banner and presented wit
  ___/ (_)__ ___ ____ / /____ ____      _______ ____/ (_)__ 
 / _  / (_-</ _ `(_-</ __/ -_) __/ _   / __/ _ `/ _  / / _ \
 \_,_/_/___/\_,_/___/\__/\__/_/   (_) /_/  \_,_/\_,_/_/\___/
-v1.0.0-rc.1
+v1.0.0-rc.2
 LoRa transceiver connected
 Local address of your node is 1d69bd4c
 Type '/join NICKNAME' to join the chat, or '/help' for more commands.
@@ -218,10 +168,6 @@ See [firmware/README.md](https://github.com/sudomesh/disaster-radio/tree/master/
 # Adding Libraries
 
 If you're including new libraries in the firmware, for PlatformIO, you wil need to add them to `platformio.ini` under `lib_deps`.
-
-If you're including new libraries in the firmware, for makeEspArduino, you wil need to add them to `LIBS =` in the correct `config.mk` file. 
-
-Make sure to also include the approprate commands for fetching the new libraries in `fetch_deps.sh`.
 
 # Creating Binary for Release
 

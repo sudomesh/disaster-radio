@@ -3,19 +3,26 @@
 
 #include "../DisasterMiddleware.h"
 #include "../DisasterClient.h"
+#ifndef SIM
 #include "../DisasterHistory.h"
+#endif
 
 class Console : public DisasterMiddleware
 {
-    String username = "";
-    String buffer = "";
-    DisasterHistory *history = NULL;
+#ifndef SIM
+  String username = "";
+  String buffer = "";
+  DisasterHistory *history = NULL;
+#endif
 
 public:
+#ifdef SIM
+    Console();
+#else
     Console(DisasterHistory *h = NULL)
         : DisasterMiddleware(), history(h){};
-
-    void print(const char* message);
+#endif
+    void printf(const char* format, ...);
 
     void setup();
 

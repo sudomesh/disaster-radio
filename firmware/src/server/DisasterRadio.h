@@ -1,7 +1,9 @@
 #ifndef DISASTERRADIO_H
 #define DISASTERRADIO_H
 
+#ifndef SIM
 #include <Arduino.h>
+#endif
 #include <set>
 #include <list>
 #include <cstddef>
