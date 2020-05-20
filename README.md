@@ -105,6 +105,12 @@ pio run -e ttgo-lora32-v1 -t upload -t uploadfs
 
 ```
 
+## Developing firmware
+
+Some useful hints for developing this firmware using platformio are included here,
+* It may be a good idea to delete the libdeps folder prior to rebuilding, as old, out-dated libraries could case conflits. To do this, `rm -rf .pio/libdeps`.
+* If you would like to make changes to a specific library, such as LoRaLayer2, you can clone the library into the `firmware/lib` folder that is created after running `pio run` and then comment it out or remove it from the `lib_deps` list in the `platformio.ini` file.
+
 # Building Web App
 
 First, build the web app using npm, instructions for can be found in [web/README.md](https://github.com/sudomesh/disaster-radio/tree/master/web#setup).

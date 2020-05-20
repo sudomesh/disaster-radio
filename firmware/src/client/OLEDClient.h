@@ -4,7 +4,6 @@
 
 #include "../DisasterClient.h"
 #include "../DisasterServer.h"
-//#include "../config.h"
 
 #ifdef OLED_SDA
 #include "SSD1306Wire.h"

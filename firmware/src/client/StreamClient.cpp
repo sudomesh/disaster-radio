@@ -42,6 +42,10 @@ void StreamClient::loop()
       else if(p == '\r') // enter key
       {
         stream->write("\n");
+        input[inputLength] = '\r';
+        inputLength++;
+        input[inputLength] = '\n';
+        inputLength++;
 
         struct Datagram datagram;
         memcpy(datagram.destination, LL2.broadcastAddr(), ADDR_LENGTH);

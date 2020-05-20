@@ -94,6 +94,7 @@ void Console::processLine(char *message, size_t len)
     else if (((strncmp(&args[0][1], "join", 4) == 0) || (strncmp(&args[0][1], "nick", 4) == 0)) && (args.size() > 1))
     {
       strtok(args[1], "\r"); // remove CR-LF from username
+      strtok(args[1], "\n"); // remove CR-LF from username
 
       if (username.length() > 0)
       {
