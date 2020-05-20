@@ -64,7 +64,7 @@
 #define LORA_MOSI MOSI
 #define LORA_RST RST_LoRa
 #define LORA_CS SS
-#define OLED_SDA SDA_OLED
+//#define OLED_SDA SDA_OLED
 #define OLED_SCL SCL_OLED
 #define OLED_RST RST_OLED
 #define OLED_WIDTH 128
@@ -80,7 +80,7 @@
 #define LORA_MOSI 13
 #define LORA_RST NOT_A_PIN
 #define LORA_CS 16
-#define OLED_SDA 21
+//#define OLED_SDA 21
 #define OLED_SCL 22
 #define OLED_RST NOT_A_PIN
 #define OLED_WIDTH 128

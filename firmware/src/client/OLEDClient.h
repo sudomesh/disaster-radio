@@ -24,6 +24,7 @@ class OLEDClient : public DisasterClient
 public:
   OLEDClient(SSD1306Wire *d, int l = 0, int t = 0, int w = 128, int h = 64)
       : display{d}, left{l}, top{t}, width{w}, height{h} {};
+  virtual ~OLEDClient();
 
   void loop();
   void receive(struct Datagram datagram, size_t len);

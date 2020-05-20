@@ -4,6 +4,8 @@
 #ifdef OLED_SDA
 #define LINE_HEIGHT 10
 
+OLEDClient::~OLEDClient() {}
+
 void OLEDClient::loop()
 {
   if (needs_display)
