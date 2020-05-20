@@ -12,7 +12,6 @@
 - [Getting Started](#getting-started)
 - [Layout and Flow](#layout-and-flow)
 - [Hardware Connections](#hardware-connections)
-- [Websocket](#websocket)
 - [Initial Setup with PlatformIO](#initial-setup-with-platformio)
     - [Building firmware](#building-firmware)
     - [Flashing firmware](#flashing-firmware)

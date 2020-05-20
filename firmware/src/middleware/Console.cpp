@@ -12,7 +12,9 @@
 
 #include <vector>
 
+#ifdef SIM
 Console::Console(){};
+#endif
 
 void Console::printf(const char* format, ...)
 {
@@ -115,7 +117,7 @@ void Console::processLine(char *message, size_t len)
 
     }
     else if (((strncmp(&args[0][1], "join", 4) == 0) || (strncmp(&args[0][1], "nick", 4) == 0)) && (args.size() == 1)){
-      print("No NICKNAME provided, type '/join NICKNAME' to join the chat\r\n");
+      printf("No NICKNAME provided, type '/join NICKNAME' to join the chat\r\n");
     }
     else if ((strncmp(&args[0][1], "restart", 7) == 0))
     {
