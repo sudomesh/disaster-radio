@@ -48,7 +48,7 @@ void StreamClient::loop()
         inputLength++;
 
         struct Datagram datagram;
-        memcpy(datagram.destination, LL2.broadcastAddr(), ADDR_LENGTH);
+        memcpy(datagram.destination, BROADCAST, ADDR_LENGTH);
         datagram.type = 'c';
         memcpy(datagram.message, input, inputLength);
         server->transmit(this, datagram, inputLength + DATAGRAM_HEADER);

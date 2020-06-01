@@ -15,6 +15,16 @@
 
 #include "config.h"
 
+#ifdef ARDUINO_LORA
+#include <Layer1_LoRa.h>
+#endif
+
+#ifdef RL_SX1276
+#include <Layer1_SX1276.h>
+#endif
+
+#include <LoRaLayer2.h>
+
 // server
 #include "server/DisasterRadio.h"
 // client
@@ -49,11 +59,26 @@ SSD1306Wire display(0x3c, OLED_SDA, OLED_SCL);
 
 SPIClass sd_card(HSPI);
 
+SPIClass SPI_1(SPI);
+SPIClass SPI_2(SPI);
+
 AsyncServer tcp_server(23);
 AsyncWebServer http_server(80);
 AsyncWebSocket ws_server("/ws");
 
 BleUartClient ble_client;
+
+#ifdef ARDUINO_LORA
+Layer1Class *Layer1 = new Layer1Class();
+#endif
+#ifdef RL_SX1276
+SX1276 lora = new Module(LORA_CS, LORA_IRQ, LORA_RST, RADIOLIB_NC);
+  #ifdef DUAL_LORA
+  SX1276 lora2 = new Module(LORA2_CS, LORA2_IRQ, LORA2_RST, RADIOLIB_NC);
+  #endif
+#endif
+
+LL2Class *LL2;
 
 #include "settings/settings.h"
 
@@ -253,18 +278,18 @@ public:
       msgLen = snprintf(data, 127, "00c|Welcome to DISASTER RADIO >%s<", username.c_str());
     }
 
-    struct Datagram datagram1 = buildDatagram(LL2.broadcastAddr(), 'c', (uint8_t *)data, msgLen);
+    struct Datagram datagram1 = buildDatagram(BROADCAST, 'i', (uint8_t *)data, msgLen);
     client->receive(datagram1, msgLen + DATAGRAM_HEADER);
     if (!sdInitialized)
     {
       msgLen = sprintf(data, "00c|WARNING: SD card not found, functionality may be limited");
-      struct Datagram datagram2 = buildDatagram(LL2.broadcastAddr(), 'c', (uint8_t *)data, msgLen);
+      struct Datagram datagram2 = buildDatagram(BROADCAST, 'i', (uint8_t *)data, msgLen);
       client->receive(datagram2, msgLen + DATAGRAM_HEADER);
     }
     if (!loraInitialized)
     {
       msgLen = sprintf(data, "00c|WARNING: LoRa radio not found, functionality may be limited");
-      struct Datagram datagram3 = buildDatagram(LL2.broadcastAddr(), 'c', (uint8_t *)data, msgLen);
+      struct Datagram datagram3 = buildDatagram(BROADCAST, 'i', (uint8_t *)data, msgLen);
       client->receive(datagram3, msgLen + DATAGRAM_HEADER);
     }
     client->setup();
@@ -310,19 +335,45 @@ void setupLoRa()
 {
 #ifdef LORA_CS
   Serial.println("* Initializing LoRa...");
-
   #ifdef LOPY4
-  SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
+  SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI); //LORA_CS);
   #endif
-  Layer1.setPins(LORA_CS, LORA_RST, LORA_IRQ);
-  Layer1.setLoRaFrequency(LORA_FREQ);
-  LL2.setLocalAddress(nodeAddress);
-  if (Layer1.init())
+  #ifdef ARDUINO_LORA
+  Layer1Class *Layer1_1 = new Layer1Class();
+  Layer1->setPins(LORA_CS, LORA_RST, LORA_IRQ);
+  Layer1->setLoRaFrequency(LORA_FREQ);
+  #endif
+  #ifdef RL_SX1276
+  pinMode(LORA_CS, OUTPUT);
+  pinMode(LORA2_CS, OUTPUT);
+  digitalWrite(LORA_CS, LOW);
+  digitalWrite(LORA2_CS, HIGH);
+  Layer1Class *Layer1_1 = new Layer1Class(&lora, 0, LORA_CS, LORA_RST, LORA_IRQ, 9, 915, 17);
+  #ifdef DUAL_LORA
+  digitalWrite(LORA_CS, HIGH);
+  digitalWrite(LORA2_CS, LOW);
+  Layer1Class *Layer1_2 = new Layer1Class(&lora2, 0, LORA2_CS, LORA2_RST, LORA2_IRQ, 7, 433, 17);
+  digitalWrite(LORA_CS, LOW);
+  digitalWrite(LORA2_CS, HIGH);
+  #endif
+  #endif
+  if(Layer1_1->init())
   {
-    LoRaClient *lora_client = new LoRaClient();
+    #ifndef DUAL_LORA
+    Serial.printf(" --> Layer1 init succeeded\r\n");
+    LL2 = new LL2Class(Layer1_1);
+    #else
+    if(Layer1_2->init()){
+      Serial.printf(" --> Dual Layer1 init succeeded\r\n");
+      LL2 = new LL2Class(Layer1_1, Layer1_2);
+    }
+    #endif
+    LL2->setLocalAddress(nodeAddress);
+    LoRaClient *lora_client = new LoRaClient(LL2);
     if (lora_client->init())
     {
-      Serial.printf(" --> LoRa address: %s\n", nodeAddress);
+      Serial.printf(" --> LL2 init succeeded\r\n");
+      Serial.printf(" --> LL2 node address: %s\n", nodeAddress);
       radio->connect(lora_client);
       loraInitialized = true;
       return;
@@ -483,14 +534,15 @@ void setup()
 void loop()
 {
   radio->loop();
-
-  int new_clients = radio->clients.size() - internal_clients;
-  int new_routes = LL2.getRouteEntry();
-  if (clients != new_clients || routes != new_routes)
-  {
-    clients = new_clients;
-    routes = new_routes;
-    Serial.printf("--> clients=%d routes=%d\n", clients, routes);
-    drawStatusBar();
+  if(loraInitialized){
+    int new_clients = radio->clients.size() - internal_clients;
+    int new_routes = LL2->getRouteEntry();
+    if (clients != new_clients || routes != new_routes)
+    {
+      clients = new_clients;
+      routes = new_routes;
+      Serial.printf("--> clients=%d routes=%d\n", clients, routes);
+      drawStatusBar();
+    }
   }
 }

@@ -91,6 +91,12 @@
 // all necessary pins are defined in the arduino-esp32 variants
 // https://github.com/espressif/arduino-esp32/blob/master/variants/lopy4/pins_arduino.h
 // any additional board specifc settings should be added here
+#define LORA_IRQ 23
+#define LORA_CS 18
+// to add second LoRa module connect it to these pins and specific DUAL_LORA as a build flag
+#define LORA2_IRQ 26
+#define LORA2_RST NOT_A_PIN
+#define LORA2_CS 25
 #endif
 
 #endif

@@ -3,7 +3,6 @@
 /** Comment out to stop debug output */
 // #define DEBUG_OUT
 
-#include <Layer1.h>
 #include <LoRaLayer2.h>
 #include "../utils/utils.h"
 #ifndef SIM
@@ -22,7 +21,7 @@ void Console::printf(const char* format, ...)
   va_list args;
   va_start(args, format);
   struct Datagram response;
-  memcpy(response.destination, LL2.loopbackAddr(), ADDR_LENGTH);
+  memcpy(response.destination, LOOPBACK, ADDR_LENGTH);
   response.type = 'i';
   size_t len = vsprintf((char *)response.message, format, args);
   client->receive(response, len + DATAGRAM_HEADER);
@@ -43,6 +42,11 @@ void Console::setup()
 
 void Console::processLine(char *message, size_t len)
 {
+  if(len <= 2){
+    // message will always contain CR-LF
+    // if length is less or equal to 2, do nothing
+    return;
+  }
   struct Datagram response;
   memset(response.message, 0, DATAGRAM_MESSAGE);
   int msgLen;
@@ -105,7 +109,7 @@ void Console::processLine(char *message, size_t len)
         msgLen = sprintf((char *)response.message, "00c|~ %s joined the channel\r\n", args[1]);
       }
 
-      memcpy(response.destination, LL2.broadcastAddr(), ADDR_LENGTH);
+      memcpy(response.destination, BROADCAST, ADDR_LENGTH);
       response.type = 'c';
       server->transmit(this, response, msgLen + DATAGRAM_HEADER);
 
@@ -129,9 +133,9 @@ void Console::processLine(char *message, size_t len)
     {
       char str[ADDR_LENGTH*2 + 1] = {'\0'};
       char str2[256] = {'\0'}; //TODO: need to check size of routing table to allocate correct amount of memory
-      hexToChar(str, LL2.localAddress(), ADDR_LENGTH);
+      //hexToChar(str, LL2Class::localAddress(), ADDR_LENGTH);
       printf("Local address: %s\r\n", str);
-      LL2.getRoutingTable(str2);
+      //LL2.getRoutingTable(str2);
       printf("%s", str2);
     }
     else
@@ -144,7 +148,7 @@ void Console::processLine(char *message, size_t len)
   else if (username.length() > 0)
   {
     msgLen = sprintf((char *)response.message, "00c|<%s>%s", username.c_str(), msgBuff);
-    memcpy(response.destination, LL2.broadcastAddr(), ADDR_LENGTH);
+    memcpy(response.destination, BROADCAST, ADDR_LENGTH);
     response.type = 'c';
     server->transmit(this, response, msgLen + DATAGRAM_HEADER);
     memcpy(response.message, &response.message[4], msgLen - 4);
@@ -165,13 +169,13 @@ void Console::processLine(char *message, size_t len)
   {
     // broadcast message
     msgLen = sprintf((char *)response.message, "%s", msgBuff);
-    memcpy(response.destination, LL2.broadcastAddr(), ADDR_LENGTH);
+    memcpy(response.destination, BROADCAST, ADDR_LENGTH);
     response.type = 'c';
     server->transmit(this, response, msgLen + DATAGRAM_HEADER);
-    memcpy(response.message, &response.message, msgLen);
-    response.message[msgLen] = '\n';
     #ifdef DEBUG_OUT
-    Serial.printf("Console message =>%s<\r\n", &response.message[4]);
+    //memcpy(response.message, &response.message, msgLen);
+    //response.message[msgLen] = '\n';
+    //Serial.printf("Console message =>%s<\r\n", &response.message[4]);
     #endif
   }
 }
@@ -184,14 +188,16 @@ void Console::printBanner()
   printf("\\_,_/_/___/\\_,_/___/\\__/\\__/_/   (_) /_/  \\_,_/\\_,_/_/\\___/\r\n");
   printf("v1.0.0-rc.2\r\n");
   #ifndef SIM
+  /*
   if(Layer1.loraInitialized()){
     printf("LoRa transceiver connected\r\n");
   }else{
     printf("WARNING: LoRa transceiver not found!\r\n");
   }
+  */
   #endif
   char *str = (char*)malloc(ADDR_LENGTH*2 + 1);// = {'\0'};
-  hexToChar(str, LL2.localAddress(), ADDR_LENGTH);
+  //hexToChar(str, LL2Class::localAddress(), ADDR_LENGTH);
   printf("Local address of your node is %s\r\n", str);
   printf("Type '/join NICKNAME' to join the chat, or '/help' for more commands.\r\n");
   free(str);

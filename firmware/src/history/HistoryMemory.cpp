@@ -37,7 +37,7 @@ void HistoryMemory::replay(DisasterClient *client)
   {
     // Serial.printf("HistoryMemory::replay Replay >%s<\n", message.c_str());
     Datagram newHistory = {0};
-    memcpy(newHistory.destination, LL2.broadcastAddr(), ADDR_LENGTH);
+    memcpy(newHistory.destination, BROADCAST, ADDR_LENGTH);
     newHistory.type = 'c';
     size_t msgLen = sprintf((char *)newHistory.message, message.c_str());
 
