@@ -67,8 +67,7 @@ void SocatClient::loop(){
     else if (length > 0)
     {
       buffer[length] = '\0';
-      struct Datagram datagram;
-      memcpy(datagram.destination, LL2.broadcastAddr(), ADDR_LENGTH);
+      struct Datagram datagram = { 0xff, 0xff, 0xff, 0xff };
       datagram.type = 'c';
       memcpy(datagram.message, buffer, length);
       server->transmit(this, datagram, length + DATAGRAM_HEADER);
