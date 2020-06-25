@@ -56,17 +56,17 @@
 #endif
 
 #ifdef HELTEC
-#define LORA_IRQ DIO0
-#define LORA_IO1 DIO1
-#define LORA_IO2 DIO2
-#define LORA_SCK SCK
-#define LORA_MISO MISO
-#define LORA_MOSI MOSI
-#define LORA_RST RST_LoRa
-#define LORA_CS SS
-//#define OLED_SDA SDA_OLED
-#define OLED_SCL SCL_OLED
-#define OLED_RST RST_OLED
+#define LORA_IRQ 26
+#define LORA_IO1 35
+#define LORA_IO2 34
+#define LORA_SCK 5
+#define LORA_MISO 19
+#define LORA_MOSI 27
+#define LORA_RST 14
+#define LORA_CS 18
+#define OLED_SDA 4
+#define OLED_SCL 15
+#define OLED_RST 16
 #define OLED_WIDTH 128
 #define OLED_HEIGHT 64
 #endif
