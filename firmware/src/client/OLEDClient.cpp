@@ -1,7 +1,7 @@
 
 #include "OLEDClient.h"
 
-#ifdef OLED_SDA
+#ifdef HAS_OLED
 #define LINE_HEIGHT 10
 
 OLEDClient::~OLEDClient() {}
