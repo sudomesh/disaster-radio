@@ -131,12 +131,11 @@ void Console::processLine(char *message, size_t len)
     #endif
     else if ((strncmp(&args[0][1], "lora", 4) == 0))
     {
-      char str[ADDR_LENGTH*2 + 1] = {'\0'};
-      char str2[256] = {'\0'}; //TODO: need to check size of routing table to allocate correct amount of memory
-      //hexToChar(str, LL2Class::localAddress(), ADDR_LENGTH);
-      printf("Local address: %s\r\n", str);
-      //LL2.getRoutingTable(str2);
-      printf("%s", str2);
+      // send messsage to LoRaClient, wait for response from LL2
+      memcpy(response.destination, BROADCAST, ADDR_LENGTH);
+      response.type = 'i';
+      msgLen = sprintf((char *)response.message, "lora");
+      server->transmit(this, response, msgLen + DATAGRAM_HEADER);
     }
     else
     {
