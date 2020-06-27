@@ -5,7 +5,7 @@
 #include "../DisasterClient.h"
 #include "../DisasterServer.h"
 
-#ifdef OLED_SDA
+#ifdef HAS_OLED
 #include "SSD1306Wire.h"
 #include <list>
 

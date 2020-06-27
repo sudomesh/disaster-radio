@@ -11,8 +11,9 @@
 #include <AsyncSDServer.h>
 #include <SD.h>
 #include <SPIFFS.h>
-#include "SSD1306Wire.h"
-
+#ifdef HAS_OLED
+#include <SSD1306Wire.h>
+#endif
 #include "config.h"
 
 #ifdef ARDUINO_LORA
@@ -53,7 +54,7 @@
 
 #define INDEX_FILE "index.htm"
 
-#ifdef OLED_SDA
+#ifdef HAS_OLED
 SSD1306Wire display(0x3c, OLED_SDA, OLED_SCL);
 #endif
 
@@ -388,7 +389,7 @@ void setupLoRa()
 
 void drawStatusBar()
 {
-  #ifdef OLED_SDA
+  #ifdef HAS_OLED
   if (!displayInitialized)
   {
     return;
@@ -436,7 +437,7 @@ void drawStatusBar()
 
 void setupDisplay()
 {
-#ifdef OLED_SDA
+#ifdef HAS_OLED
   Serial.println("* Initializing display...");
   if (OLED_RST != NOT_A_PIN)
   {
