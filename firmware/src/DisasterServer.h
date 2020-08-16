@@ -10,7 +10,7 @@
 #include "DisasterClient.h"
 
 #define DATAGRAM_HEADER 5
-#define DATAGRAM_MESSAGE 239
+#define DATAGRAM_MESSAGE 238
 
 class DisasterClient;
 

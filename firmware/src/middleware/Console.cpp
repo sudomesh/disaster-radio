@@ -23,7 +23,7 @@ void Console::printf(const char* format, ...)
   struct Datagram response;
   memcpy(response.destination, LOOPBACK, ADDR_LENGTH);
   response.type = 'i';
-  size_t len = vsprintf((char *)response.message, format, args);
+  size_t len = vsnprintf((char *)response.message, sizeof(response.message), format, args);
   client->receive(response, len + DATAGRAM_HEADER);
   va_end(args);
 }
@@ -48,7 +48,7 @@ void Console::processLine(char *message, size_t len)
     return;
   }
   struct Datagram response;
-  memset(response.message, 0, DATAGRAM_MESSAGE);
+  memset(&response, 0, DATAGRAM_MESSAGE);
   int msgLen;
 
   // message might not be NULL ended
@@ -195,11 +195,12 @@ void Console::printBanner()
   }
   */
   #endif
-  char *str = (char*)malloc(ADDR_LENGTH*2 + 1);// = {'\0'};
+  // TODO: need to get local address through a datagram
+  //char *str = (char*)malloc(ADDR_LENGTH*2 + 1);// = {'\0'};
   //hexToChar(str, LL2Class::localAddress(), ADDR_LENGTH);
-  printf("Local address of your node is %s\r\n", str);
+  printf("Local address of your node is __\r\n");
   printf("Type '/join NICKNAME' to join the chat, or '/help' for more commands.\r\n");
-  free(str);
+  //free(str);
 }
 
 void Console::printPrompt()
