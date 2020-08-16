@@ -19,11 +19,19 @@ void LoRaClient::loop()
 
 void LoRaClient::receive(struct Datagram datagram, size_t len)
 {
-    struct Datagram response;
+    struct Datagram response = {0};
 
     // forward all messages to LL2, except those of type 'i'(info)
     if(datagram.type == 'i'){
-        if(memcmp(&datagram.message[0], "lora", 4) == 0){
+        if(memcmp(&datagram.message[0], "addr", 4) == 0){
+            char localAddr[8] = {'\0'};
+            LL2->getLocalAddress(localAddr);
+            memcpy(response.destination, BROADCAST, ADDR_LENGTH);
+            response.type = 'i';
+            size_t msgLen = sprintf((char *)response.message, "%s", localAddr);
+            server->transmit(this, response, msgLen + DATAGRAM_HEADER);
+        }
+        else if(memcmp(&datagram.message[0], "lora", 4) == 0){
             char r_table[256] = {'\0'}; //TODO: need to check size of routing table to allocate correct amount of memory
             LL2->getRoutingTable(r_table);
             memcpy(response.destination, BROADCAST, ADDR_LENGTH);

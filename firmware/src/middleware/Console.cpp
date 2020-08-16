@@ -181,6 +181,8 @@ void Console::processLine(char *message, size_t len)
 
 void Console::printBanner()
 {
+  struct Datagram request = {0};
+  size_t msgLen;
   printf("     ___              __                            ___    \r\n");
   printf(" ___/ (_)__ ___ ____ / /____ ____      _______ ____/ (_)__ \r\n");
   printf("/ _  / (_-</ _ `(_-</ __/ -_) __/ _   / __/ _ `/ _  / / _ \\\r\n");
@@ -195,12 +197,13 @@ void Console::printBanner()
   }
   */
   #endif
-  // TODO: need to get local address through a datagram
-  //char *str = (char*)malloc(ADDR_LENGTH*2 + 1);// = {'\0'};
-  //hexToChar(str, LL2Class::localAddress(), ADDR_LENGTH);
-  printf("Local address of your node is __\r\n");
+  printf("Local address of your node is ");
+  memcpy(request.destination, BROADCAST, ADDR_LENGTH);
+  request.type = 'i';
+  msgLen = sprintf((char *)request.message, "addr");
+  server->transmit(this, request, msgLen + DATAGRAM_HEADER);
+  printf("\r\n");
   printf("Type '/join NICKNAME' to join the chat, or '/help' for more commands.\r\n");
-  //free(str);
 }
 
 void Console::printPrompt()
@@ -221,7 +224,6 @@ void Console::printPrompt()
 
 void Console::transmit(DisasterClient *client, struct Datagram datagram, size_t len)
 {
-  // TODO: set sessionConnected back to zero on disconnection?
   if(sessionConnected == 0){
     printBanner();
     printPrompt();
@@ -236,7 +238,14 @@ void Console::transmit(DisasterClient *client, struct Datagram datagram, size_t 
 
 void Console::receive(struct Datagram datagram, size_t len)
 {
-  printf("\r\n");
+  // only print out additional formatting for chat messages
+  if(datagram.type == 'c'){
+    printf("\r\n");
+  }
+
   client->receive(datagram, len);
-  printPrompt();
+
+  if(datagram.type == 'c'){
+    printPrompt();
+  }
 }
