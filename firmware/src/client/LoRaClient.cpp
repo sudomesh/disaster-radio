@@ -39,6 +39,14 @@ void LoRaClient::receive(struct Datagram datagram, size_t len)
             size_t msgLen = sprintf((char *)response.message, "%s", r_table);
             server->transmit(this, response, msgLen + DATAGRAM_HEADER);
         }
+        if(memcmp(&datagram.message[0], "config", 4) == 0){
+            char config[256] = {'\0'};
+            LL2->getCurrentConfig(config);
+            memcpy(response.destination, BROADCAST, ADDR_LENGTH);
+            response.type = 'i';
+            size_t msgLen = sprintf((char *)response.message, "%s", config);
+            server->transmit(this, response, msgLen + DATAGRAM_HEADER);
+        }
     }
     else{
       LL2->writeData(datagram, len);

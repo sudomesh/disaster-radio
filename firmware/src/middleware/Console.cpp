@@ -81,6 +81,16 @@ void Console::processLine(char *message, size_t len)
       server->connect(client);
     }
     #ifndef SIM
+    else if ((strncmp(&args[0][1], "get", 3) == 0) && (args.size() > 1))
+    {
+      if (strncmp(&args[1][0], "config", 6) == 0){
+        memcpy(response.destination, BROADCAST, ADDR_LENGTH);
+        response.type = 'i';
+        msgLen = sprintf((char *)response.message, "config");
+        server->transmit(this, response, msgLen + DATAGRAM_HEADER);
+      }
+    }
+
     else if ((strncmp(&args[0][1], "set", 3) == 0) && (args.size() > 1))
     {
       if (strncmp(&args[1][0], "ui", 2) == 0){
