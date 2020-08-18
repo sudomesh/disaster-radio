@@ -4,6 +4,7 @@ Preferences preferences;
 
 String username = "";
 bool useBLE = true;
+int txPower = 17;
 
 void getSettings(void)
 {
@@ -25,8 +26,10 @@ void getSettings(void)
 
   // Try to get UI settings, defaults to WiFi!
   useBLE = preferences.getBool("ble", false);
-
   Serial.printf("Got IF setting %s\n", useBLE ? "BLE" : "WiFi");
+  txPower = preferences.getInt("txPwr", false);
+  Serial.printf("Got txPwr setting %d\n", txPower);
+
 
   preferences.end();
   return;
@@ -61,6 +64,18 @@ void saveUI(bool useBLE)
   }
 
   preferences.putBool("ble", useBLE);
+  preferences.end();
+}
+
+void saveTxPower(int txPower)
+{
+  if (!preferences.begin("dr", false))
+  {
+    Serial.println("Error opening preferences");
+    return;
+  }
+
+  preferences.putInt("txPwr", txPower);
   preferences.end();
 }
 

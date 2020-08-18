@@ -50,6 +50,7 @@ void Console::processLine(char *message, size_t len)
   struct Datagram response;
   memset(&response, 0, DATAGRAM_MESSAGE);
   int msgLen;
+  int value;
 
   // message might not be NULL ended
   char msgBuff[len + 2] = {0};
@@ -72,7 +73,7 @@ void Console::processLine(char *message, size_t len)
 
     if (strncmp(&args[0][1], "help", 4) == 0)
     {
-      printf("Commands: /help /join /nick /raw /lora /set /restart\r\n");
+      printf("Commands: /help /join /nick /raw /lora /get /set /restart\r\n");
     }
     else if (strncmp(&args[0][1], "raw", 3) == 0)
     {
@@ -90,6 +91,11 @@ void Console::processLine(char *message, size_t len)
         server->transmit(this, response, msgLen + DATAGRAM_HEADER);
       }
     }
+    else if ((strncmp(&args[0][1], "get", 3) == 0) && (args.size() == 1)){
+      printf("No option provided, type '/get OPTION'\r\n");
+      printf("OPTIONs include,\r\n");
+      printf("'config' - print the current configuration of Layer1 interface and LL2 options\r\n");
+    }
 
     else if ((strncmp(&args[0][1], "set", 3) == 0) && (args.size() > 1))
     {
@@ -98,11 +104,46 @@ void Console::processLine(char *message, size_t len)
         delay(500);
         ESP.restart();
       }
+      else if ((strncmp(&args[1][0], "txpower", 7) == 0) && (args.size() > 2)){
+
+        sscanf(&args[2][0], "%d", &value);
+
+        if((value < 2) || (value > 20)){
+          printf("Invalid value provided, type '/set txpower VAL'\r\n");
+          printf("'txpower VAL' - sets the transmit power of LoRa transceiver,\r\n");
+          printf("                  where VAL is desired power in dB between 2 and 20\r\n");
+        }
+        else{
+          // save txPower to preferences, so it is maintained on next boot
+          saveTxPower(value);
+
+          // transmit setting change to LoRaClient
+          memcpy(response.destination, BROADCAST, ADDR_LENGTH);
+          response.type = 'i';
+          msgLen = sprintf((char *)response.message, "txpower %d", value);
+          server->transmit(this, response, msgLen + DATAGRAM_HEADER);
+        }
+      }
+      else if ((strncmp(&args[1][0], "txpower", 7) == 0) && (args.size() == 2)){
+        printf("No value provided, type '/set txpower VAL'\r\n");
+        printf("'txpower VAL' - sets the transmit power of LoRa transceiver,\r\n");
+        printf("                  where VAL is desired power in dB between 2 and 20\r\n");
+
+      }
+      else{
+        printf("Setting provided does not exist, type '/set SETTING'\r\n");
+        printf("SETTINGs include,\r\n");
+        printf("'ui' - toggles between WiFi and BLE user interface\r\n");
+        printf("'txpower VAL' - sets the transmit power of LoRa transceiver,\r\n");
+        printf("                  where VAL is desired power in dB between 2 and 20\r\n");
+      }
     }
     else if ((strncmp(&args[0][1], "set", 3) == 0) && (args.size() == 1)){
       printf("No setting provided, type '/set SETTING'\r\n");
       printf("SETTINGs include,\r\n");
       printf("'ui' - toggles between WiFi and BLE user interface\r\n");
+      printf("'txpower VAL' - sets the transmit power of LoRa transceiver,\r\n");
+      printf("                  where VAL is desired power in dB between 2 and 20\r\n");
     }
 
     else if (((strncmp(&args[0][1], "join", 4) == 0) || (strncmp(&args[0][1], "nick", 4) == 0)) && (args.size() > 1))

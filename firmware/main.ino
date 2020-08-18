@@ -334,6 +334,7 @@ void setupWebSocket()
 
 void setupLoRa()
 {
+  char cfgStr[DATAGRAM_MESSAGE];
 #ifdef LORA_CS
   Serial.println("* Initializing LoRa...");
   #ifdef LOPY4
@@ -341,8 +342,9 @@ void setupLoRa()
   #endif
   #ifdef ARDUINO_LORA
   Layer1Class *Layer1_1 = new Layer1Class();
-  Layer1->setPins(LORA_CS, LORA_RST, LORA_IRQ);
-  Layer1->setLoRaFrequency(LORA_FREQ);
+  Layer1_1->setPins(LORA_CS, LORA_RST, LORA_IRQ);
+  Layer1_1->setLoRaFrequency(LORA_FREQ);
+  Layer1_1->setTxPower(txPower);
   #endif
   #ifdef RL_SX1276
   pinMode(LORA_CS, OUTPUT);
@@ -374,7 +376,8 @@ void setupLoRa()
     if (lora_client->init())
     {
       Serial.printf(" --> LL2 init succeeded\r\n");
-      Serial.printf(" --> LL2 node address: %s\n", nodeAddress);
+      LL2->getCurrentConfig(cfgStr);
+      Serial.printf("%s", cfgStr);
       radio->connect(lora_client);
       loraInitialized = true;
       return;

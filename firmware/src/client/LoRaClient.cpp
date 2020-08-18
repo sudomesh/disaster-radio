@@ -20,6 +20,9 @@ void LoRaClient::loop()
 void LoRaClient::receive(struct Datagram datagram, size_t len)
 {
     struct Datagram response = {0};
+    int value;
+    int ret;
+    size_t msgLen;
 
     // forward all messages to LL2, except those of type 'i'(info)
     if(datagram.type == 'i'){
@@ -28,7 +31,7 @@ void LoRaClient::receive(struct Datagram datagram, size_t len)
             LL2->getLocalAddress(localAddr);
             memcpy(response.destination, BROADCAST, ADDR_LENGTH);
             response.type = 'i';
-            size_t msgLen = sprintf((char *)response.message, "%s", localAddr);
+            msgLen = sprintf((char *)response.message, "%s", localAddr);
             server->transmit(this, response, msgLen + DATAGRAM_HEADER);
         }
         else if(memcmp(&datagram.message[0], "lora", 4) == 0){
@@ -36,15 +39,28 @@ void LoRaClient::receive(struct Datagram datagram, size_t len)
             LL2->getRoutingTable(r_table);
             memcpy(response.destination, BROADCAST, ADDR_LENGTH);
             response.type = 'i';
-            size_t msgLen = sprintf((char *)response.message, "%s", r_table);
+            msgLen = sprintf((char *)response.message, "%s", r_table);
             server->transmit(this, response, msgLen + DATAGRAM_HEADER);
         }
-        if(memcmp(&datagram.message[0], "config", 4) == 0){
+        else if(memcmp(&datagram.message[0], "config", 4) == 0){
             char config[256] = {'\0'};
             LL2->getCurrentConfig(config);
             memcpy(response.destination, BROADCAST, ADDR_LENGTH);
             response.type = 'i';
-            size_t msgLen = sprintf((char *)response.message, "%s", config);
+            msgLen = sprintf((char *)response.message, "%s", config);
+            server->transmit(this, response, msgLen + DATAGRAM_HEADER);
+        }
+        else if(memcmp(&datagram.message[0], "txpower", 4) == 0){
+            sscanf((char *)&datagram.message[8], "%d", &value);
+            ret = LL2->setTxPower(value, 1);
+            memcpy(response.destination, BROADCAST, ADDR_LENGTH);
+            response.type = 'i';
+            if(ret > 0){
+                msgLen = sprintf((char *)response.message, "TxPower on LoRa%d set to %ddB\r\n", ret, value);
+            }
+            else{
+                msgLen = sprintf((char *)response.message, "TxPower setting failed\r\n");
+            }
             server->transmit(this, response, msgLen + DATAGRAM_HEADER);
         }
     }
