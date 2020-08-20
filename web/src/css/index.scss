@@ -28,7 +28,7 @@ h1 {
 #chat {
     width: 100%;
     max-width: 630px;
-    height: 470px;
+    height: 400px;
     margin: 0 auto;
     background-color: black;
     border: 1px solid rgba(80,80,80,1);
@@ -64,4 +64,20 @@ h1 {
     background-color: black;
     border: 0;
     border-top: 1px solid gray;
+}
+
+#routes {
+    width: 100%;
+    max-width: 630px;
+    height: 70px;
+    margin: 0 auto;
+    background-color: black;
+    border: 1px solid rgba(80,80,80,1);
+    color: #0fba00;
+    font-family: monospace;
+    font-size: 14px;
+    padding: 5px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    white-space: pre;
 }

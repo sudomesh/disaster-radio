@@ -51,7 +51,7 @@ F1 "Device_C_Small" 10 -80 50 H V L CNN
 F2 "" 0 0 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST
- *:C_*
+ C_*
 $ENDFPLIST
 DRAW
 P 2 0 1 13 -60 -20 60 -20 N
@@ -133,7 +133,7 @@ $FPLIST
  Choke_*
  *Coil*
  Inductor_*
- *:L_*
+ L_*
 $ENDFPLIST
 DRAW
 A 0 -60 20 -899 899 0 1 0 N 0 -80 0 -40
@@ -205,7 +205,7 @@ F1 "Device_R_Small" 30 -40 50 H V L CNN
 F2 "" 0 0 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST
- *:R_*
+ R_*
 $ENDFPLIST
 DRAW
 S -30 70 30 -70 0 1 8 N
@@ -263,22 +263,6 @@ C -80 0 20 0 0 0 N
 C 80 0 20 0 0 0 N
 X A 1 -200 0 100 R 50 50 1 1 P
 X B 2 200 0 100 L 50 50 1 1 P
-ENDDRAW
-ENDDEF
-#
-# Mechanical_Mounting_Hole
-#
-DEF Mechanical_Mounting_Hole MK 0 40 Y Y 1 F N
-F0 "MK" 0 200 50 H V C CNN
-F1 "Mechanical_Mounting_Hole" 0 125 50 H V C CNN
-F2 "" 0 0 50 H I C CNN
-F3 "" 0 0 50 H I C CNN
-$FPLIST
- Mounting?Hole*
- Hole*
-$ENDFPLIST
-DRAW
-C 0 0 50 0 1 50 N
 ENDDRAW
 ENDDEF
 #
@@ -392,6 +376,22 @@ P 2 0 1 0 100 -100 100 -75 N
 P 3 0 1 10 50 200 0 0 -50 200 N
 X A 1 0 -200 100 U 50 50 1 1 I
 X Shield 2 100 -200 100 U 50 50 1 1 I
+ENDDRAW
+ENDDEF
+#
+# lora_nodemcu-rescue_Mounting_Hole-Mechanical
+#
+DEF lora_nodemcu-rescue_Mounting_Hole-Mechanical MK 0 40 Y Y 1 F N
+F0 "MK" 0 200 50 H V C CNN
+F1 "lora_nodemcu-rescue_Mounting_Hole-Mechanical" 0 125 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+$FPLIST
+ Mounting?Hole*
+ Hole*
+$ENDFPLIST
+DRAW
+C 0 0 50 0 1 50 N
 ENDDRAW
 ENDDEF
 #

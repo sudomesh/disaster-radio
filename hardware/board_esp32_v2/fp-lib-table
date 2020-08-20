@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name "ESP32-WROOM-32U")(type "Legacy")(uri "${KIPRJMOD}/parts.pretty/ESP32-WROOM-32U.mod")(options "")(descr ""))
+  (lib (name "parts")(type "KiCad")(uri "${KIPRJMOD}/parts.pretty")(options "")(descr ""))
+)

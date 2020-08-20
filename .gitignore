@@ -1,7 +1,9 @@
 ~*
 esp8266-arduino
+arduino-esp32
 libs/**
 Makefile
+config.mk
 settings.mk
 web/settings.js
 web/static/build/*.js
@@ -9,4 +11,9 @@ web/static/build/*.css
 web/static/build/*.gz
 web/node_modules
 makeEspArduino/
+lib/**
+firmware/lib/**
 
+.pio
+.vscode
+secrets.h

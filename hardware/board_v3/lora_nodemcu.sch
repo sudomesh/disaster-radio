@@ -1,6 +1,6 @@
 EESchema Schematic File Version 4
 LIBS:lora_nodemcu-cache
-EELAYER 26 0
+EELAYER 29 0
 EELAYER END
 $Descr A3 16535 11693
 encoding utf-8
@@ -1180,7 +1180,7 @@ Wire Wire Line
 Wire Wire Line
 	11700 5500 8750 5500
 $Comp
-L Mechanical:Mounting_Hole MK1
+L lora_nodemcu-rescue:Mounting_Hole-Mechanical MK1
 U 1 1 5ABC6521
 P 1850 8950
 F 0 "MK1" H 1950 8996 50  0000 L CNN
@@ -1191,7 +1191,7 @@ F 3 "" H 1850 8950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Mechanical:Mounting_Hole MK3
+L lora_nodemcu-rescue:Mounting_Hole-Mechanical MK3
 U 1 1 5ABC68A6
 P 2700 8950
 F 0 "MK3" H 2800 8996 50  0000 L CNN
@@ -1202,7 +1202,7 @@ F 3 "" H 2700 8950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Mechanical:Mounting_Hole MK2
+L lora_nodemcu-rescue:Mounting_Hole-Mechanical MK2
 U 1 1 5ABC6A8E
 P 1850 9300
 F 0 "MK2" H 1950 9346 50  0000 L CNN
@@ -1213,7 +1213,7 @@ F 3 "" H 1850 9300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Mechanical:Mounting_Hole MK4
+L lora_nodemcu-rescue:Mounting_Hole-Mechanical MK4
 U 1 1 5ABC6A95
 P 2700 9300
 F 0 "MK4" H 2800 9346 50  0000 L CNN

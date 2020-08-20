@@ -4,6 +4,7 @@ import {h} from 'preact'
 module.exports = function(Component) {
 
   var ChatMessage = require('./chat_message')(Component)
+  var RouteMessage = require('./route_message')(Component)
 
   return class Chat extends Component {
 
@@ -11,9 +12,11 @@ module.exports = function(Component) {
       super(props)
 
       this.setState({
-        messages: []
+        messages: [],
+        routes: []
       });
       app.socket.addListener('c', this.receive)
+      app.socket.addListener('r', this.receiveRoutes)
     }
     
     scrollBottom() {
@@ -23,6 +26,18 @@ module.exports = function(Component) {
 
     receive(namespace, data) {
       app.actions.chat.showMessage(data.toString('utf8'));
+    }
+
+    receiveRoutes(namespace, data) {
+      var dataStr = '';
+      // tried to map across data, but wasn't working, so just did a loop
+      // convert byte array to byte string
+      for(var i = 0 ; i < data.length; i++){
+        var firstHalf = data[i] >> 4;
+        var secondHalf = data[i] & parseInt(1111, 2);
+        dataStr += firstHalf.toString(16) + secondHalf.toString(16);
+      }
+      app.actions.chat.showRoutes(dataStr.toString('utf8'));
     }
 
     send(e) {
@@ -48,10 +63,18 @@ module.exports = function(Component) {
         return <ChatMessage txt={o.txt} type={o.type} />
       }, this)
 
+      var routes = this.state.routes.map(function(o) {
+        return <RouteMessage rts={o} />
+      }, this)
+
 		  return <div>
         <form id="chatForm" action="/chat" method="POST" onsubmit={this.send}>
           <div id="chat">
             {messages}
+          </div>
+          <div id="routes">
+            <div><u>Active Nodes | Hops | Metric </u></div>
+            {routes}
           </div>
           <input id="chatInput" type="text" name="msg" placeholder="Enter you name or alias" autofocus />
         </form>

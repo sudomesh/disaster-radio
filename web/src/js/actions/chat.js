@@ -24,6 +24,19 @@ var self = module.exports = {
     })
   },
 
+  showRoutes: function(data) {
+    var length = data.length;
+    var routeTable = [];
+    var mac, hops, metric;
+    for(var i = 0; i < length*(1/16); i++ ){
+        mac = data.slice(i*16, (i*16)+12);
+        hops = data.slice((i*16)+12, (i*16)+14);
+        metric = data.slice((i*16)+14, (i*16)+16);
+        routeTable[i] = {"mac" : mac, "hops" : hops, "metric" : metric};
+    }
+    app.changeState({chat: {routes: routeTable}});
+  },
+
   sendMessage: function(msg, cb) {
     if(!msg.trim()) return cb(new Error("You must supply a (non-whitespace) message/nick"));
 

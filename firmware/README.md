@@ -11,7 +11,3 @@ To test the web app:
 * enter a nick
 * send a message
 * to toggle the local echo, type `$`
-
-# Firmware layout
-Currently, the firmware works like so:
-![alt-text](https://raw.githubusercontent.com/sudomesh/disaster-radio/master/firmware/diagram.png "firmware flow")

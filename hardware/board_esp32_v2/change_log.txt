@@ -1,0 +1,18 @@
+board_esp32 changelog
+
+191216
+Fitz
+ - Move components around layout
+ 
+200505
+Fitz
+ - Flipped SD Card
+ - Switched LORA2_NSS from IO34 to IO33 (since IO34 input only), battery analog voltage detection is no IO34
+ - increased pad length on USB and SD-CARD to make handsoldering easier
+ - changed switch to more common part (I have a 1000 of em)
+ - fixed E22-900M22S footprint
+ - Defaulted E22-900M30S to 3v3 (previously it was connected to both Vbatt and 3v3 shorting both!)
+ - removed copper from underneath ESP32 antenna
+ - fixed USB+ and USB- data lines, they were reversed going into the FT231XS usb to serial IC
+ - changed TPS62162 buck converter footprint to WSON, previous footprint was not in stock anywhere
+
