@@ -130,12 +130,55 @@ void Console::processLine(char *message, size_t len)
         printf("                  where VAL is desired power in dB between 2 and 20\r\n");
 
       }
+      else if ((strncmp(&args[1][0], "lorafrq", 7) == 0) && (args.size() > 2)){
+
+        sscanf(&args[2][0], "%d", &value);
+        // save new frequency to preferences
+        saveLoraFrq(value);
+        delay(500);
+        // changing this setting requires a reboot, maybe?
+        ESP.restart();
+
+      }
+      else if ((strncmp(&args[1][0], "lorafrq", 7) == 0) && (args.size() == 2)){
+        printf("No value provided, type '/set lorafrq VAL'\r\n");
+        printf("'lorafrq VAL' - sets the frequency for the LoRa transceiver,\r\n");
+        printf("                  where VAL is desired frequency in MHz\r\n");
+      }
+      else if ((strncmp(&args[1][0], "sf", 2) == 0) && (args.size() > 2)){
+
+        sscanf(&args[2][0], "%d", &value);
+        if((value < 6) || (value > 12)){
+          printf("Invalid value provided, type '/set sf VAL'\r\n");
+          printf("'sf VAL' - sets the spreading factor of LoRa transceiver,\r\n");
+          printf("           where VAL is desired spreading factor between 6 and 12\r\n");
+        }
+        else{
+          // save new spreading factor to preferences
+          saveSpreadingFactor(value);
+
+          // transmit setting change to LoRaClient
+          memcpy(response.destination, BROADCAST, ADDR_LENGTH);
+          response.type = 'i';
+          msgLen = sprintf((char *)response.message, "sf %d", value);
+          server->transmit(this, response, msgLen + DATAGRAM_HEADER);
+        }
+      }
+      else if ((strncmp(&args[1][0], "sf", 2) == 0) && (args.size() == 2)){
+        printf("No value provided, type '/set sf VAL'\r\n");
+        printf("'sf VAL' - sets the spreading factor of LoRa transceiver,\r\n");
+        printf("           where VAL is desired spreading factor between 6 and 12\r\n");
+      }
       else{
         printf("Setting provided does not exist, type '/set SETTING'\r\n");
         printf("SETTINGs include,\r\n");
         printf("'ui' - toggles between WiFi and BLE user interface\r\n");
         printf("'txpower VAL' - sets the transmit power of LoRa transceiver,\r\n");
         printf("                  where VAL is desired power in dB between 2 and 20\r\n");
+        printf("'lorafrq VAL' - sets the frequency for the LoRa transceiver,\r\n");
+        printf("                  where VAL is desired frequency in MHz\r\n");
+        printf("'sf VAL' - sets the spreading factor of LoRa transceiver,\r\n");
+        printf("           where VAL is desired spreading factor between 6 and 12\r\n");
       }
     }
     else if ((strncmp(&args[0][1], "set", 3) == 0) && (args.size() == 1)){
@@ -144,6 +187,10 @@ void Console::processLine(char *message, size_t len)
       printf("'ui' - toggles between WiFi and BLE user interface\r\n");
       printf("'txpower VAL' - sets the transmit power of LoRa transceiver,\r\n");
       printf("                  where VAL is desired power in dB between 2 and 20\r\n");
+      printf("'lorafrq VAL' - sets the frequency for the LoRa transceiver,\r\n");
+      printf("                  where VAL is desired frequency in MHz\r\n");
+      printf("'sf VAL' - sets the spreading factor of LoRa transceiver,\r\n");
+      printf("           where VAL is desired spreading factor between 6 and 12\r\n");
     }
 
     else if (((strncmp(&args[0][1], "join", 4) == 0) || (strncmp(&args[0][1], "nick", 4) == 0)) && (args.size() > 1))

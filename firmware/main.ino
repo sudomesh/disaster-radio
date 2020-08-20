@@ -343,8 +343,9 @@ void setupLoRa()
   #ifdef ARDUINO_LORA
   Layer1Class *Layer1_1 = new Layer1Class();
   Layer1_1->setPins(LORA_CS, LORA_RST, LORA_IRQ);
-  Layer1_1->setLoRaFrequency(LORA_FREQ);
+  Layer1_1->setLoRaFrequency(loraFrq*1E6);
   Layer1_1->setTxPower(txPower);
+  Layer1_1->setSpreadingFactor(spreadingFactor);
   #endif
   #ifdef RL_SX1276
   pinMode(LORA_CS, OUTPUT);

@@ -42,7 +42,7 @@ void LoRaClient::receive(struct Datagram datagram, size_t len)
             msgLen = sprintf((char *)response.message, "%s", r_table);
             server->transmit(this, response, msgLen + DATAGRAM_HEADER);
         }
-        else if(memcmp(&datagram.message[0], "config", 4) == 0){
+        else if(memcmp(&datagram.message[0], "config", 5) == 0){
             char config[256] = {'\0'};
             LL2->getCurrentConfig(config);
             memcpy(response.destination, BROADCAST, ADDR_LENGTH);
@@ -50,7 +50,7 @@ void LoRaClient::receive(struct Datagram datagram, size_t len)
             msgLen = sprintf((char *)response.message, "%s", config);
             server->transmit(this, response, msgLen + DATAGRAM_HEADER);
         }
-        else if(memcmp(&datagram.message[0], "txpower", 4) == 0){
+        else if(memcmp(&datagram.message[0], "txpower", 7) == 0){
             sscanf((char *)&datagram.message[8], "%d", &value);
             ret = LL2->setTxPower(value, 1);
             memcpy(response.destination, BROADCAST, ADDR_LENGTH);
@@ -60,6 +60,19 @@ void LoRaClient::receive(struct Datagram datagram, size_t len)
             }
             else{
                 msgLen = sprintf((char *)response.message, "TxPower setting failed\r\n");
+            }
+            server->transmit(this, response, msgLen + DATAGRAM_HEADER);
+        }
+        else if(memcmp(&datagram.message[0], "sf", 2) == 0){
+            sscanf((char *)&datagram.message[3], "%d", &value);
+            ret = LL2->setSpreadingFactor(value, 1);
+            memcpy(response.destination, BROADCAST, ADDR_LENGTH);
+            response.type = 'i';
+            if(ret > 0){
+                msgLen = sprintf((char *)response.message, "SpreadingFactor on LoRa%d set to %d\r\n", ret, value);
+            }
+            else{
+                msgLen = sprintf((char *)response.message, "SpreadingFactor setting failed\r\n");
             }
             server->transmit(this, response, msgLen + DATAGRAM_HEADER);
         }
