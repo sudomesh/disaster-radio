@@ -26,6 +26,24 @@ public:
 
     void setup();
 
+    void usage();
+    void getUsage();
+    void uiUsage();
+    void txpowerUsage();
+    void lorafrqUsage();
+    void sfUsage();
+    void dutyUsage();
+    void setUsage();
+
+    void get(std::vector<char *> args);
+
+    void uiSet();
+    void txpowerSet(std::vector<char *> args);
+    void lorafrqSet(std::vector<char *> args);
+    void sfSet(std::vector<char *> args);
+    void dutySet(std::vector<char *> args);
+    void set(std::vector<char *> args);
+
     void transmit(DisasterClient *client, struct Datagram datagram, size_t len);
     void receive(struct Datagram datagram, size_t len);
 

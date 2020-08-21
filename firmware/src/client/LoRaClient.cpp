@@ -21,6 +21,7 @@ void LoRaClient::receive(struct Datagram datagram, size_t len)
 {
     struct Datagram response = {0};
     int value;
+    double value2;
     int ret;
     size_t msgLen;
 
@@ -74,6 +75,14 @@ void LoRaClient::receive(struct Datagram datagram, size_t len)
             else{
                 msgLen = sprintf((char *)response.message, "SpreadingFactor setting failed\r\n");
             }
+            server->transmit(this, response, msgLen + DATAGRAM_HEADER);
+        }
+        else if(memcmp(&datagram.message[0], "duty", 4) == 0){
+            sscanf((char *)&datagram.message[5], "%lf", &value2);
+            LL2->setDutyCycle(value2);
+            memcpy(response.destination, BROADCAST, ADDR_LENGTH);
+            response.type = 'i';
+            msgLen = sprintf((char *)response.message, "Duty Cycle of LL2 set to %lf\r\n", value2);
             server->transmit(this, response, msgLen + DATAGRAM_HEADER);
         }
     }

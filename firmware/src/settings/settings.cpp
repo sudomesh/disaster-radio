@@ -7,6 +7,7 @@ bool useBLE = true;
 int txPower = 17;
 int loraFrq = 915;
 int spreadingFactor = 9;
+double dutyCycle = .1;
 
 void getSettings(void)
 {
@@ -35,6 +36,8 @@ void getSettings(void)
   Serial.printf("Got loraFrq setting %d\n", loraFrq);
   spreadingFactor = preferences.getInt("sf", spreadingFactor);
   Serial.printf("Got sf setting %d\n", spreadingFactor);
+  dutyCycle = preferences.getDouble("duty", dutyCycle);
+  Serial.printf("Got duty setting %lf\n", dutyCycle);
 
   preferences.end();
   return;
@@ -105,5 +108,17 @@ void saveSpreadingFactor(int spreadFactor)
   }
 
   preferences.putInt("sf", spreadFactor);
+  preferences.end();
+}
+
+void saveDutyCycle(double dutyCycle)
+{
+  if (!preferences.begin("dr", false))
+  {
+    Serial.println("Error opening preferences");
+    return;
+  }
+
+  preferences.putDouble("duty", dutyCycle);
   preferences.end();
 }

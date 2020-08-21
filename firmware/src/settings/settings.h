@@ -8,9 +8,11 @@ void saveUI(bool useBLE);
 void saveTxPower(int txPower);
 void saveLoraFrq(int loraFrq);
 void saveSpreadingFactor(int spreadFactor);
+void saveDutyCycle(double dutyCycle);
 
 extern String username;
 extern bool useBLE;
 extern int txPower;
 extern int loraFrq;
 extern int spreadingFactor;
+extern double dutyCycle;
