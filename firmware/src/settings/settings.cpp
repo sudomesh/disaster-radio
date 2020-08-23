@@ -8,6 +8,8 @@ int txPower = 17;
 int loraFrq = 915;
 int spreadingFactor = 9;
 double dutyCycle = .1;
+long routeInterval = 10000;
+long beaconPeriod = 0;
 
 void getSettings(void)
 {
@@ -38,6 +40,10 @@ void getSettings(void)
   Serial.printf("Got sf setting %d\n", spreadingFactor);
   dutyCycle = preferences.getDouble("duty", dutyCycle);
   Serial.printf("Got duty setting %lf\n", dutyCycle);
+  routeInterval = preferences.getLong("interval", routeInterval);
+  Serial.printf("Got interval setting %ld\n", routeInterval);
+  beaconPeriod = preferences.getLong("gps", beaconPeriod);
+  Serial.printf("Got gps setting %ld\n", beaconPeriod);
 
   preferences.end();
   return;
@@ -120,5 +126,29 @@ void saveDutyCycle(double dutyCycle)
   }
 
   preferences.putDouble("duty", dutyCycle);
+  preferences.end();
+}
+
+void saveInterval(long interval)
+{
+  if (!preferences.begin("dr", false))
+  {
+    Serial.println("Error opening preferences");
+    return;
+  }
+
+  preferences.putLong("interval", interval);
+  preferences.end();
+}
+
+void saveGPS(long period)
+{
+  if (!preferences.begin("dr", false))
+  {
+    Serial.println("Error opening preferences");
+    return;
+  }
+
+  preferences.putLong("gps", period);
   preferences.end();
 }

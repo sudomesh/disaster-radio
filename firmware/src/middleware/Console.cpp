@@ -5,6 +5,7 @@
 
 #include <LoRaLayer2.h>
 #include "../utils/utils.h"
+#include "../../config.h"
 #ifndef SIM
 #include "settings/settings.h"
 #endif
@@ -53,32 +54,49 @@ void Console::getUsage()
 
 void Console::uiUsage()
 {
-  printf("'ui' - toggles between WiFi and BLE user interface\r\n");
+  printf("'ui'           - toggles between WiFi and BLE user interface\r\n\r\n");
 }
 
 void Console::txpowerUsage()
 {
-  printf("'txpower VAL' - sets the transmit power of LoRa transceiver,\r\n");
-  printf("                  where VAL is desired power in dB between 2 and 20\r\n");
+  printf("'txpower VAL'  - sets the transmit power of LoRa transceiver,\r\n");
+  printf("                 where VAL is desired power in dB between 2 and 20\r\n\r\n");
 }
 
 void Console::lorafrqUsage()
 {
-  printf("'lorafrq VAL' - sets the frequency for the LoRa transceiver,\r\n");
-  printf("                  where VAL is desired frequency in MHz\r\n");
+  printf("'lorafrq VAL'  - sets the frequency for the LoRa transceiver,\r\n");
+  printf("                 where VAL is desired frequency in MHz\r\n\r\n");
 }
 
 void Console::sfUsage()
 {
-  printf("'sf VAL' - sets the spreading factor of LoRa transceiver,\r\n");
-  printf("           where VAL is desired spreading factor between 6 and 12\r\n");
+  printf("'sf VAL'       - sets the spreading factor of LoRa transceiver,\r\n");
+  printf("                 where VAL is desired spreading factor between 6 and 12\r\n\r\n");
 }
 
 void Console::dutyUsage()
 {
-  printf("'duty VAL' - sets the duty cycle of LoRaLayer2 protocol,\r\n");
-  printf("           where VAL is a floating point decimal representing\r\n");
-  printf("           precentage of airtime alotted for this LL2 node\r\n");
+  printf("'duty VAL'     - sets the duty cycle of LoRaLayer2 protocol,\r\n");
+  printf("                 where VAL is a floating point decimal representing\r\n");
+  printf("                 precentage of airtime alotted for this LL2 node\r\n\r\n");
+}
+
+void Console::intervalUsage()
+{
+  printf("'interval VAL' - sets the interval (in ms) at which LoRaLayer2\r\n");
+  printf("                 routing table messages are broadcast to neighboiring nodes\r\n");
+  printf("                 Allowing routing table is built/maintained `automatically`\r\n");
+  printf("                 if 0 is entered as VAL, routing table messages are disabled\r\n");
+  printf("                 and routing table must be built/maintained 'manually' by nodes\r\n");
+  printf("                 actively transmitting messages to one another\r\n\r\n");
+}
+
+void Console::gpsUsage()
+{
+  printf("'gps VAL'      - sets the inverval (in ms) at which a GPS beacon messages are broadcast\r\n");
+  printf("                 if 0 is entered as VAL, GPS beacon messages are disabled,\r\n");
+  printf("                 but GPS coordinates may still be availble for internal use\r\n");
 }
 
 void Console::setUsage()
@@ -89,6 +107,10 @@ void Console::setUsage()
   lorafrqUsage();
   sfUsage();
   dutyUsage();
+  intervalUsage();
+#ifdef GPS_SERIAL
+  gpsUsage();
+#endif
 }
 
 void Console::get(std::vector<char *> args)
@@ -181,6 +203,46 @@ void Console::dutySet(std::vector<char *> args)
   }
 }
 
+void Console::intervalSet(std::vector<char *> args)
+{
+  struct Datagram response;
+  int msgLen;
+  long value; // this should use an unsigned long, but LL2 would need to be updated also
+
+  sscanf(&args[2][0], "%ld", &value);
+  if(value < 0 || value > 2147483647){ // i.e. max value of signed long
+    printf("Invalid value provided, type '/set interval VAL'\r\n");
+    intervalUsage();
+  }
+  else{
+    saveInterval(value);
+    memcpy(response.destination, BROADCAST, ADDR_LENGTH);
+    response.type = 'i';
+    msgLen = sprintf((char *)response.message, "interval %ld", value);
+    server->transmit(this, response, msgLen + DATAGRAM_HEADER);
+  }
+}
+
+void Console::gpsSet(std::vector<char *> args)
+{
+  struct Datagram response;
+  int msgLen;
+  long value; // this should use an unsigned long, but LL2 would need to be updated also
+
+  sscanf(&args[2][0], "%ld", &value);
+  if(value < 0 || value > 2147483647){ // i.e. max value of signed long
+    printf("Invalid value provided, type '/set gps VAL'\r\n");
+    gpsUsage();
+  }
+  else{
+    saveGPS(value);
+    memcpy(response.destination, BROADCAST, ADDR_LENGTH);
+    response.type = 'i';
+    msgLen = sprintf((char *)response.message, "gps %ld", value);
+    server->transmit(this, response, msgLen + DATAGRAM_HEADER);
+  }
+}
+
 void Console::set(std::vector<char *> args)
 {
   if (strncmp(&args[1][0], "ui", 2) == 0)
@@ -222,6 +284,24 @@ void Console::set(std::vector<char *> args)
     printf("No value provided, type '/set duty VAL'\r\n");
     dutyUsage();
   }
+  else if ((strncmp(&args[1][0], "interval", 8) == 0) && (args.size() > 2))
+  {
+    intervalSet(args);
+  }
+  else if ((strncmp(&args[1][0], "interval", 8) == 0) && (args.size() == 2)){
+    printf("No value provided, type '/set interval VAL'\r\n");
+    intervalUsage();
+  }
+#ifdef GPS_SERIAL
+  else if ((strncmp(&args[1][0], "gps", 3) == 0) && (args.size() > 2))
+  {
+    gpsSet(args);
+  }
+  else if ((strncmp(&args[1][0], "gps", 3) == 0) && (args.size() == 2)){
+    printf("No value provided, type '/set gps VAL'\r\n");
+    gpsUsage();
+  }
+#endif
   else{
     printf("Setting provided does not exist, type '/set SETTING'\r\n");
     setUsage();

@@ -9,8 +9,8 @@ void GPSClient::loop()
         gps.encode(stream->read());
     }
 
-    int elapsed = millis() - beacon_last;
-    if (elapsed > beacon_period)
+    long elapsed = millis() - beacon_last;
+    if (elapsed > beacon_period && beacon_period > 0)
     {
         if (gps.location.isValid() && gps.location.age() < beacon_period)
         {
@@ -39,4 +39,31 @@ void GPSClient::loop()
 void GPSClient::setUsername(String newname)
 {
 	username = newname;
+}
+
+void GPSClient::setBeaconPeriod(long new_period)
+{
+	beacon_period = new_period;
+}
+
+void GPSClient::receive(struct Datagram datagram, size_t len)
+{
+  Datagram response;
+  int msgLen;
+  long value;
+  if(datagram.type == 'i'){
+    if(memcmp(&datagram.message[0], "gps", 3) == 0){
+      sscanf((char *)&datagram.message[4], "%ld", &value);
+      setBeaconPeriod(value);
+      memcpy(response.destination, BROADCAST, ADDR_LENGTH);
+      response.type = 'i';
+      if(value > 0){
+        msgLen = sprintf((char *)response.message, "GPS beacons enabled, interval of GPS beacon messages set to %ldms\r\n", value);
+      }
+      else if(value == 0){
+        msgLen = sprintf((char *)response.message, "GPS beacons disabled\r\n");
+      }
+      server->transmit(this, response, msgLen + DATAGRAM_HEADER);
+    }
+  }
 }

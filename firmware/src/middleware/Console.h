@@ -33,6 +33,8 @@ public:
     void lorafrqUsage();
     void sfUsage();
     void dutyUsage();
+    void intervalUsage();
+    void gpsUsage();
     void setUsage();
 
     void get(std::vector<char *> args);
@@ -42,6 +44,8 @@ public:
     void lorafrqSet(std::vector<char *> args);
     void sfSet(std::vector<char *> args);
     void dutySet(std::vector<char *> args);
+    void intervalSet(std::vector<char *> args);
+    void gpsSet(std::vector<char *> args);
     void set(std::vector<char *> args);
 
     void transmit(DisasterClient *client, struct Datagram datagram, size_t len);

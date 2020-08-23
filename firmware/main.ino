@@ -373,6 +373,7 @@ void setupLoRa()
     }
     #endif
     LL2->setLocalAddress(nodeAddress);
+    LL2->setInterval(routeInterval);
     LoRaClient *lora_client = new LoRaClient(LL2);
     if (lora_client->init())
     {
@@ -474,7 +475,7 @@ void setupGPS()
 #ifdef GPS_SERIAL
   Serial.println("* Initializing GPS...");
   Serial1.begin(GPS_SERIAL);
-  radio->connect(new GPSClient(&Serial1));
+  radio->connect(new GPSClient(&Serial1, beaconPeriod));
 #endif
 }
 

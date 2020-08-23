@@ -22,7 +22,8 @@ void LoRaClient::receive(struct Datagram datagram, size_t len)
     struct Datagram response = {0};
     int value;
     double value2;
-    int ret;
+    long value3;
+    long ret;
     size_t msgLen;
 
     // forward all messages to LL2, except those of type 'i'(info)
@@ -83,6 +84,19 @@ void LoRaClient::receive(struct Datagram datagram, size_t len)
             memcpy(response.destination, BROADCAST, ADDR_LENGTH);
             response.type = 'i';
             msgLen = sprintf((char *)response.message, "Duty Cycle of LL2 set to %lf\r\n", value2);
+            server->transmit(this, response, msgLen + DATAGRAM_HEADER);
+        }
+        else if(memcmp(&datagram.message[0], "interval", 8) == 0){
+            sscanf((char *)&datagram.message[9], "%ld", &value3);
+            ret = LL2->setInterval(value3);
+            memcpy(response.destination, BROADCAST, ADDR_LENGTH);
+            response.type = 'i';
+            if(ret > 0){
+              msgLen = sprintf((char *)response.message, "Routing mode set to `auto`, interval of routing table messages set to %ld\r\n", ret);
+            }
+            else if(ret == 0){
+              msgLen = sprintf((char *)response.message, "Routing table messages disabled, routing mode set to `manual`\r\n");
+            }
             server->transmit(this, response, msgLen + DATAGRAM_HEADER);
         }
     }
