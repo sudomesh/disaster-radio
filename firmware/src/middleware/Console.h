@@ -7,6 +7,9 @@
 #include "../DisasterHistory.h"
 #endif
 
+#include <vector>
+#include <string>
+
 class Console : public DisasterMiddleware
 {
 #ifndef SIM

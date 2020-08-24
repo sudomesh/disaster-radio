@@ -58,7 +58,7 @@ void LoRaClient::receive(struct Datagram datagram, size_t len)
             memcpy(response.destination, BROADCAST, ADDR_LENGTH);
             response.type = 'i';
             if(ret > 0){
-                msgLen = sprintf((char *)response.message, "TxPower on LoRa%d set to %ddB\r\n", ret, value);
+                msgLen = sprintf((char *)response.message, "TxPower on LoRa%ld set to %ddB\r\n", ret, value);
             }
             else{
                 msgLen = sprintf((char *)response.message, "TxPower setting failed\r\n");
@@ -71,7 +71,7 @@ void LoRaClient::receive(struct Datagram datagram, size_t len)
             memcpy(response.destination, BROADCAST, ADDR_LENGTH);
             response.type = 'i';
             if(ret > 0){
-                msgLen = sprintf((char *)response.message, "SpreadingFactor on LoRa%d set to %d\r\n", ret, value);
+                msgLen = sprintf((char *)response.message, "SpreadingFactor on LoRa%ld set to %d\r\n", ret, value);
             }
             else{
                 msgLen = sprintf((char *)response.message, "SpreadingFactor setting failed\r\n");

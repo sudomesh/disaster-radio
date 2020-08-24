@@ -10,8 +10,6 @@
 #include "settings/settings.h"
 #endif
 
-#include <vector>
-
 #ifdef SIM
 Console::Console(){};
 #endif
@@ -46,6 +44,8 @@ void Console::usage()
   printf("Commands: /help /join /nick /raw /lora /get /set /restart\r\n");
 }
 
+// TODO add support for `/get` and `/set` in simulator
+#ifndef SIM
 void Console::getUsage()
 {
   printf("OPTIONs include,\r\n");
@@ -307,6 +307,7 @@ void Console::set(std::vector<char *> args)
     setUsage();
   }
 }
+#endif
 
 void Console::processLine(char *message, size_t len)
 {
