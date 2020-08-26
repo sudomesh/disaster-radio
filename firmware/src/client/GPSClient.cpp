@@ -12,13 +12,13 @@ void GPSClient::loop()
     long elapsed = millis() - beacon_last;
     if (elapsed > beacon_period && beacon_period > 0)
     {
+        struct Datagram datagram = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+        memset(datagram.message, 0, 233);
+		size_t len;
         if (gps.location.isValid() && gps.location.age() < beacon_period)
         {
 			// 04m|<user>{"pos":[48.75608,2.302038]}
-            struct Datagram datagram = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-			memset(datagram.message, 0, 233);
 			datagram.type = 'm';
-			size_t len;
 			if (username.length() > 0)
 			{
 				len = snprintf((char *)datagram.message, 233, "m|<%s>{\"pos\":[%.3f,%.3f]}", username.c_str(), gps.location.lat(), gps.location.lng());
@@ -27,12 +27,22 @@ void GPSClient::loop()
 			{
 				len = snprintf((char *)datagram.message, 233, "m|<%s>{\"pos\":[%.3f,%.3f]}", nodeAddress, gps.location.lat(), gps.location.lng());
 			}
-            len = len+DATAGRAM_HEADER;
-
-			Serial.printf("Sending GPS %s\n", (char *)datagram.message);
+            // Send datagram with lat-long info
             server->transmit(this, datagram, len);
-            beacon_last = millis();
+            // if debug is enabled, print coordinates to console
+            datagram.type = 'i';
+			len = snprintf((char *)datagram.message, 233, "Sent GPS reading [%.3f,%.3f]\r\n", gps.location.lat(), gps.location.lng());
+            len = len+DATAGRAM_HEADER;
+            server->transmit(this, datagram, len);
         }
+        else
+        {
+            datagram.type = 'i';
+	        len = snprintf((char *)datagram.message, 233, "Failed to get GPS reading\r\n");
+            len = len+DATAGRAM_HEADER;
+            server->transmit(this, datagram, len);
+        }
+        beacon_last = millis();
     }
 }
 

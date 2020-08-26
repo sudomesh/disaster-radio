@@ -476,6 +476,15 @@ void setupGPS()
   Serial.println("* Initializing GPS...");
   Serial1.begin(GPS_SERIAL);
   radio->connect(new GPSClient(&Serial1, beaconPeriod));
+  Serial.printf(" --> GPS connected,");
+  if(beaconPeriod == 0)
+  {
+    Serial.printf(" beacons disabled\r\n");
+  }
+  else
+  {
+    Serial.printf(" beacons enabled with period of %ldms\r\n", beaconPeriod);
+  }
 #endif
 }
 

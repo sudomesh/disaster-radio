@@ -511,14 +511,16 @@ void Console::transmit(DisasterClient *client, struct Datagram datagram, size_t 
 
 void Console::receive(struct Datagram datagram, size_t len)
 {
+  // only print chat and info messages, add more as needed
+  if(datagram.type == 'i')
+  {
+    client->receive(datagram, len);
+  }
+
   // only print out additional formatting for chat messages
   if(datagram.type == 'c'){
     printf("\r\n");
-  }
-
-  client->receive(datagram, len);
-
-  if(datagram.type == 'c'){
+    client->receive(datagram, len);
     printPrompt();
   }
 }
