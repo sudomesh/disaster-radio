@@ -9,3 +9,18 @@ fix lora (small) footprint ***
 make E22-900M30S only connect to 3V3 or Vbatt NOT both! **
 remove copper form underneath esp32 antenna ***
 fix usb plus and minus reverse *** 
+
+
+todo_200811
+
+switching LORA1_DIO2 to IO26 and LORA1_RXEN to IO21 ****
+connect LORAx_DIO1 pins instead of LORAx_DIO2 to ESP32 ***
+	add solderbridge between the two LORAxDIO1 lines  ****
+connect LORAx_DIO2 pins to LORAx_TXEN (for SetDio2AsRfSwitchCtrl)  ****
+switch wroom module ****
+
+
+-possible changes:
+hook up SENSOR_VP/VN as inputs ***
+remove or repurpose LORA leds, connect to dio2 and txen **
+ 

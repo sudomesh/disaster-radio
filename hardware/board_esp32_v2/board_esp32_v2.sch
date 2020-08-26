@@ -1,5 +1,5 @@
-EESchema Schematic File Version 5
-EELAYER 32 0
+EESchema Schematic File Version 4
+EELAYER 30 0
 EELAYER END
 $Descr A3 16535 11693
 encoding utf-8
@@ -12,11 +12,6 @@ Comment1 ""
 Comment2 ""
 Comment3 ""
 Comment4 ""
-Comment5 ""
-Comment6 ""
-Comment7 ""
-Comment8 ""
-Comment9 ""
 $EndDescr
 Connection ~ 13100 1350
 Connection ~ 13350 1350
@@ -1451,7 +1446,7 @@ L Device:R_Small R7
 U 1 1 5DD569E4
 P 4750 1650
 F 0 "R7" H 4809 1696 50  0000 L CNN
-F 1 "1K" H 4809 1605 50  0000 L CNN
+F 1 "100" H 4809 1605 50  0000 L CNN
 F 2 "Resistor_SMD:R_0402_1005Metric" H 4750 1650 50  0001 C CNN
 F 3 "~" H 4750 1650 50  0001 C CNN
 	1    4750 1650

@@ -1,11 +1,9 @@
 board_esp32 changelog
 
-191216
-Fitz
+191216 - Fitz
  - Move components around layout
  
-200505
-Fitz
+200505 - Fitz
  - Flipped SD Card
  - Switched LORA2_NSS from IO34 to IO33 (since IO34 input only), battery analog voltage detection is no IO34
  - increased pad length on USB and SD-CARD to make handsoldering easier
@@ -16,3 +14,12 @@ Fitz
  - fixed USB+ and USB- data lines, they were reversed going into the FT231XS usb to serial IC
  - changed TPS62162 buck converter footprint to WSON, previous footprint was not in stock anywhere
 
+
+200819 - Fitz
+connect LORAx_DIO2 pin to LORAx_TXEN, and removed LORAx_TXEN connection to MCU
+switched D5/D6 from LORAx_DIO1 to LORAx_DIO2
+switching LORA1_DIO2 and LORA1_RXEN (IO26 and IO21)
+connect LORAx_DIO1 pins instead of LORAx_DIO2 to ESP32 (IO17, IO26)
+add non-connected solder bridge between LORAxDIO1s (as a GPIO conservation)
+changed ESP32 from WROOM-32D to WROOM-32U (exernal antenna)
+hook un-used ESP32 pins (including SENSOR_VP/VN) to test point
