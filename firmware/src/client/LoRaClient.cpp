@@ -3,7 +3,6 @@
 bool LoRaClient::init()
 {
     LL2->init(); // initialize Layer2
-    LL2->setInterval(0); // set to zero to disable routing packets
     return true;
 }
 
