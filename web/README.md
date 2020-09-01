@@ -1,5 +1,14 @@
 
-This is the web app served up by the ESP8266 for Disaster Radio + the simulator web server.
+This is the web app served up by the Disaster Radio firmware + the simulator web server.
+
+# Dependencies
+
+This web app is intended to be built using Node.JS version 7.10.1. It is recommended that a tool such as [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) is used to manage your Node and NPM versions.   
+If you have `nvm` installed, you can install and activate the correct version of Node.JS like so,
+```
+nvm install 7.10.1
+nvm use 7.10.1
+```  
 
 # Setup
 
