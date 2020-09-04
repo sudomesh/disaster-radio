@@ -10,10 +10,9 @@ void TCPClient::receive(struct Datagram datagram, size_t len)
 
 void TCPClient::handleData(void *data, size_t len)
 {
-  struct Datagram datagram; //= {0xff, 0xff, 0xff, 0xff};
+  struct Datagram datagram;
   memcpy(datagram.destination, BROADCAST, ADDR_LENGTH);
   datagram.type = 'c';
-  memset(datagram.message, 0, DATAGRAM_MESSAGE);
   memcpy(datagram.message, data, len);
   len = len+DATAGRAM_HEADER;
   server->transmit(this, datagram, len);
