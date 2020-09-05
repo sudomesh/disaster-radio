@@ -19,7 +19,7 @@ public:
   void receive(struct Datagram datagram, size_t len);
 
 private:
-  char input[DATAGRAM_MESSAGE];
+  char input[MESSAGE_LENGTH];
   int inputLength;
 
 };

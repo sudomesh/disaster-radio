@@ -334,7 +334,7 @@ void setupWebSocket()
 
 void setupLoRa()
 {
-  char cfgStr[DATAGRAM_MESSAGE];
+  char cfgStr[MESSAGE_LENGTH];
 #ifdef LORA_CS
   Serial.println("* Initializing LoRa...");
   #ifdef LOPY4

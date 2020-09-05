@@ -317,7 +317,6 @@ void Console::processLine(char *message, size_t len)
     return;
   }
   struct Datagram response;
-  memset(&response, 0, DATAGRAM_MESSAGE);
   int msgLen;
 
   // message might not be NULL ended

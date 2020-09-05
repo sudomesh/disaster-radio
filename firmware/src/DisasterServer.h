@@ -9,9 +9,6 @@
 
 #include "DisasterClient.h"
 
-#define DATAGRAM_HEADER 5
-#define DATAGRAM_MESSAGE 238
-
 class DisasterClient;
 
 class DisasterServer

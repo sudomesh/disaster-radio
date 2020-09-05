@@ -53,7 +53,7 @@ void StreamClient::loop()
         memcpy(datagram.message, input, inputLength);
         server->transmit(this, datagram, inputLength + DATAGRAM_HEADER);
 
-        memset(input, 0, DATAGRAM_MESSAGE);
+        memset(input, 0, MESSAGE_LENGTH);
         inputLength = 0;
       }
       else
