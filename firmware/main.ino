@@ -349,9 +349,11 @@ void setupLoRa()
   #endif
   #ifdef RL_SX1276
   pinMode(LORA_CS, OUTPUT);
-  pinMode(LORA2_CS, OUTPUT);
   digitalWrite(LORA_CS, LOW);
+  #ifdef DUAL_LORA
+  pinMode(LORA2_CS, OUTPUT);
   digitalWrite(LORA2_CS, HIGH);
+  #endif
   Layer1Class *Layer1_1 = new Layer1Class(&lora, 0, LORA_CS, LORA_RST, LORA_IRQ, 9, 915, 17);
   #ifdef DUAL_LORA
   digitalWrite(LORA_CS, HIGH);
