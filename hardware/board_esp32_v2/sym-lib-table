@@ -1,5 +1,7 @@
 (sym_lib_table
-  (lib (name "symbols")(type "Legacy")(uri "${KIPRJMOD}/symbols/symbols.lib")(options "")(descr ""))
-  (lib (name "ESP32-WROOM-32U")(type "Legacy")(uri "${KIPRJMOD}/symbols/ESP32-WROOM-32U.lib")(options "")(descr ""))
-  (lib (name "board_esp32-rescue")(type "Legacy")(uri "${KIPRJMOD}/board_esp32-rescue.lib")(options "")(descr ""))
+  (lib (name symbols)(type Legacy)(uri ${KIPRJMOD}/symbols/symbols.lib)(options "")(descr ""))
+  (lib (name ESP32-WROOM-32U)(type Legacy)(uri ${KIPRJMOD}/symbols/ESP32-WROOM-32U.lib)(options "")(descr ""))
+  (lib (name board_esp32-rescue)(type Legacy)(uri ${KIPRJMOD}/board_esp32-rescue.lib)(options "")(descr ""))
+  (lib (name board_esp32_v2-rescue)(type Legacy)(uri ${KIPRJMOD}/board_esp32_v2-rescue.lib)(options "")(descr ""))
+  (lib (name board_esp32_v2_updated-rescue)(type Legacy)(uri ${KIPRJMOD}/board_esp32_v2_updated-rescue.lib)(options "")(descr ""))
 )

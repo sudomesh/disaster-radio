@@ -1,5 +1,5 @@
-EESchema Schematic File Version 4
-EELAYER 30 0
+EESchema Schematic File Version 5
+EELAYER 34 0
 EELAYER END
 $Descr A3 16535 11693
 encoding utf-8
@@ -12,53 +12,58 @@ Comment1 ""
 Comment2 ""
 Comment3 ""
 Comment4 ""
+Comment5 ""
+Comment6 ""
+Comment7 ""
+Comment8 ""
+Comment9 ""
 $EndDescr
-Connection ~ 13100 1350
-Connection ~ 13350 1350
-Connection ~ 13900 1350
-Connection ~ 11700 1350
-Connection ~ 11500 1350
-Connection ~ 12500 4950
-Connection ~ 8250 6250
-Connection ~ 8850 6200
-Connection ~ 8250 6200
-Connection ~ 8850 3450
-Connection ~ 8250 3450
-Connection ~ 1250 1750
-Connection ~ 2600 3000
-Connection ~ 1300 4000
 Connection ~ 1150 3900
-Connection ~ 3500 3000
-Connection ~ 4950 1050
-Connection ~ 4550 1050
-Connection ~ 4950 1450
-Connection ~ 4750 1450
-Connection ~ 4550 1450
-Connection ~ 3500 5000
+Connection ~ 1200 7400
+Connection ~ 1200 8000
+Connection ~ 1250 1750
+Connection ~ 1300 4000
+Connection ~ 1700 7350
+Connection ~ 1700 7400
+Connection ~ 2550 7150
+Connection ~ 2600 3000
 Connection ~ 2600 5400
 Connection ~ 3000 6450
 Connection ~ 3000 7150
-Connection ~ 2900 7150
+Connection ~ 3500 3000
+Connection ~ 3500 5000
 Connection ~ 3750 6450
+Connection ~ 4550 1050
+Connection ~ 4550 1450
+Connection ~ 4750 1450
 Connection ~ 4800 7150
 Connection ~ 4800 7350
+Connection ~ 4950 1050
+Connection ~ 4950 1450
 Connection ~ 5150 9350
-Connection ~ 5350 8750
-Connection ~ 1200 8000
-Connection ~ 1700 7350
-Connection ~ 1200 7400
-Connection ~ 1700 7400
-Connection ~ 5350 8450
 Connection ~ 5350 8350
+Connection ~ 5350 8450
+Connection ~ 5350 8750
+Connection ~ 8250 3450
+Connection ~ 8250 6200
+Connection ~ 8250 6250
+Connection ~ 8850 3450
+Connection ~ 8850 6200
+Connection ~ 11500 1350
+Connection ~ 11700 1350
 Connection ~ 12150 2150
 Connection ~ 12250 2150
-NoConn ~ 9600 7450
-NoConn ~ 9600 4700
-NoConn ~ 3150 8750
-NoConn ~ 3150 8850
-NoConn ~ 3150 8350
-NoConn ~ 3150 8450
+Connection ~ 12500 4950
+Connection ~ 13100 1350
+Connection ~ 13350 1350
+Connection ~ 13900 1350
 NoConn ~ 3150 8550
+NoConn ~ 9600 7450
+NoConn ~ 3150 8350
+NoConn ~ 9600 4700
+NoConn ~ 3150 8450
+NoConn ~ 3150 8850
+NoConn ~ 3150 8750
 NoConn ~ 3150 8650
 Wire Wire Line
 	1100 7400 1100 7500
@@ -137,11 +142,17 @@ Wire Wire Line
 Wire Wire Line
 	2150 1750 2150 1850
 Wire Wire Line
+	2350 7150 2550 7150
+Wire Wire Line
 	2400 1050 2400 1450
 Wire Wire Line
 	2400 1850 2400 1750
 Wire Wire Line
-	2500 7150 2900 7150
+	2550 7150 2550 7350
+Wire Wire Line
+	2550 7150 3000 7150
+Wire Wire Line
+	2550 7350 2300 7350
 Wire Wire Line
 	2600 2900 2600 3000
 Wire Wire Line
@@ -159,12 +170,6 @@ Wire Wire Line
 Wire Wire Line
 	2800 5400 2600 5400
 Wire Wire Line
-	2900 7150 2900 7350
-Wire Wire Line
-	2900 7150 3000 7150
-Wire Wire Line
-	2900 7350 2300 7350
-Wire Wire Line
 	3000 6350 3000 6450
 Wire Wire Line
 	3000 6450 3000 6600
@@ -172,6 +177,10 @@ Wire Wire Line
 	3000 6800 3000 7150
 Wire Wire Line
 	3000 7150 3150 7150
+Wire Wire Line
+	3000 7350 3150 7350
+Wire Wire Line
+	3000 7450 3150 7450
 Wire Wire Line
 	3400 3600 3500 3600
 Wire Wire Line
@@ -367,9 +376,17 @@ Wire Wire Line
 Wire Wire Line
 	6000 950  6000 1050
 Wire Wire Line
+	6150 5550 6150 5650
+Wire Wire Line
+	6150 5650 6250 5650
+Wire Wire Line
 	6650 900  6650 1050
 Wire Wire Line
 	6650 1050 6850 1050
+Wire Wire Line
+	6650 5550 6650 5650
+Wire Wire Line
+	6650 5650 6550 5650
 Wire Wire Line
 	7150 1050 7350 1050
 Wire Wire Line
@@ -638,6 +655,8 @@ Text Notes 3950 750  0    50   ~ 0
 BATTERY POWERS WHEN USB NOT CONNECTED
 Text Notes 4500 6550 0    50   ~ 0
 TODO: \n-DOUBLE CHECK RX/TX dir\n-set BATT div to match battery\n- DOUBLE CHECK SPI CS
+Text Notes 5700 5350 0    50   ~ 0
+Possible Connection\nto save GPIO
 Text Notes 8000 5600 0    50   ~ 0
 NOTE: E22-900M22S MAX CURRENT 119mA\nVin 1.8-3.7V
 Text Notes 8050 8500 0    50   ~ 0
@@ -658,7 +677,7 @@ Text Label 1700 7350 0    50   ~ 0
 SW_RESET
 Text Label 1900 3650 2    50   ~ 0
 FT_3V3
-Text Label 2500 7150 2    50   ~ 0
+Text Label 2350 7150 2    50   ~ 0
 FT_RTS
 Text Label 2800 3000 0    50   ~ 0
 FT_3V3
@@ -689,25 +708,21 @@ SD_CMD
 Text Label 4450 8150 0    50   ~ 0
 LORA1_NSS
 Text Label 4450 8250 0    50   ~ 0
-LORA2_DIO2
+LORA2_DIO1
 Text Label 4450 8350 0    50   ~ 0
 VSPI_CLK
 Text Label 4450 8450 0    50   ~ 0
 VSPI_MISO
 Text Label 4450 8550 0    50   ~ 0
-LORA1_DIO2
+LORA2_RXEN
 Text Label 4450 8650 0    50   ~ 0
 LORA1_BUSY
 Text Label 4450 8750 0    50   ~ 0
 VSPI_MOSI
-Text Label 4450 8850 0    50   ~ 0
-LORA1_TXEN
 Text Label 4450 8950 0    50   ~ 0
-LORA2_RXEN
+LORA1_DIO1
 Text Label 4450 9050 0    50   ~ 0
 LORA1_RXEN
-Text Label 4450 9150 0    50   ~ 0
-LORA2_TXEN
 Text Label 4450 9250 0    50   ~ 0
 LORA2_NSS
 Text Label 4450 9450 0    50   ~ 0
@@ -742,14 +757,18 @@ Text Label 5500 8750 0    50   ~ 0
 LORA1_MOSI
 Text Label 5500 8850 0    50   ~ 0
 LORA2_MOSI
+Text Label 6150 5550 2    50   ~ 0
+LORA1_DIO1
 Text Label 6650 900  2    50   ~ 0
 VBUS
+Text Label 6650 5550 0    50   ~ 0
+LORA2_DIO1
 Text Label 7350 9400 0    50   ~ 0
 ESP_LED
 Text Label 7550 4150 2    50   ~ 0
 LORA1_RXEN
 Text Label 7550 4250 2    50   ~ 0
-LORA1_TXEN
+LORA1_DIO2
 Text Label 7550 4500 2    50   ~ 0
 LORA1_MOSI
 Text Label 7550 4600 2    50   ~ 0
@@ -759,7 +778,7 @@ LORA1_NSS
 Text Label 7700 6900 2    50   ~ 0
 LORA2_RXEN
 Text Label 7700 7000 2    50   ~ 0
-LORA2_TXEN
+LORA2_DIO2
 Text Label 7700 7250 2    50   ~ 0
 LORA2_MOSI
 Text Label 7700 7350 2    50   ~ 0
@@ -767,9 +786,9 @@ LORA2_SCK
 Text Label 7700 7450 2    50   ~ 0
 LORA2_NSS
 Text Label 8000 9400 0    50   ~ 0
-LORA1_DIO1
+LORA1_DIO2
 Text Label 8650 9400 0    50   ~ 0
-LORA2_DIO1
+LORA2_DIO2
 Text Label 10050 6900 0    50   ~ 0
 LORA2_DIO1
 Text Label 10050 7000 0    50   ~ 0
@@ -815,6 +834,28 @@ F 4 "NR3015T2R2M" V 12993 1350 50  0000 C CNN "MPN"
 	0    -1   -1   0   
 $EndComp
 $Comp
+L fitz_parts:TP_HOLE TP5
+U 1 1 00000000
+P 3000 7350
+F 0 "TP5" V 3000 7650 50  0000 C CNN
+F 1 "TP_HOLE" H 3000 7550 50  0001 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 3200 7350 50  0001 C CNN
+F 3 "~" H 3200 7350 50  0001 C CNN
+	1    3000 7350
+	0    -1   -1   0   
+$EndComp
+$Comp
+L fitz_parts:TP_HOLE TP6
+U 1 1 00000000
+P 3000 7450
+F 0 "TP6" V 3000 7750 50  0000 C CNN
+F 1 "TP_HOLE" H 3000 7650 50  0001 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 3200 7450 50  0001 C CNN
+F 3 "~" H 3200 7450 50  0001 C CNN
+	1    3000 7450
+	0    -1   -1   0   
+$EndComp
+$Comp
 L Connector:TestPoint TP1
 U 1 1 5DCF71F0
 P 3600 4700
@@ -856,6 +897,28 @@ F 1 "TestPoint" V 3645 5188 50  0001 L CNN
 F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 3800 5000 50  0001 C CNN
 F 3 "~" H 3800 5000 50  0001 C CNN
 	1    3600 5000
+	0    1    1    0   
+$EndComp
+$Comp
+L fitz_parts:TP_HOLE TP7
+U 1 1 00000000
+P 4450 8850
+F 0 "TP7" V 4400 9100 50  0000 C CNN
+F 1 "TP_HOLE" H 4450 9050 50  0001 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 4650 8850 50  0001 C CNN
+F 3 "~" H 4650 8850 50  0001 C CNN
+	1    4450 8850
+	0    1    1    0   
+$EndComp
+$Comp
+L fitz_parts:TP_HOLE TP8
+U 1 1 00000000
+P 4450 9150
+F 0 "TP8" V 4400 9400 50  0000 C CNN
+F 1 "TP_HOLE" H 4450 9350 50  0001 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 4650 9150 50  0001 C CNN
+F 3 "~" H 4650 9150 50  0001 C CNN
+	1    4450 9150
 	0    1    1    0   
 $EndComp
 $Comp
@@ -1849,6 +1912,17 @@ F 3 "~" H 5050 8750 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
+L Jumper:SolderJumper_2_Open JP42
+U 1 1 00000000
+P 6400 5650
+F 0 "JP42" V 6392 5392 50  0000 L CNN
+F 1 "SolderJumper_2_Open" V 6487 5695 50  0001 R CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm" H 6400 5650 50  0001 C CNN
+F 3 "~" H 6400 5650 50  0001 C CNN
+	1    6400 5650
+	1    0    0    -1  
+$EndComp
+$Comp
 L Jumper:SolderJumper_2_Bridged JP13
 U 1 1 5DD60A96
 P 7000 1050
@@ -2366,12 +2440,12 @@ F 3 "" H 2700 4200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L RF_Module:ESP32-WROOM-32D U2
-U 1 1 5DB8779E
+L RF_Module:ESP32-WROOM-32U U2
+U 1 1 00000000
 P 3750 8350
-F 0 "U2" H 3750 8750 50  0000 C CNN
-F 1 "ESP32-WROOM-32D" H 4250 6950 50  0000 C CNN
-F 2 "RF_Module:ESP32-WROOM-32" H 3750 6850 50  0001 C CNN
+F 0 "U2" H 3750 9926 50  0000 C CNN
+F 1 "ESP32-WROOM-32U" H 3750 9835 50  0000 C CNN
+F 2 "RF_Module:ESP32-WROOM-32U" H 3750 6850 50  0001 C CNN
 F 3 "https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32d_esp32-wroom-32u_datasheet_en.pdf" H 3450 8400 50  0001 C CNN
 	1    3750 8350
 	1    0    0    -1  
