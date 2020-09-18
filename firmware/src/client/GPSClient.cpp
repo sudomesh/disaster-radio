@@ -21,14 +21,14 @@ void GPSClient::loop()
 			datagram.type = 'm';
 			if (username.length() > 0)
 			{
-				len = snprintf((char *)datagram.message, 233, "m|<%s>{\"pos\":[%.3f,%.3f]}", username.c_str(), gps.location.lat(), gps.location.lng());
+				len = sprintf((char *)datagram.message, "<%s>{\"pos\":[%.3f,%.3f]}", username.c_str(), gps.location.lat(), gps.location.lng());
 			}
 			else
 			{
-				len = snprintf((char *)datagram.message, 233, "m|<%s>{\"pos\":[%.3f,%.3f]}", nodeAddress, gps.location.lat(), gps.location.lng());
+				len = sprintf((char *)datagram.message, "<%s>{\"pos\":[%.3f,%.3f]}", nodeAddress, gps.location.lat(), gps.location.lng());
 			}
             // Send datagram with lat-long info
-            server->transmit(this, datagram, len);
+            server->transmit(this, datagram, len+DATAGRAM_HEADER);
             // if debug is enabled, print coordinates to console
             datagram.type = 'i';
 			len = snprintf((char *)datagram.message, 233, "Sent GPS reading [%.3f,%.3f]\r\n", gps.location.lat(), gps.location.lng());
