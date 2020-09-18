@@ -76,7 +76,7 @@ module.exports = function(Component) {
             <div><u>Active Nodes | Hops | Metric </u></div>
             {routes}
           </div>
-          <input id="chatInput" type="text" name="msg" placeholder="Enter you name or alias" autofocus />
+          <input id="chatInput" type="text" name="msg" placeholder="Enter your name or alias" autofocus />
         </form>
       </div>
 	  }
