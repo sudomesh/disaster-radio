@@ -91,7 +91,7 @@ int clients = 0;
 int routes = 0;
 
 #define WIFI_POLL_DELAY 500
-#define WIFI_POLL_TRIES 10
+#define WIFI_POLL_TRIES 20
 
 char nodeAddress[ADDR_LENGTH*2 + 1] = {'\0'};
 char ssid[100] = {'\0'};
@@ -115,9 +115,9 @@ void setupWiFi()
 
 #ifdef WIFI_SSID
   Serial.printf(" --> Connecting to WiFi \"%s\"\n", WIFI_SSID);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   for (int i = 0; i < WIFI_POLL_TRIES && WiFi.status() != WL_CONNECTED; i++)
   {
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     delay(WIFI_POLL_DELAY);
   }
   if (WiFi.status() == WL_CONNECTED)
@@ -148,6 +148,14 @@ void setupWiFi()
     Serial.printf(" --> Started WiFi AP \"%s\", IP address: ", ssid);
     Serial.println(ip);
   }
+}
+
+void checkWiFi() {
+#ifdef WIFI_SSID
+  if (WiFi.status() != WL_CONNECTED) {
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  }
+#endif
 }
 
 void setupMDNS()
@@ -562,4 +570,10 @@ void loop()
       drawStatusBar();
     }
   }
+  // reconnect only in WiFi client mode 
+#ifdef WIFI_SSID
+  if (!useBLE) {
+    checkWiFi();
+  }
+#endif
 }
