@@ -1,4 +1,6 @@
-[disaster.radio](https://disaster.radio) is a work-in-progress long-range, low-bandwidth wireless disaster recovery mesh network powered by the sun.  
+[disaster.radio](https://disaster.radio) is currently not actively developed and [seeks a new maintainer](https://github.com/sudomesh/disaster-radio/issues/110)
+
+It is a work-in-progress long-range, low-bandwidth wireless disaster recovery mesh network powered by the sun. 
 
 [![Build Status](https://travis-ci.org/sudomesh/disaster-radio.svg?branch=master)](https://travis-ci.org/sudomesh/disaster-radio)  
 
