@@ -98,4 +98,24 @@
 #define LORA2_CS 25
 #endif
 
+#ifdef ESP32_V3
+#define LORA_IRQ 36
+#define LORA_CS 27
+#define LORA_IO1 11
+#define LORA_IO2 NOT_A_PIN
+#define LORA_RST 15
+#define LORA_SCK 30
+#define LORA_MOSI 37
+#define LORA_MISO 31
+#define LORA_RXEN 28
+
+#define DUAL_LORA
+
+#define LORA2_CS 9
+#define LORA2_IRQ 7
+#define LORA2_RST 15
+#define LORA2_IO1 12
+#define LORA2_IO2 NOT_A_PIN
+#define LORA2_RXEN 33
+
 #endif
