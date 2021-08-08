@@ -109,7 +109,7 @@
 #define LORA_MISO 31
 #define LORA_RXEN 28
 
-#define DUAL_LORA
+//comment all LORA2 lines and -DDUAL_LORA build flag to disable second module
 
 #define LORA2_CS 9
 #define LORA2_IRQ 7
@@ -117,5 +117,6 @@
 #define LORA2_IO1 12
 #define LORA2_IO2 NOT_A_PIN
 #define LORA2_RXEN 33
+#endif
 
 #endif
