@@ -13,7 +13,8 @@ web/node_modules
 makeEspArduino/
 lib/**
 firmware/lib/**
-
+hardware/board_esp32_v3/**
+firmware/platformio.ini
 .pio
 .vscode
 secrets.h
