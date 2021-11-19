@@ -75,6 +75,7 @@ BleUartClient ble_client;
 #ifdef ARDUINO_LORA
 Layer1Class *Layer1 = new Layer1Class();
 #endif
+
 #ifdef RL_SX1276
 SX1276 lora = new Module(LORA_CS, LORA_IRQ, LORA_RST, RADIOLIB_NC);
   #ifdef DUAL_LORA
@@ -365,7 +366,7 @@ void setupLoRa()
   Layer1_1->setTxPower(txPower);
   Layer1_1->setSpreadingFactor(spreadingFactor);
   #endif
-  #ifdef RL_SX1262
+  #if defined ( RL_SX1276 ) || defined ( RL_SX1262 )
   pinMode(LORA_CS, OUTPUT);
   digitalWrite(LORA_CS, LOW);
   #ifdef DUAL_LORA
