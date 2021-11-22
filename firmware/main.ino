@@ -1,5 +1,5 @@
 #include <Arduino.h>
-
+#define RL_SX1262
 // required for LoRa and/or AsyncSDServer libraries?
 #include <FS.h>
 #include <SPI.h>
@@ -15,16 +15,17 @@
 #include <SSD1306Wire.h>
 #endif
 #include "config.h"
-
+/*
 #ifdef ARDUINO_LORA
 #include <Layer1_LoRa.h>
 #endif
-
+*/
 #ifdef RL_SX1276
 #include <Layer1_SX1276.h>
 #endif
 #ifdef RL_SX1262
 #include <Layer1_SX126x.h>
+#undef ARDUINO_LORA
 #endif
 
 #include <LoRaLayer2.h>
@@ -71,11 +72,11 @@ AsyncWebServer http_server(80);
 AsyncWebSocket ws_server("/ws");
 
 BleUartClient ble_client;
-
+/*
 #ifdef ARDUINO_LORA
 Layer1Class *Layer1 = new Layer1Class();
 #endif
-
+*/
 #ifdef RL_SX1276
 SX1276 lora = new Module(LORA_CS, LORA_IRQ, LORA_RST, RADIOLIB_NC);
   #ifdef DUAL_LORA
@@ -359,6 +360,7 @@ void setupLoRa()
   #ifdef LOPY4
   SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI); //LORA_CS);
   #endif
+  /*
   #ifdef ARDUINO_LORA
   Layer1Class *Layer1_1 = new Layer1Class();
   Layer1_1->setPins(LORA_CS, LORA_RST, LORA_IRQ);
@@ -366,6 +368,7 @@ void setupLoRa()
   Layer1_1->setTxPower(txPower);
   Layer1_1->setSpreadingFactor(spreadingFactor);
   #endif
+  */
   #if defined ( RL_SX1276 ) || defined ( RL_SX1262 )
   pinMode(LORA_CS, OUTPUT);
   digitalWrite(LORA_CS, LOW);
