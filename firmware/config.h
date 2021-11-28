@@ -98,4 +98,26 @@
 #define LORA2_CS 25
 #endif
 
+#ifdef ESP32_V3
+
+#define LORA_IRQ 22
+#define LORA_CS 16
+#define LORA_IO1 26
+#define LORA_IO2 NOT_A_PIN
+#define LORA_RST NOT_A_PIN
+#define LORA_SCK 18
+#define LORA_MOSI 23
+#define LORA_MISO 19
+#define LORA_RXEN 17
+
+//comment all LORA2 lines and -DDUAL_LORA build flag to disable second module
+
+#define LORA2_CS 33
+#define LORA2_IRQ 35
+#define LORA2_RST NOT_A_PIN
+#define LORA2_IO1 27
+#define LORA2_IO2 NOT_A_PIN
+#define LORA2_RXEN 21
+#endif
+
 #endif

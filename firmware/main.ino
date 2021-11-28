@@ -23,6 +23,9 @@
 #ifdef RL_SX1276
 #include <Layer1_SX1276.h>
 #endif
+#ifdef RL_SX1262
+#include <Layer1_SX126x.h>
+#endif
 
 #include <LoRaLayer2.h>
 
@@ -72,10 +75,18 @@ BleUartClient ble_client;
 #ifdef ARDUINO_LORA
 Layer1Class *Layer1 = new Layer1Class();
 #endif
+
 #ifdef RL_SX1276
 SX1276 lora = new Module(LORA_CS, LORA_IRQ, LORA_RST, RADIOLIB_NC);
   #ifdef DUAL_LORA
   SX1276 lora2 = new Module(LORA2_CS, LORA2_IRQ, LORA2_RST, RADIOLIB_NC);
+  #endif
+#endif
+
+#ifdef RL_SX1262
+SX1262 lora = new Module(LORA_CS, LORA_IRQ, LORA_RST, RADIOLIB_NC);
+  #ifdef DUAL_LORA
+  SX1262 lora2 = new Module(LORA2_CS, LORA2_IRQ, LORA2_RST, RADIOLIB_NC);
   #endif
 #endif
 
@@ -348,14 +359,16 @@ void setupLoRa()
   #ifdef LOPY4
   SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI); //LORA_CS);
   #endif
-  #ifdef ARDUINO_LORA
+  
+  #if defined (ARDUINO_LORA)
   Layer1Class *Layer1_1 = new Layer1Class();
   Layer1_1->setPins(LORA_CS, LORA_RST, LORA_IRQ);
   Layer1_1->setLoRaFrequency(loraFrq*1E6);
   Layer1_1->setTxPower(txPower);
   Layer1_1->setSpreadingFactor(spreadingFactor);
   #endif
-  #ifdef RL_SX1276
+  
+  #if defined ( RL_SX1276 ) || defined ( RL_SX1262 )
   pinMode(LORA_CS, OUTPUT);
   digitalWrite(LORA_CS, LOW);
   #ifdef DUAL_LORA
@@ -366,7 +379,7 @@ void setupLoRa()
   #ifdef DUAL_LORA
   digitalWrite(LORA_CS, HIGH);
   digitalWrite(LORA2_CS, LOW);
-  Layer1Class *Layer1_2 = new Layer1Class(&lora2, 0, LORA2_CS, LORA2_RST, LORA2_IRQ, 7, 433, 17);
+  Layer1Class *Layer1_2 = new Layer1Class(&lora2, 0, LORA2_CS, LORA2_RST, LORA2_IRQ, 7, 915, 17);
   digitalWrite(LORA_CS, LOW);
   digitalWrite(LORA2_CS, HIGH);
   #endif
