@@ -40,7 +40,7 @@ npm run dev # starts simulator server and auto-builder
 
 # Websocket
 
-The disaster.radio firmware opens up a websocket using [the ESPAsyncWebServer library](https://github.com/me-no-dev/ESPAsyncWebServer). Through this, client-side javascript can transmit and receive messages over the LoRa tranceiver. If you'd like to build an application for disaster.radio, you could write a websocket client that sends and receives messages in the same format. Currently, the firmware expects websocket messages in the following format,   
+The disaster.radio firmware opens up a websocket using [the ESPAsyncWebServer library](https://github.com/me-no-dev/ESPAsyncWebServer). Through this, client-side javascript can transmit and receive messages over the LoRa tranceiver. If you'd like to build an application for disaster.radio, you could write a websocket client that sends and receives messages in the same format. Currently, the firmware expects websocket messages in the following format:   
 `<msgID><msgType>|<msg>`  
 where,
 * `<msgID>` is a two-byte binary unsigned integer representing an abitrary sequence number, this is sent back to the websocket client with an `!` appended to act as an acknowledgment and could be used for error-checking,  
@@ -50,7 +50,7 @@ where,
 An example messge may appear as follows,
 `0100c|<noffle>@juul did you feel that earthquake!`
 
-Alternatively, you could write another Layer3 client for as part of the disater radio firmware and create you own Layer 4 message format. See more about our networkng stack on our wiki, https://github.com/sudomesh/disaster-radio/wiki/Layered-Model.
+Alternatively, you could write another Layer3 client for as part of the disater radio firmware and create your own Layer 4 message format. See more about our networkng stack on our wiki, https://github.com/sudomesh/disaster-radio/wiki/Layered-Model.
 
 # Uploading to dev board 
 
